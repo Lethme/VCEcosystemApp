@@ -1,5 +1,5 @@
 {
-  "name": "vc-ecosystem-app",
+  "name": "VCEcosystem",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "ant-design-vue": "^3.2.15",
+    "axios": "^1.2.0",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
