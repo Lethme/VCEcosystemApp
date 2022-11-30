@@ -4,7 +4,39 @@
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>
+  <loader-view />
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import LoaderView from "@/components/LoaderComponent/LoaderComponent.vue";
+import {Vue} from "vue-class-component";
+
+export default defineComponent({
+  components: { LoaderView },
+  computed: {
+    loading() {
+      return this.$store.getters.loading;
+    }
+  },
+  created() {
+    window.addEventListener("resize", async () => {
+      await this.$store.dispatch("updateWindowSize");
+    });
+
+    // (Vue.prototype as any).$loader = () => ({
+    //   get: () => {
+    //     return this.$store.getters.loading;
+    //   },
+    //   set: (state: boolean) => {
+    //     this.$store.dispatch("setLoading", state);
+    //   }
+    // });
+
+    (Vue.prototype as any).$test = 123;
+  }
+});
+</script>
 
 <style lang="less">
 #app {
