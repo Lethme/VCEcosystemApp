@@ -10,7 +10,8 @@ import { Options, Vue } from 'vue-class-component';
 import HelloWorld from '@/components/HelloWorld.vue';
 import { Loader } from "@/utils";
 import axios from "axios";
-import {ApiService} from "@/api/services";
+import {ApiService, AuthService, UsersService} from "@/api/services";
+import {User} from "@/api/services/types";
 
 @Options({
   components: {
@@ -18,15 +19,21 @@ import {ApiService} from "@/api/services";
   },
 })
 export default class HomeView extends Vue {
-  created() {
-    Loader.Use(async () => {
+  async created() {
+    const response = await Loader.Use(async () => {
       //return new Promise(r => setTimeout(r, 3000));
-      return await axios.get(ApiService.CreateApiRequestUrl({
-        path: ["gkassa", "services"]
-      }).Url);
-    }).then(response => {
-      console.log(response);
+      // return await AuthService.Authorize({
+      //   username: "root",
+      //   password: "root",
+      // });
+
+      return await UsersService.WhoAmI();
     });
+
+    if (response.status) {
+      const user = response.data as User;
+      console.log(user);
+    }
   }
 }
 </script>

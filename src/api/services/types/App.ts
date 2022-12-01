@@ -1,5 +1,6 @@
 enum App {
-    GKassa = "gkassa"
+    GKassa = "gkassa",
+    GSchedule = "gschedule",
 }
 
 export default App;
