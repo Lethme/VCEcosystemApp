@@ -10,6 +10,7 @@ import {
 import { Url } from "@/api/services";
 import {AxiosError} from "axios";
 import {ApiResponse} from "@/api/services/types";
+import {Message} from "@/api/services/types/Message";
 
 class ApiService {
   protected static get ApiHost(): RequestHost {
@@ -42,8 +43,8 @@ class ApiService {
   }
 
   protected static async Try<T>(
-    callback: () => (ApiResponse<T | string>) | Promise<ApiResponse<T | string>>
-  ): Promise<ApiResponse<T | string>> {
+    callback: () => (ApiResponse<T | Message>) | Promise<ApiResponse<T | Message>>
+  ): Promise<ApiResponse<T | Message>> {
     try {
       return await callback();
     } catch (ex) {

@@ -11,6 +11,7 @@
 import { defineComponent } from "vue";
 import LoaderView from "@/components/LoaderComponent/LoaderComponent.vue";
 import {Vue} from "vue-class-component";
+import {Loader} from "@/utils";
 
 export default defineComponent({
   components: { LoaderView },
@@ -24,16 +25,9 @@ export default defineComponent({
       await this.$store.dispatch("updateWindowSize");
     });
 
-    // (Vue.prototype as any).$loader = () => ({
-    //   get: () => {
-    //     return this.$store.getters.loading;
-    //   },
-    //   set: (state: boolean) => {
-    //     this.$store.dispatch("setLoading", state);
-    //   }
-    // });
-
-    (Vue.prototype as any).$test = 123;
+    Loader.Use(async () => {
+      await this.$store.dispatch("updateUserData");
+    });
   }
 });
 </script>

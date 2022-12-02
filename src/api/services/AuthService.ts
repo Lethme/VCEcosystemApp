@@ -2,13 +2,14 @@ import ApiService from "@/api/services/ApiService";
 import {ApiResponse, Auth} from "@/api/services/types";
 import {Token} from "@/api/services/types/Token";
 import axios from "axios";
+import {Message} from "@/api/services/types/Message";
 
 class AuthService extends ApiService {
     private static get Path(): string {
         return "auth";
     }
 
-    static async Authorize(authData: Auth): Promise<ApiResponse<Token | string> > {
+    static async Authorize(authData: Auth): Promise<ApiResponse<Token | Message> > {
         const url = this.CreateApiRequestUrl({
             path: [this.Path, "login"],
         });
