@@ -1,7 +1,8 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/about">About</router-link> |
+    <router-link to="/login">Login</router-link>
   </nav>
   <router-view/>
   <loader-view />
@@ -15,18 +16,14 @@ import {Loader} from "@/utils";
 
 export default defineComponent({
   components: { LoaderView },
-  computed: {
-    loading() {
-      return this.$store.getters.loading;
-    }
-  },
+  computed: {},
   created() {
     window.addEventListener("resize", async () => {
       await this.$store.dispatch("updateWindowSize");
     });
 
     Loader.Use(async () => {
-      await this.$store.dispatch("updateUserData");
+      await this.$store.dispatch("updateUserInfo");
     });
   }
 });
