@@ -1,6 +1,6 @@
 import store from "@/store";
 
-export class Loader {
+class Loader {
     static get State(): boolean {
         return store.getters.loading;
     }
@@ -25,3 +25,5 @@ export class Loader {
         return response;
     }
 }
+
+export default Loader;

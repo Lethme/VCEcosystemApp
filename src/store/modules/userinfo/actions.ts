@@ -21,7 +21,11 @@ const actions = {
       } else {
         context.commit("setUserInfo", (response as ApiResponse<User>).data);
       }
+
+      return response;
     }
+
+    return undefined;
   }
 };
 

@@ -11,8 +11,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoaderView from "@/components/LoaderComponent/LoaderComponent.vue";
-import {Vue} from "vue-class-component";
 import {Loader} from "@/utils";
+import {RouteAccess} from "@/router/types";
 
 export default defineComponent({
   components: { LoaderView },
@@ -23,13 +23,28 @@ export default defineComponent({
     });
 
     Loader.Use(async () => {
-      await this.$store.dispatch("updateUserInfo");
+      const response = await this.$store.dispatch("updateUserInfo");
+
+      if (response && !response.status) {
+        this.$router.push({
+          name: "login",
+          state: {
+            exception: "Your session has expired",
+          },
+        });
+      }
+
+      if (response && response.status && this.$route.meta.access === RouteAccess.PrivateWhileAuthorized && this.$authorized) {
+        this.$router.push("/");
+      }
     });
   }
 });
 </script>
 
 <style lang="less">
+@import "./global";
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

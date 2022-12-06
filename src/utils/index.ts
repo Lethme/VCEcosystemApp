@@ -1,3 +1,4 @@
-import { Loader } from "./loader";
+import Loader from "./loader";
+import { isAuthorized } from "./isAuthorized";
 
-export { Loader };
+export { Loader, isAuthorized };

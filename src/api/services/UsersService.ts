@@ -17,7 +17,7 @@ class UsersService extends ApiService {
         return await this.Try<User>(async () => {
             const response = await axios.get<ApiResponse<User>>(url.Url, {
                 headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("api_token") || ""}`
+                    "Authorization": `Bearer ${this.ApiToken || ""}`
                 }
             });
 

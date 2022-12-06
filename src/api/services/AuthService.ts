@@ -19,7 +19,7 @@ class AuthService extends ApiService {
             const token = response.data.data?.token;
 
             if (token) {
-                localStorage.setItem("api_token", token);
+                this.ApiToken = token;
             }
 
             return response.data;

@@ -13,6 +13,16 @@ import {ApiResponse} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 
 class ApiService {
+  public static get ApiToken(): string | null {
+    return localStorage.getItem("api_token");
+  }
+
+  protected static set ApiToken(token: string | null) {
+    token
+        ? localStorage.setItem("api_token", token)
+        : localStorage.removeItem("api_token");
+  }
+
   protected static get ApiHost(): RequestHost {
     return process.env.VUE_APP_API_HOST || "localhost";
   }
