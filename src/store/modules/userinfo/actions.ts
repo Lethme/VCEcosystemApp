@@ -1,9 +1,10 @@
 import {ActionContext} from "vuex";
 import {State} from "./state";
-import {UsersService} from "@/api/services";
+import {ApiService, UsersService} from "@/api/services";
 import {ApiResponse, User} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 import {HttpStatusCode} from "axios";
+import {isAuthorized} from "@/utils";
 
 const actions = {
   async updateUserInfo(context: ActionContext<State, any>) {
@@ -26,6 +27,12 @@ const actions = {
     }
 
     return undefined;
+  },
+  async logout(context: ActionContext<State, any>) {
+    if (isAuthorized()) {
+      context.commit("setUserInfo", undefined);
+      localStorage.removeItem("api_token");
+    }
   }
 };
 

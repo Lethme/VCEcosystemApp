@@ -105,7 +105,7 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
-  @import '@/var.less';
+  @import "@/var.less";
 
   .container {
     //height: 100vh;

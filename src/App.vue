@@ -1,10 +1,12 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/login">Login</router-link>
-  </nav>
+<!--  <nav>-->
+<!--    <router-link to="/">Home</router-link> |-->
+<!--    <router-link to="/about">About</router-link> |-->
+<!--    <router-link to="/login">Login</router-link>-->
+<!--  </nav>-->
+  <vc-navbar />
   <router-view/>
+  <vc-footer />
   <loader-view />
 </template>
 
@@ -13,11 +15,21 @@ import { defineComponent } from "vue";
 import LoaderView from "@/components/LoaderComponent/LoaderComponent.vue";
 import {Loader} from "@/utils";
 import {RouteAccess} from "@/router/types";
+import VcFooter from "@/components/FooterComponent/FooterComponent.vue";
+import VcNavbar from "@/components/NavbarComponent/NavbarComponent.vue";
 
 export default defineComponent({
-  components: { LoaderView },
-  computed: {},
+  components: {VcNavbar, VcFooter, LoaderView },
+  data() {
+    return {
+      dateIntervalHandler: 0,
+    };
+  },
   created() {
+    this.dateIntervalHandler = setInterval(async () => {
+      await this.$store.dispatch("updateDate");
+    }, 1000);
+
     window.addEventListener("resize", async () => {
       await this.$store.dispatch("updateWindowSize");
     });
@@ -38,7 +50,10 @@ export default defineComponent({
         this.$router.push("/");
       }
     });
-  }
+  },
+  unmounted() {
+    clearInterval(this.dateIntervalHandler);
+  },
 });
 </script>
 
