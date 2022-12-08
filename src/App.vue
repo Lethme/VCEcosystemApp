@@ -5,7 +5,7 @@
 <!--    <router-link to="/login">Login</router-link>-->
 <!--  </nav>-->
   <vc-navbar />
-  <router-view/>
+  <router-view class="view" />
   <vc-footer />
   <loader-view />
 </template>

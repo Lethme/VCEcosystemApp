@@ -3,7 +3,7 @@ import {App} from "vue";
 import {Loader} from "@/utils";
 
 class UserPlugin {
-    install(app: App) {
+    static install(app: App) {
         Object.defineProperty(app.config.globalProperties, "$user", {
             get() {
                 return {

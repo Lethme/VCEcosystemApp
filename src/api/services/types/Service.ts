@@ -1,6 +1,6 @@
 import Timestamp from "./Timestamp";
 
-interface Service extends Timestamp{
+interface Service extends Timestamp {
     id: number;
     title: string;
     price: number;

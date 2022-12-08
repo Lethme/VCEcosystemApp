@@ -6,6 +6,7 @@ import antd from "ant-design-vue";
 import AuthorizedPlugin from "@/plugins/authorized";
 import UserPlugin from "@/plugins/user";
 import DatePlugin from "@/plugins/date";
+import WindowSizePlugin from "@/plugins/windowSize";
 
 import 'ant-design-vue/dist/antd.css';
 
@@ -13,7 +14,8 @@ createApp(App)
     .use(store)
     .use(router)
     .use(antd)
-    .use(new DatePlugin())
-    .use(new AuthorizedPlugin())
-    .use(new UserPlugin())
+    .use(DatePlugin)
+    .use(AuthorizedPlugin)
+    .use(UserPlugin)
+    .use(WindowSizePlugin)
     .mount('#app');

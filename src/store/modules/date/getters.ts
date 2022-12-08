@@ -6,7 +6,7 @@ const getters = {
     return state.date;
   },
   formattedDate(state: State): string {
-    return moment(state.date).format("DD-MM-YYYY | HH:mm:ss");
+    return moment(state.date).format("DD.MM.YYYY | HH:mm:ss");
   },
 };
 

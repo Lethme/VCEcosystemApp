@@ -2,7 +2,7 @@ import {App} from "vue";
 import store from "@/store";
 
 class DatePlugin {
-    install(app: App) {
+    static install(app: App) {
         Object.defineProperty(app.config.globalProperties, "$date", {
             get() { return store.getters.date; }
         });

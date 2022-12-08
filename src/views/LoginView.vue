@@ -1,55 +1,57 @@
 <template>
-  <div class="container d-flex flex-column justify-content-center align-items-center">
-    <div class="form-wrapper d-flex flex-column col-12 col-lg-8">
-      <a-form
-          class="login-form"
-          :model="formState"
-          name="basic"
-          autocomplete="off"
-          @finish="onFinish"
-          @finishFailed="onFinishFailed"
-      >
-        <a-form-item
-            class="d-flex justify-content-center"
+  <a-layout>
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+      <div class="form-wrapper d-flex flex-column col-12 col-lg-8">
+        <a-form
+            class="login-form"
+            :model="formState"
+            name="basic"
+            autocomplete="off"
+            @finish="onFinish"
+            @finishFailed="onFinishFailed"
         >
-          <div class="logo-wrapper py-4 col-12 d-flex justify-content-center">
-            <img class="logo-img col-12 col-sm-5" src="/vc_logo.png" alt="">
-          </div>
-        </a-form-item>
+          <a-form-item
+              class="d-flex justify-content-center"
+          >
+            <div class="logo-wrapper py-4 col-12 d-flex justify-content-center">
+              <img class="logo-img col-12 col-sm-5" src="/vc_logo.png" alt="">
+            </div>
+          </a-form-item>
 
-        <a-form-item
-            label="Username"
-            name="username"
-            :rules="[{ required: true, message: 'Please input your username' }]"
-        >
-          <a-input v-model:value="formState.username" />
-        </a-form-item>
+          <a-form-item
+              label="Username"
+              name="username"
+              :rules="[{ required: true, message: 'Please input your username' }]"
+          >
+            <a-input v-model:value="formState.username" />
+          </a-form-item>
 
-        <a-form-item
-            label="Password"
-            name="password"
-            :rules="[{ required: true, message: 'Please input your password!' }]"
-        >
-          <a-input-password v-model:value="formState.password" />
-        </a-form-item>
+          <a-form-item
+              label="Password"
+              name="password"
+              :rules="[{ required: true, message: 'Please input your password!' }]"
+          >
+            <a-input-password v-model:value="formState.password" />
+          </a-form-item>
 
-        <a-form-item name="remember">
-          <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
-        </a-form-item>
+          <a-form-item name="remember">
+            <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
+          </a-form-item>
 
-        <a-form-item>
-          <a-button type="primary" html-type="submit" class="submit-btn col-12 col-sm-auto px-4">Login</a-button>
-        </a-form-item>
+          <a-form-item>
+            <a-button type="primary" html-type="submit" class="submit-btn col-12 col-sm-auto px-4">Login</a-button>
+          </a-form-item>
 
-        <a-alert
-            v-if="formState.exception"
-            :message="formState.exception"
-            type="error"
-            closable
-        />
-      </a-form>
+          <a-alert
+              v-if="formState.exception"
+              :message="formState.exception"
+              type="error"
+              closable
+          />
+        </a-form>
+      </div>
     </div>
-  </div>
+  </a-layout>
 </template>
 
 <script lang="ts">
@@ -116,6 +118,7 @@ export default defineComponent({
       //border: 1px solid rgba(34, 60, 80, 0.2);
       border-radius: 2em;
       padding: 2em 5em;
+      background: #fff;
 
       @media (max-width: 576px) {
         padding: 1em 3em;
