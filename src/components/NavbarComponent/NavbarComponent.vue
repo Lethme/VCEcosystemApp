@@ -41,6 +41,9 @@
 <!--              Navigation Four - Link-->
 <!--            </a>-->
 <!--          </a-menu-item>-->
+          <a-menu-item v-if="$authorized" key="createOrder">
+            <router-link to="/">Create Order</router-link>
+          </a-menu-item>
           <a-menu-item v-if="!$authorized" key="userProfile" style="margin-left: auto">
             <router-link to="/login">Log In</router-link>
           </a-menu-item>
