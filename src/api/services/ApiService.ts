@@ -8,28 +8,41 @@ import {
 } from "@/api/services/utils/types";
 
 import { Url } from "@/api/services";
+import {AxiosError} from "axios";
+import {ApiResponse} from "@/api/services/types";
+import {Message} from "@/api/services/types/Message";
 
 class ApiService {
-  static get ApiHost(): RequestHost {
+  public static get ApiToken(): string | null {
+    return localStorage.getItem("api_token");
+  }
+
+  protected static set ApiToken(token: string | null) {
+    token
+        ? localStorage.setItem("api_token", token)
+        : localStorage.removeItem("api_token");
+  }
+
+  protected static get ApiHost(): RequestHost {
     return process.env.VUE_APP_API_HOST || "localhost";
   }
-  static get ApiProtocol(): RequestProtocol {
+  protected static get ApiProtocol(): RequestProtocol {
     return (process.env.VUE_APP_API_PROTOCOL as RequestProtocol) || "";
   }
-  static get ApiPort(): RequestPort | undefined {
+  protected static get ApiPort(): RequestPort | undefined {
     return +process.env.VUE_APP_API_PORT! || undefined;
   }
-  static get ApiPrefix(): RequestPrefix {
+  protected static get ApiPrefix(): RequestPrefix {
     return process.env.VUE_APP_API_PREFIX || "";
   }
-  static CreateRequestUrl<T = never>(
+  protected static CreateRequestUrl<T = never>(
     host: RequestHost,
     options?: RequestOptions<T>
   ): Url<T> {
     return Url.Create<T>(host, options);
   }
 
-  static CreateApiRequestUrl<T = never>(options?: ApiRequestOptions<T>) {
+  protected static CreateApiRequestUrl<T = never>(options?: ApiRequestOptions<T>) {
     return Url.Create<T>(this.ApiHost, {
       protocol: this.ApiProtocol,
       port: this.ApiPort,
@@ -39,14 +52,14 @@ class ApiService {
     });
   }
 
-  static async Try<T>(
-    callback: () => (T | undefined) | Promise<T | undefined>
-  ): Promise<T | undefined> {
+  protected static async Try<T>(
+    callback: () => (ApiResponse<T | Message>) | Promise<ApiResponse<T | Message>>
+  ): Promise<ApiResponse<T | Message>> {
     try {
       return await callback();
     } catch (ex) {
       console.log(ex);
-      return undefined;
+      return (ex as any).response.data;
     }
   }
 }

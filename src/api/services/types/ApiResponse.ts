@@ -1,7 +1,9 @@
-interface ApiResponse<TData = any, TMeta = any, TLinks = any> {
+import {HttpStatusCode} from "axios";
+
+interface ApiResponse<TData = any> {
+  status: boolean;
+  statusCode: HttpStatusCode;
   data?: TData;
-  meta?: TMeta;
-  links?: TLinks;
 }
 
 export default ApiResponse;

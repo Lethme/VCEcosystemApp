@@ -1,44 +1,65 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+<!--  <nav>-->
+<!--    <router-link to="/">Home</router-link> |-->
+<!--    <router-link to="/about">About</router-link> |-->
+<!--    <router-link to="/login">Login</router-link>-->
+<!--  </nav>-->
+  <vc-navbar />
+  <router-view class="view" />
+  <vc-footer />
   <loader-view />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoaderView from "@/components/LoaderComponent/LoaderComponent.vue";
-import {Vue} from "vue-class-component";
+import {Loader} from "@/utils";
+import {RouteAccess} from "@/router/types";
+import VcFooter from "@/components/FooterComponent/FooterComponent.vue";
+import VcNavbar from "@/components/NavbarComponent/NavbarComponent.vue";
 
 export default defineComponent({
-  components: { LoaderView },
-  computed: {
-    loading() {
-      return this.$store.getters.loading;
-    }
+  components: {VcNavbar, VcFooter, LoaderView },
+  data() {
+    return {
+      dateIntervalHandler: 0,
+    };
   },
   created() {
+    this.dateIntervalHandler = setInterval(async () => {
+      await this.$store.dispatch("updateDate");
+    }, 1000);
+
     window.addEventListener("resize", async () => {
       await this.$store.dispatch("updateWindowSize");
     });
 
-    // (Vue.prototype as any).$loader = () => ({
-    //   get: () => {
-    //     return this.$store.getters.loading;
-    //   },
-    //   set: (state: boolean) => {
-    //     this.$store.dispatch("setLoading", state);
-    //   }
-    // });
+    Loader.Use(async () => {
+      const response = await this.$store.dispatch("updateUserInfo");
 
-    (Vue.prototype as any).$test = 123;
-  }
+      if (response && !response.status) {
+        this.$router.push({
+          name: "login",
+          state: {
+            exception: "Your session has expired",
+          },
+        });
+      }
+
+      if (response && response.status && this.$route.meta.access === RouteAccess.PrivateWhileAuthorized && this.$authorized) {
+        this.$router.push("/");
+      }
+    });
+  },
+  unmounted() {
+    clearInterval(this.dateIntervalHandler);
+  },
 });
 </script>
 
 <style lang="less">
+@import "./global";
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

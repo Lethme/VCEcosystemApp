@@ -2,8 +2,8 @@ import {Action, ActionContext} from "vuex";
 import { State } from "./state";
 
 const actions = {
-  async setLoading(context: ActionContext<State, any>, payload: boolean) {
-    context.commit("setLoadingState", payload);
+  async updateDate(context: ActionContext<State, any>) {
+    context.commit("setDate", new Date());
   },
 };
 
