@@ -1,11 +1,11 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4">
     <div class="container py-sm-4">
-      <a-layout-header class="h-auto py-4">
-        <div class="container d-flex flex-column justify-content-center align-items-center py-4">
+      <a-layout-header class="h-auto py-sm-4">
+        <div class="container d-flex flex-column justify-content-center align-items-center pt-4 py-sm-4">
           <div class="img-wrapper col-12 col-sm-8 col-md-6 col-lg-4">
             <img class="img" src="/vc_logo_full.png" alt="">
-            <p class="date" v-html="$formattedDate" />
+            <p class="date m-0" v-html="$formattedDate" />
           </div>
         </div>
       </a-layout-header>
@@ -15,7 +15,7 @@
 <!--        </a-layout-sider>-->
         <a-layout-content class="px-4">
           <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between">
-            <h4 class="text-start d-flex align-items-center gap-3">
+            <h4 class="text-start d-flex align-items-center gap-3 pb-2">
               <span>Current Price List</span>
               <sync-outlined class="refresh-btn" @click="refreshServices" />
             </h4>
@@ -71,15 +71,15 @@ import {Service} from "@/api/services/types";
           key: "title"
         },
         {
-          title: "Price ₽",
+          title: "Price (₽/unit)",
           dataIndex: "price",
           key: "price"
         },
-        {
-          title: "Description",
-          dataIndex: "description",
-          key: "description"
-        },
+        // {
+        //   title: "Description",
+        //   dataIndex: "description",
+        //   key: "description"
+        // },
       ]
     };
   },
@@ -92,7 +92,7 @@ import {Service} from "@/api/services/types";
       return this.$services;
     }
   },
-  created() {
+  mounted() {
     this.$store.dispatch("updateServices");
   }
 })
@@ -109,9 +109,13 @@ export default class HomeView extends Vue {}
 }
 
 .date {
-  font-size: 1.7em;
+  font-size: 1.8em;
   font-weight: 700;
   color: @mainColor;
+
+  @media (max-width: 576px) {
+    font-size: 1.5em;
+  }
 }
 
 .refresh-btn {

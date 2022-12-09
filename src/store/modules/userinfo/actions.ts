@@ -33,7 +33,7 @@ const actions = {
     if (isAuthorized()) {
       context.commit("setUserInfo", undefined);
       localStorage.removeItem("api_token");
-      await router.push("/");
+      await router.push("/login");
     }
   }
 };
