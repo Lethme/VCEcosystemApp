@@ -8,6 +8,10 @@ import Rate from "./Rate";
 import Role from "./Role";
 import User from "./User";
 import Preference from "./Preference";
+import {Message} from "@/api/services/types/Message";
+import {Token} from "@/api/services/types/Token";
+import {Order} from "@/api/services/types/Order";
+import {OrderService} from "@/api/services/types/OrderService";
 
 export type {
     Service,
@@ -19,6 +23,10 @@ export type {
     Role,
     User,
     Preference,
+    Message,
+    Token,
+    OrderService,
+    Order,
 };
 
 export { App };

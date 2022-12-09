@@ -14,7 +14,24 @@
 <!--          <p class="date text-start" v-html="$formattedDate" />-->
 <!--        </a-layout-sider>-->
         <a-layout-content class="px-4">
-          <h4 class="text-start">Current Price List</h4>
+          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between">
+            <h4 class="text-start d-flex align-items-center gap-3">
+              <span>Current Price List</span>
+              <sync-outlined class="refresh-btn" @click="refreshServices" />
+            </h4>
+            <div class="input-field col-12 col-md-6 col-lg-5">
+              <a-input v-model:value="searchText">
+                <template #prefix>
+                  <search-outlined />
+                </template>
+                <template #suffix>
+                  <a-tooltip title="Filter by substring included in service title (case insensitive)">
+                    <info-circle-outlined style="color: rgba(0, 0, 0, 0.45)" />
+                  </a-tooltip>
+                </template>
+              </a-input>
+            </div>
+          </div>
           <a-table
               v-if="$windowWidth <= 576"
               :scroll="{ y: 245 }"
@@ -35,19 +52,18 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import HelloWorld from '@/components/HelloWorld.vue';
-import moment from 'moment';
+import { SyncOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 import {Service} from "@/api/services/types";
-import {Loader} from "@/utils";
-import ServicesService from "@/api/services/ServicesService";
 
 @Options({
   components: {
-    HelloWorld,
+    SyncOutlined,
+    SearchOutlined,
+    InfoCircleOutlined
   },
   data() {
     return {
-      services: new Array<Service>(),
+      searchText: "",
       columns: [
         {
           title: "Title",
@@ -67,15 +83,17 @@ import ServicesService from "@/api/services/ServicesService";
       ]
     };
   },
-  created() {
-    Loader.Use(async () => {
-      const response = await ServicesService.GetAll();
-      if (response.status) {
-        this.services = response.data;
-      } else {
-        this.services = null;
+  computed: {
+    services() {
+      if (this.searchText) {
+        return this.$services.filter((s: Service) => s.title.toLocaleLowerCase().includes(this.searchText.toLocaleLowerCase()));
       }
-    });
+
+      return this.$services;
+    }
+  },
+  created() {
+    this.$store.dispatch("updateServices");
   }
 })
 export default class HomeView extends Vue {}
@@ -94,5 +112,9 @@ export default class HomeView extends Vue {}
   font-size: 1.7em;
   font-weight: 700;
   color: @mainColor;
+}
+
+.refresh-btn {
+  cursor: pointer;
 }
 </style>

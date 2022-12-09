@@ -41,16 +41,31 @@
 <!--              Navigation Four - Link-->
 <!--            </a>-->
 <!--          </a-menu-item>-->
-          <a-menu-item v-if="$authorized" key="createOrder">
-            <router-link to="/">Create Order</router-link>
-          </a-menu-item>
-          <a-menu-item v-if="!$authorized" key="userProfile" style="margin-left: auto">
+<!--          <a-menu-item v-if="$authorized" key="createOrder">-->
+<!--            <router-link to="/">Create Order</router-link>-->
+<!--          </a-menu-item>-->
+          <a-menu-item v-if="!$authorized" class="d-flex align-items-center" key="userProfile" style="margin-left: auto">
+            <template #icon>
+              <login-outlined />
+            </template>
             <router-link to="/login">Log In</router-link>
           </a-menu-item>
           <a-sub-menu v-else key="userProfile1" style="margin-left: auto">
-            <template #title>{{ username }}</template>
-            <a-menu-item key="setting:1" class="log-out" @click="$user.logout">
-              <a-divider class="m-0" />
+            <template #title>
+              <user-outlined />
+              {{ username }}
+            </template>
+            <a-menu-item key="setting:1" class="d-flex align-items-center">
+              <template #icon>
+                <solution-outlined />
+              </template>
+              <router-link to="/orders">Orders</router-link>
+            </a-menu-item>
+            <a-divider class="m-0" />
+            <a-menu-item key="setting:0" class="log-out d-flex align-items-center" @click="$user.logout">
+              <template #icon>
+                <logout-outlined />
+              </template>
               Log Out
             </a-menu-item>
           </a-sub-menu>
@@ -62,12 +77,18 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons-vue';
+import { LoginOutlined, LogoutOutlined, SolutionOutlined, UserOutlined } from '@ant-design/icons-vue';
+
 export default defineComponent({
   name: "VcNavbar",
-  components: {},
+  components: {
+    LoginOutlined,
+    LogoutOutlined,
+    SolutionOutlined,
+    UserOutlined,
+  },
   setup() {
-    const current = ref<string[]>(['mail']);
+    const current = ref<string[]>([]);
     return {
       current,
     };

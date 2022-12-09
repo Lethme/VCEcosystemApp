@@ -1,5 +1,5 @@
 import { Store } from "@/store";
-import {User} from "@/api/services/types";
+import {Service, User} from "@/api/services/types";
 import {WindowSize} from "@/plugins/windowSize";
 
 declare module "@vue/runtime-core" {
@@ -12,5 +12,8 @@ declare module "@vue/runtime-core" {
     $windowSize: WindowSize,
     $windowHeight: number;
     $windowWidth: number;
+    $services: Array<Service>;
+
+    refreshServices: () => Promise<void>;
   }
 }

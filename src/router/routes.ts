@@ -21,6 +21,14 @@ const routes: Array<RouteRecordRaw> = [
         }
     },
     {
+        path: "/orders",
+        name: "orders",
+        component: () => import('../views/OrdersView.vue'),
+        meta: {
+            access: RouteAccess.Private,
+        }
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),

@@ -8,7 +8,10 @@ class UserPlugin {
             get() {
                 return {
                     ...store.getters.userInfo,
-                    logout: async () => await Loader.Use(async () => await store.dispatch("logout")),
+                    logout: async () => await Loader.Use(async () => {
+                        await (() => new Promise(resolve => setTimeout(resolve, 1000)))();
+                        await store.dispatch("logout");
+                    }),
                 }
             }
         });
