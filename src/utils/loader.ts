@@ -10,7 +10,7 @@ class Loader {
     }
 
     static SetState(state: boolean) {
-        store.dispatch("setLoading", state);
+        this.State = state;
     }
 
     static GetState() {

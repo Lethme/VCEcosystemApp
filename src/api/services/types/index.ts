@@ -12,6 +12,7 @@ import {Message} from "@/api/services/types/Message";
 import {Token} from "@/api/services/types/Token";
 import {Order} from "@/api/services/types/Order";
 import {OrderService} from "@/api/services/types/OrderService";
+import {DaysToRemoveOrders} from "@/api/services/types/DaysToRemoveOrders";
 
 export type {
     Service,
@@ -27,6 +28,7 @@ export type {
     Token,
     OrderService,
     Order,
+    DaysToRemoveOrders,
 };
 
 export { App };

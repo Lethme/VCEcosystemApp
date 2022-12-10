@@ -5,6 +5,9 @@ const mutations = {
   setServices(state: State, payload: Array<Service>) {
     state.services = payload.sort((f, s) => f.id - s.id);
   },
+  setDaysToRemoveOrders(state: State, payload: number) {
+    state.daysToRemoveOrders = payload;
+  }
 };
 
 export default mutations;

@@ -66,6 +66,11 @@ import {Service} from "@/api/services/types";
       searchText: "",
       columns: [
         {
+          title: "Id",
+          dataIndex: "id",
+          key: "id"
+        },
+        {
           title: "Title",
           dataIndex: "title",
           key: "title"

@@ -13,6 +13,7 @@ declare module "@vue/runtime-core" {
     $windowHeight: number;
     $windowWidth: number;
     $services: Array<Service>;
+    $daysToRemoveOrders: number;
 
     refreshServices: () => Promise<void>;
   }
