@@ -2,7 +2,7 @@
   <a-layout class="flex-grow-0 sticky-top t-0">
     <a-layout-content>
       <div class="container-fluid container-sm">
-        <a-menu v-model:selectedKeys="current" mode="horizontal" class="vc-navbar">
+        <a-menu v-model:selectedKeys="current" :selectable="false" mode="horizontal" class="vc-navbar">
           <a-menu-item key="logo" class="logo-item">
             <div class="logo">
               <router-link to="/">
@@ -21,11 +21,24 @@
               <user-outlined />
               {{ username }}
             </template>
-            <a-menu-item key="setting:1" class="d-flex align-items-center">
+            <a-menu-item key="setting:3" class="d-flex align-items-center">
+              <template #icon>
+                <file-outlined />
+              </template>
+              <router-link to="/orders/create">New Order</router-link>
+            </a-menu-item>
+            <a-menu-item key="setting:2" class="d-flex align-items-center">
               <template #icon>
                 <solution-outlined />
               </template>
               <router-link to="/orders">Orders</router-link>
+            </a-menu-item>
+            <a-divider class="m-0" />
+            <a-menu-item key="setting:1" class="d-flex align-items-center">
+              <template #icon>
+                <setting-outlined />
+              </template>
+              Settings
             </a-menu-item>
             <a-divider class="m-0" />
             <a-menu-item key="setting:0" class="log-out d-flex align-items-center" @click="$user.logout">
@@ -43,7 +56,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { LoginOutlined, LogoutOutlined, SolutionOutlined, UserOutlined } from '@ant-design/icons-vue';
+import {
+    LoginOutlined,
+    LogoutOutlined,
+    SolutionOutlined,
+    UserOutlined,
+    SettingOutlined,
+    FileOutlined,
+} from '@ant-design/icons-vue';
 
 export default defineComponent({
   name: "VcNavbar",
@@ -52,6 +72,8 @@ export default defineComponent({
     LogoutOutlined,
     SolutionOutlined,
     UserOutlined,
+    SettingOutlined,
+    FileOutlined,
   },
   setup() {
     const current = ref<string[]>([]);

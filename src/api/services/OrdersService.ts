@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, App, DaysToRemoveOrders, Order} from "@/api/services/types";
+import {ApiResponse, App, DaysToRemoveOrders, NewOrder, Order} from "@/api/services/types";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
 
@@ -12,6 +12,20 @@ interface SelectOrdersQuery {
 class OrdersService extends ApiService {
     private static get Path(): string {
         return `orders`;
+    }
+
+    static async Create(order: NewOrder): Promise<ApiResponse<Order | Message>> {
+        const url = this.CreateApiRequestUrl({
+            path: [App.GKassa, this.Path],
+        });
+
+        return await this.Try<Order>(async () => {
+            const response = await axios.post<ApiResponse<Order>>(url.Url, order, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
     }
 
     static async GetDaysToRemove(): Promise<ApiResponse<DaysToRemoveOrders | Message>> {
@@ -34,9 +48,7 @@ class OrdersService extends ApiService {
 
         return await this.Try<Array<Order>>(async () => {
             const response = await axios.get<ApiResponse<Array<Order>>>(url.Url, {
-                headers: {
-                    "Authorization": `Bearer ${this.ApiToken || ""}`
-                }
+                headers: this.ApiRequestHeaders,
             });
 
             return response.data;
@@ -51,9 +63,7 @@ class OrdersService extends ApiService {
 
         return await this.Try(async () => {
             const response = await axios.delete<ApiResponse>(url.Url, {
-                headers: {
-                    "Authorization": `Bearer ${this.ApiToken || ""}`
-                }
+                headers: this.ApiRequestHeaders,
             });
 
             return response.data;
@@ -67,9 +77,7 @@ class OrdersService extends ApiService {
 
         return await this.Try<Order>(async () => {
             const response = await axios.patch<ApiResponse<Order>>(url.Url, {}, {
-                headers: {
-                    "Authorization": `Bearer ${this.ApiToken || ""}`
-                }
+                headers: this.ApiRequestHeaders,
             });
 
             return response.data;

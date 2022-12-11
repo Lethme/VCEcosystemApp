@@ -16,7 +16,7 @@ class ServicesService extends ApiService {
         return await this.Try<Array<Service>>(async () => {
             const response = await axios.get<ApiResponse<Array<Service>>>(url.Url);
             return response.data;
-        })
+        });
     }
 }
 

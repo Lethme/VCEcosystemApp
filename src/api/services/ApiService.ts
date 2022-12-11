@@ -23,6 +23,12 @@ class ApiService {
         : localStorage.removeItem("api_token");
   }
 
+  protected static get ApiRequestHeaders() {
+    return {
+      "Authorization": `Bearer ${this.ApiToken || ""}`
+    }
+  }
+
   protected static get ApiHost(): RequestHost {
     return process.env.VUE_APP_API_HOST || "localhost";
   }

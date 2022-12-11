@@ -2,7 +2,7 @@
   <a-layout class="layout flex-grow-1 py-sm-4 orders">
     <div class="container py-sm-4">
       <a-layout class="flex-grow-1 py-4">
-        <a-layout-content class="px-4">
+        <a-layout-content>
           <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between pb-4 pb-md-2">
             <h4 class="text-start d-flex align-items-center gap-3">
               <span>Orders</span>
@@ -10,7 +10,9 @@
               <a-switch checked-children="Archive" un-checked-children="Current" v-model:checked="showArchivedOrders" @change="refreshOrders" />
             </h4>
             <div class="btn-wrapper">
-              <a-button type="primary" class="col-12 col-md-auto">Create Order</a-button>
+              <a-button type="primary" size="large" class="col-12 col-md-auto">
+                <router-link to="/orders/create">New Order</router-link>
+              </a-button>
             </div>
           </div>
           <a-table class="unselectable" v-model:expanded-row-keys="expandedRowKeys" :data-source="orders" :columns="columns" :expand-row-by-click="true" :custom-row="customOrderRow">
