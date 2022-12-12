@@ -19,7 +19,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.access === RouteAccess.Private)) {
-    if (isAuthorized()) {
+    if (isAuthorized() || ApiService.ApiToken !== null) {
       next();
     } else {
       next("/login");

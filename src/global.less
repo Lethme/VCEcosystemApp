@@ -9,3 +9,25 @@
 [class^='ant-layout'] {
   background: none !important;
 }
+
+table,
+[class^='ant-input'],
+[class^='ant-select'] {
+  font-size: 18px;
+
+  @media (max-width: 576px) {
+    font-size: 16px;
+  }
+}
+
+.ant-table-content {
+  overflow-x: auto;
+}
+
+.sticky-top {
+  z-index: 999;
+}
+
+.unselectable {
+  user-select: none;
+}

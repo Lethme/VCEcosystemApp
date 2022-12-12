@@ -10,11 +10,25 @@
 
 .logo-img {
   max-width: 100px;
+
+  @media (max-width: 500px) {
+    max-width: 90px;
+  }
 }
 
 .ant-menu-item,
 .ant-menu-submenu-title {
-  font-size: 1.1em;
+  font-size: 1.25em;
+
+  @media (max-width: 500px) {
+    font-size: 1.1em;
+  }
+}
+
+.ant-menu-title-content {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .logo-item.ant-menu-item-active::after,
@@ -22,6 +36,14 @@
   display: none;
 }
 
+.container-fluid.container-sm {
+  @media (max-width: 567px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .vc-navbar {
   box-shadow: 0 0 5px 2px rgba(0, 0, 0, .1) !important;
+  z-index: 999 !important;
 }

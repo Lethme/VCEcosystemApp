@@ -5,6 +5,7 @@ import {ApiResponse, User} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 import {HttpStatusCode} from "axios";
 import {isAuthorized} from "@/utils";
+import router from "@/router";
 
 const actions = {
   async updateUserInfo(context: ActionContext<State, any>) {
@@ -32,6 +33,7 @@ const actions = {
     if (isAuthorized()) {
       context.commit("setUserInfo", undefined);
       localStorage.removeItem("api_token");
+      await router.push("/login");
     }
   }
 };

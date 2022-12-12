@@ -35,6 +35,8 @@ export default defineComponent({
     });
 
     Loader.Use(async () => {
+      await this.$store.dispatch("updateDaysToRemoveOrders");
+
       const response = await this.$store.dispatch("updateUserInfo");
 
       if (response && !response.status) {

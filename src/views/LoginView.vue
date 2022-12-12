@@ -69,7 +69,6 @@ interface FormState {
 }
 
 export default defineComponent({
-  name: "LoginView",
   setup() {
     const route = useRoute();
     const router = useRouter();

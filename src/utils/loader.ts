@@ -10,11 +10,11 @@ class Loader {
     }
 
     static SetState(state: boolean) {
-        store.dispatch("setLoading", state);
+        this.State = state;
     }
 
     static GetState() {
-        return store.getters.loading;
+        return this.State;
     }
 
     static async Use<TReturn>(callback: () => TReturn | Promise<TReturn>): Promise<TReturn> {
