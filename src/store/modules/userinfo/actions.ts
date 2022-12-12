@@ -22,6 +22,7 @@ const actions = {
         context.commit("setUserInfo", undefined);
       } else {
         context.commit("setUserInfo", (response as ApiResponse<User>).data);
+        context.commit("loadState");
       }
 
       return response;
@@ -32,6 +33,7 @@ const actions = {
   async logout(context: ActionContext<State, any>) {
     if (isAuthorized()) {
       context.commit("setUserInfo", undefined);
+      context.commit("clearState");
       localStorage.removeItem("api_token");
       await router.push("/login");
     }

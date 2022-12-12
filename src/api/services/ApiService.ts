@@ -8,7 +8,7 @@ import {
 } from "@/api/services/utils/types";
 
 import { Url } from "@/api/services";
-import {AxiosError} from "axios";
+import axios, {AxiosError} from "axios";
 import {ApiResponse} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 

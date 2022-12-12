@@ -21,7 +21,13 @@
               <user-outlined />
               {{ username }}
             </template>
-            <a-menu-item key="setting:3" class="d-flex align-items-center">
+            <a-menu-item v-if="tempOrdersExist" key="setting:4" class="d-flex align-items-center">
+              <template #icon>
+                <bars-outlined />
+              </template>
+              <router-link to="/orders/create">Edit New Orders</router-link>
+            </a-menu-item>
+            <a-menu-item v-else key="setting:3" class="d-flex align-items-center">
               <template #icon>
                 <file-outlined />
               </template>
@@ -63,6 +69,7 @@ import {
     UserOutlined,
     SettingOutlined,
     FileOutlined,
+    BarsOutlined
 } from '@ant-design/icons-vue';
 
 export default defineComponent({
@@ -74,6 +81,7 @@ export default defineComponent({
     UserOutlined,
     SettingOutlined,
     FileOutlined,
+    BarsOutlined,
   },
   setup() {
     const current = ref<string[]>([]);
@@ -90,6 +98,10 @@ export default defineComponent({
       }
 
       return fullName;
+    },
+    tempOrdersExist() {
+      return this.$store.getters.panes.length > 1
+          || (this.$store.getters.panes.length === 1 && this.$store.getters.panes[0].order.dataSource.length);
     }
   }
 });

@@ -11,7 +11,7 @@
             </h4>
             <div class="btn-wrapper">
               <a-button type="primary" size="large" class="col-12 col-md-auto">
-                <router-link to="/orders/create">New Order</router-link>
+                <router-link to="/orders/create" @click="() => $store.commit('addPane')">New Order</router-link>
               </a-button>
             </div>
           </div>
@@ -100,7 +100,7 @@ export default defineComponent({
           ...service,
           totalPrice: service.amount * service.price,
         }
-      }))
+      }).sort((f, s) => f.id - s.id));
     },
     orders(): Array<OrderData> {
       return this.ordersRaw.map((order: Order) => {
