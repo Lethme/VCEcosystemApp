@@ -41,7 +41,7 @@
                          } : {}"
                     >
                       <div v-if="activePane.order.dataEditable[record.key] && $windowWidth >= 768" class="editable-cell-input-wrapper w-100">
-                        <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" @keydown.esc="cancel(record.key)" />
+                        <a-input-number type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" @keydown.esc="cancel(record.key)" />
                         <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
                       </div>
                       <div v-else class="editable-cell-text-wrapper">
@@ -59,7 +59,7 @@
                             @cancel="cancel(record.key)"
                             centered
                         >
-                          <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
+                          <a-input-number type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
                         </a-modal>
                       </div>
                     </div>
