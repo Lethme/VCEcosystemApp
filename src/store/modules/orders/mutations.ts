@@ -91,13 +91,14 @@ const mutations = {
       const maxTabIndex = Math.max(...state.panes.map(pane => +(pane.key.split("newOrder")[1])));
       state.tabIndex = maxTabIndex + 1;
     }
-    store.dispatch("saveState");
+    store.commit("saveState");
   },
   clearOrder(state: State) {
     const activePane = state.panes.find(pane => pane.key === state.activeKey);
 
     if (activePane) {
       activePane.order.clear();
+      store.commit("saveState");
     }
   },
   editOrderServiceAmount(state: State, payload: string) {
@@ -105,6 +106,7 @@ const mutations = {
 
     if (activePane) {
       activePane.order.dataEditable[payload] = cloneDeep(activePane.order.dataSource.filter(item => payload === item.key)[0]);
+      store.commit("saveState");
     }
   },
   saveOrderServiceAmount(state: State, payload: string) {
@@ -119,7 +121,14 @@ const mutations = {
         activePane.order.dataSource[itemIndex].totalPrice = activePane.order.dataSource[itemIndex].amount * activePane.order.dataSource[itemIndex].price;
       }
 
-      store.dispatch("saveState");
+      store.commit("saveState");
+    }
+  },
+  cancelOrderServiceAmount(state: State, payload: string) {
+    const activePane = state.panes.find(pane => pane.key === state.activeKey);
+
+    if (activePane && activePane.order.dataEditable[payload]) {
+      delete activePane.order.dataEditable[payload];
     }
   },
   addOrderService(state: State) {
@@ -137,7 +146,7 @@ const mutations = {
         amount: 1,
       });
 
-      store.dispatch("saveState");
+      store.commit("saveState");
     }
   },
   deleteOrderService(state: State, payload: string) {
@@ -145,7 +154,7 @@ const mutations = {
 
     if (activePane) {
       activePane.order.dataSource = activePane.order.dataSource.filter(item => item.key !== payload);
-      store.dispatch("saveState");
+      store.commit("saveState");
     }
   }
 };

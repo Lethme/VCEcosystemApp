@@ -17,6 +17,7 @@
                       show-search
                       size="large"
                       placeholder="Select service"
+                      @change="() => $store.commit('saveState')"
                       :options="servicesOptions"
                       :filter-option="filterOption"
                       class="text-start col-12 col-md-4 col-lg-3"
@@ -39,13 +40,27 @@
                            }
                          } : {}"
                     >
-                      <div v-if="activePane.order.dataEditable[record.key]" class="editable-cell-input-wrapper w-100">
-                        <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
+                      <div v-if="activePane.order.dataEditable[record.key] && $windowWidth >= 768" class="editable-cell-input-wrapper w-100">
+                        <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" @keydown.esc="cancel(record.key)" />
                         <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
                       </div>
                       <div v-else class="editable-cell-text-wrapper">
                         {{ text || ' ' }}
-                        <edit-outlined class="editable-cell-icon" />
+                        <edit-outlined :class="{
+                          'editable-cell-icon': true,
+                          'd-inline-block': activePane.order.dataEditable[record.key] && $windowWidth < 768
+                        }" />
+                        <a-modal
+                            v-if="activePane.order.dataEditable[record.key] && $windowWidth < 768"
+                            :visible="activePane.order.dataEditable[record.key] && $windowWidth < 768"
+                            :title="record.title"
+                            ok-text="Save"
+                            @ok="save(record.key)"
+                            @cancel="cancel(record.key)"
+                            centered
+                        >
+                          <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
+                        </a-modal>
                       </div>
                     </div>
                   </template>
@@ -183,6 +198,8 @@ export default defineComponent({
       }, 1);
     }
 
+    const mobileAmountEditVisible = ref<boolean>(false);
+
     const visible = ref<boolean>(false);
     const confirmLoading = ref<boolean>(false);
 
@@ -267,6 +284,10 @@ export default defineComponent({
       store.commit("saveOrderServiceAmount", key);
     };
 
+    const cancel = (key: string) => {
+      store.commit("cancelOrderServiceAmount", key);
+    };
+
     const removeService = (key: string) => {
       store.commit("deleteOrderService", key);
     };
@@ -291,9 +312,11 @@ export default defineComponent({
       removeService,
       edit,
       save,
+      cancel,
       addService,
       customServicesRow,
       orderSummaryOverflowed,
+      mobileAmountEditVisible,
       visible,
       confirmLoading,
       showModal,

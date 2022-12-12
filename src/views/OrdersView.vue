@@ -169,7 +169,6 @@ export default defineComponent({
       }
     },
     customOrderServiceRow(orderRecord: OrderData, record: OrderInnerData, index: number) {
-      console.log({ orderRecord, record, index });
       return {
         class: {
           test: true,
