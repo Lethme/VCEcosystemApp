@@ -1,4 +1,4 @@
-import state, { State } from "./state";
+import { State } from "./state";
 
 const mutations = {
   setLoadingState(state: State, payload: boolean) {

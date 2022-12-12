@@ -1,13 +1,8 @@
 <template>
-<!--  <nav>-->
-<!--    <router-link to="/">Home</router-link> |-->
-<!--    <router-link to="/about">About</router-link> |-->
-<!--    <router-link to="/login">Login</router-link>-->
-<!--  </nav>-->
+  <loader-view />
   <vc-navbar />
   <router-view class="view" />
   <vc-footer />
-  <loader-view />
 </template>
 
 <script lang="ts">
@@ -46,6 +41,10 @@ export default defineComponent({
             exception: "Your session has expired",
           },
         });
+      }
+
+      if (response && response.status) {
+        await this.$store.dispatch("loadState");
       }
 
       if (response && response.status && this.$route.meta.access === RouteAccess.PrivateWhileAuthorized && this.$authorized) {

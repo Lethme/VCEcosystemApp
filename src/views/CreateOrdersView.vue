@@ -8,8 +8,8 @@
           </h4>
         </div>
         <a-layout-content>
-          <a-tabs class="unselectable" v-model:activeKey="activeKey" type="editable-card" @edit="onEdit">
-            <a-tab-pane class="d-flex flex-column flex-xxl-row justify-content-between gap-3" v-for="pane in panes" :key="pane.key" :tab="pane.title" :closable="panes.length > 1">
+          <a-tabs class="unselectable" v-model:activeKey="activeKey" type="editable-card" @edit="paneAction">
+            <a-tab-pane class="d-flex flex-column flex-xxl-row justify-content-between gap-3" v-for="pane in panes" :key="pane.key" :tab="pane.title" :closable="true">
               <div class="pane-content-wrapper d-flex flex-column justify-content-start flex-grow-1 gap-3">
                 <div class="service-select-wrapper d-flex flex-column flex-md-row gap-2 justify-content-start">
                   <a-select
@@ -21,20 +21,27 @@
                       :filter-option="filterOption"
                       class="text-start col-12 col-md-4 col-lg-3"
                   />
-                  <a-button type="primary" size="large" class="col-12 col-md-auto" @click="addService(activePane.order)">Add Service</a-button>
+                  <a-button size="large" class="col-12 col-md-auto" @click="refreshServices">Refresh Services</a-button>
+                  <a-popconfirm
+                      title="Sure to clear this order?"
+                      @confirm="clearOrder"
+                  >
+                    <a-button type="primary" size="large" danger class="col-12 col-md-auto">Clear Order</a-button>
+                  </a-popconfirm>
+                  <a-button type="primary" size="large" class="col-12 col-md-auto" @click="addService">Add Service</a-button>
                 </div>
                 <a-table bordered :data-source="activePane.order.dataSource" :columns="columns" :custom-row="customServicesRow">
                   <template #amount="{ text, record }">
                     <div class="editable-cell"
                          v-on="!activePane.order.dataEditable[record.key] ? {
                            click: () => {
-                             edit(record.key, activePane.order);
+                             edit(record.key);
                            }
                          } : {}"
                     >
                       <div v-if="activePane.order.dataEditable[record.key]" class="editable-cell-input-wrapper w-100">
-                        <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key, activePane.order)" />
-                        <check-outlined class="editable-cell-icon-check" @click="save(record.key, activePane.order)" />
+                        <a-input-number class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
+                        <check-outlined class="editable-cell-icon-check" @click="save(record.key)" />
                       </div>
                       <div v-else class="editable-cell-text-wrapper">
                         {{ text || ' ' }}
@@ -46,7 +53,7 @@
                     <a-popconfirm
                         v-if="activePane.order.dataSource.length"
                         title="Sure to delete?"
-                        @confirm="onDelete(record.key, activePane.order)"
+                        @confirm="removeService(record.key)"
                     >
                       <a-button type="primary" danger>Remove</a-button>
                     </a-popconfirm>
@@ -61,7 +68,7 @@
                     <h4 class="m-0 text-end change-value">{{ activePane.order.change }} ₽</h4>
                   </template>
                   <h6 class="pb-1">Order Services</h6>
-                  <a-collapse class="order-services-collapse" v-model:activeKey="orderSummaryActiveKey" :bordered="false" expand-icon-position="right">
+                  <a-collapse class="order-services-collapse" v-model:activeKey="activePane.order.summaryActiveKeys" :bordered="false" expand-icon-position="right" @change="() => $store.commit('saveState')">
                     <a-collapse-panel class="text-start service-panel-header" v-for="service in activePane.order.groupedDataSource" :key="service.key" :header="service.title">
                       <div class="summary-service-wrapper d-flex flex-row justify-content-between">
                         <div class="summary-service">
@@ -91,6 +98,11 @@
                   centered
               >
                 <div class="create-order-wrapper d-flex flex-column gap-2">
+                  <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                    <h5 class="m-0 fw-normal">Service</h5>
+                    <h5 class="m-0">Price (₽)</h5>
+                  </div>
+                  <a-divider />
                   <div :key="service.id" v-for="service in activePane.order.groupedDataSource" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-normal">{{ service.title }}</h6>
                     <h5 class="m-0 value d-flex align-items-center"><span class="fw-normal fs-6">{{ service.amount }} x {{ service.price }}₽ =&nbsp;</span>{{ service.totalPrice }} ₽</h5>
@@ -118,83 +130,13 @@
   </a-layout>
 </template>
 <script lang="ts">
-import {computed, defineComponent, reactive, Ref, ref, UnwrapRef} from 'vue';
-import { cloneDeep } from "lodash-es";
-import {NewOrder, Service} from "@/api/services/types";
+import {Loader} from "@/utils";
+import { computed, ComputedRef, defineComponent, ref, WritableComputedRef } from 'vue';
+import { Service } from "@/api/services/types";
 import { OrdersService } from "@/api/services";
 import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
 import { useStore } from 'vuex';
-import {Loader} from "@/utils";
-
-interface DataItem {
-  key: string;
-  id: number;
-  title: string;
-  price: number;
-  totalPrice: number;
-  amount: number;
-}
-
-class OrderState {
-  public selectedService?: number = undefined;
-  public dataSource: Array<DataItem> = [];
-  public dataEditable: Record<string, DataItem> = {};
-  public cash = 0;
-
-  public get change() {
-    return this.cash - this.totalPrice;
-  }
-
-  public get groupedDataSource() {
-    const resultDataSource: Array<DataItem> = [];
-
-    for (let i = 0; i < this.dataSource.length; i++) {
-      const item = this.dataSource[i];
-      const groupedItemIndex = resultDataSource.findIndex(resultItem => resultItem.id === item.id);
-
-      if (groupedItemIndex !== -1) {
-        resultDataSource[groupedItemIndex].amount += item.amount;
-        resultDataSource[groupedItemIndex].totalPrice += item.totalPrice;
-      } else {
-        resultDataSource.push({ ...item });
-      }
-    }
-
-    return resultDataSource;
-  }
-
-  public get uploadDataSource(): NewOrder {
-    return {
-      moneyReceived: this.cash,
-      services: this.groupedDataSource.map(service => ({
-        serviceId: service.id,
-        amount: service.amount,
-      })),
-    };
-  }
-
-  public get totalPrice() {
-    return this.dataSource.map(item => item.totalPrice).reduce((cur, next) => cur + next);
-  }
-
-  public getItemByKey(key: string) {
-    return this.dataSource.find(item => item.key === key);
-  }
-
-  public getItemIndexByKey(key: string) {
-    return this.dataSource.findIndex(item => item.key === key);
-  }
-
-  constructor() {
-    /* ToDo */
-  }
-}
-
-interface Pane {
-  title: string;
-  key: string;
-  order: Ref<OrderState>;
-}
+import { Pane } from "@/store/modules/orders/types";
 
 export default defineComponent({
   components: {
@@ -211,16 +153,35 @@ export default defineComponent({
       return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
     },
   },
-  mounted() {
+  created() {
     this.$store.dispatch("updateServices");
   },
   setup() {
-    const panes = ref<Array<Pane>>([]);
-    const activeKey = ref<string | undefined>();
-    const activePane = computed(() => panes.value.find(pane => pane.key === activeKey.value));
-    const newTabIndex = ref(1);
-    const orderSummaryActiveKey = ref<Array<string>>([]);
     const store = useStore();
+    const panes = computed<Array<Pane>>(() => store.getters.panes);
+    const activeKey: WritableComputedRef<string | undefined> = computed<string | undefined>({
+      get() {
+        return store.getters.activeKey;
+      },
+      set(key: string | undefined) {
+        store.commit("setActiveKey", key);
+      }
+    });
+    const activePane: ComputedRef<Pane> = computed(() => store.getters.activePane);
+    const tabIndex: ComputedRef<number> = computed(() => store.getters.tabIndex);
+
+    /* That's just completely stupid thing
+    *  but it works as expected with a little timeout
+    *  Idk why but tabs're not being rendered
+    *  if you just provide active tab key to it */
+    if (panes.value.length) {
+      const key = activeKey.value;
+      activeKey.value = panes.value[0].key;
+      store.commit("setActiveKey", panes.value[0].key);
+      setTimeout(() => {
+        store.commit("setActiveKey", key);
+      }, 1);
+    }
 
     const visible = ref<boolean>(false);
     const confirmLoading = ref<boolean>(false);
@@ -238,7 +199,7 @@ export default defineComponent({
         const response = await OrdersService.Create(newOrder);
 
         if (response.status) {
-          /* ToDo */
+          removePane(activePane.value.key);
         }
       }
 
@@ -246,38 +207,24 @@ export default defineComponent({
       confirmLoading.value = false;
     };
 
-    const add = () => {
-      activeKey.value = `newOrder${newTabIndex.value}`;
-      panes.value.push({ title: `New Order (${newTabIndex.value})`, order: reactive(new OrderState()), key: activeKey.value });
-      newTabIndex.value++;
-    };
-
-    const remove = (targetKey: string) => {
-      let lastIndex = 0;
-      panes.value.forEach((pane, i) => {
-        if (pane.key === targetKey) {
-          lastIndex = i - 1;
-        }
+    const paneAction = (targetKey: string | MouseEvent, action: string) => {
+      store.dispatch("paneAction", {
+        key: targetKey,
+        action,
       });
-      panes.value = panes.value.filter(pane => pane.key !== targetKey);
-      if (panes.value.length && activeKey.value === targetKey) {
-        if (lastIndex >= 0) {
-          activeKey.value = panes.value[lastIndex].key;
-        } else {
-          activeKey.value = panes.value[0].key;
-        }
-      }
     };
 
-    const onEdit = (targetKey: string | MouseEvent, action: string) => {
-      if (action === 'add') {
-        add();
-      } else {
-        remove(targetKey as string);
-      }
-    };
+    const removePane = (targetKey: string) => {
+      store.commit("removePane", activePane.value.key);
+    }
 
-    add();
+    const clearOrder = async () => {
+      await store.dispatch("clearOrder");
+    }
+
+    if (!panes.value.length) {
+      store.commit("addPane");
+    }
 
     const columns = [
       {
@@ -308,37 +255,20 @@ export default defineComponent({
       },
     ];
 
-    const addService = (order: OrderState) => {
-      if (order.selectedService) {
-        const service: Service = store.getters.services.find((s: Service) => s.id === order.selectedService);
-
-        order.dataSource.push({
-          key: order.dataSource.length.toString(),
-          id: service.id,
-          title: service.title,
-          price: service.price,
-          totalPrice: service.price,
-          amount: 1,
-        });
-      }
+    const addService = () => {
+      store.commit("addOrderService");
     }
 
-    const edit = (key: string, order: OrderState) => {
-      order.dataEditable[key] = cloneDeep(order.dataSource.filter(item => key === item.key)[0]);
+    const edit = (key: string) => {
+      store.commit("editOrderServiceAmount", key);
     };
 
-    const save = (key: string, order: OrderState) => {
-      Object.assign(order.dataSource.filter(item => key === item.key)[0], order.dataEditable[key]);
-      delete order.dataEditable[key];
-
-      const itemIndex = order.getItemIndexByKey(key);
-      if (itemIndex !== -1) {
-        order.dataSource[itemIndex].totalPrice = order.dataSource[itemIndex].amount * order.dataSource[itemIndex].price;
-      }
+    const save = (key: string) => {
+      store.commit("saveOrderServiceAmount", key);
     };
 
-    const onDelete = (key: string, order: OrderState) => {
-      order.dataSource = order.dataSource.filter(item => item.key !== key);
+    const removeService = (key: string) => {
+      store.commit("deleteOrderService", key);
     };
 
     const customServicesRow = (record: any, index: number) => {
@@ -349,19 +279,19 @@ export default defineComponent({
       }
     };
 
-    const orderSummaryOverflowed = computed(() => activePane.value!.order!.groupedDataSource.length > 5);
+    const orderSummaryOverflowed = computed(() => activePane.value?.order.groupedDataSource.length > 5);
 
     return {
       panes,
       activeKey,
       activePane,
-      onEdit,
+      paneAction,
+      clearOrder,
       columns,
-      onDelete,
+      removeService,
       edit,
       save,
       addService,
-      orderSummaryActiveKey,
       customServicesRow,
       orderSummaryOverflowed,
       visible,

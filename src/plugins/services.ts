@@ -1,3 +1,4 @@
+import {Loader} from "@/utils";
 import {App} from "vue";
 import store from "@/store";
 
@@ -10,7 +11,9 @@ class ServicesPlugin {
             get() { return store.getters.daysToRemoveOrders; }
         });
         app.config.globalProperties.refreshServices = async () => {
+            Loader.SetState(true);
             await store.dispatch("updateServices");
+            Loader.SetState(false);
         }
     }
 }
