@@ -47,7 +47,7 @@ import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
 export interface OrderData extends Order {
   key: number;
   price: number;
-  payback: number;
+  change: number;
   removedIn?: string;
   remaining?: number;
 }
@@ -80,9 +80,9 @@ export default defineComponent({
 
       return [
         { title: 'Id', dataIndex: 'id', key: 'id' },
-        { title: 'Money Received (₽)', dataIndex: 'moneyReceived', key: 'moneyReceived' },
+        { title: 'Cash (₽)', dataIndex: 'moneyReceived', key: 'moneyReceived' },
         { title: 'Total Price (₽)', dataIndex: "price", key: 'price' },
-        { title: 'Payback (₽)', dataIndex: "payback", key: 'payback' },
+        { title: 'Change (₽)', dataIndex: "change", key: 'change' },
         { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt' },
         { title: archived ? 'Deleted At' : 'Updated At', dataIndex: archived ? 'deletedAt' : 'updatedAt', key: archived ? 'deletedAt' : 'updatedAt' },
           archived ? {
@@ -125,7 +125,7 @@ export default defineComponent({
               ? parseFloat((this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)).toFixed(2))
               : undefined,
           price,
-          payback: order.moneyReceived - price,
+          change: order.moneyReceived - price,
         }
       })
     }

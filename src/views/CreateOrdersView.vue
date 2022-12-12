@@ -57,7 +57,8 @@
                 <h5 class="py-lg-2">Order Summary</h5>
                 <a-card class="text-start" :title="activePane.title">
                   <template #extra>
-                    <h4 class="m-0">{{ activePane.order.totalPrice }} ₽</h4>
+                    <h4 class="m-0 text-end">{{ activePane.order.totalPrice }} ₽</h4>
+                    <h4 class="m-0 text-end change-value">{{ activePane.order.change }} ₽</h4>
                   </template>
                   <h6 class="pb-1">Order Services</h6>
                   <a-collapse class="order-services-collapse" v-model:activeKey="orderSummaryActiveKey" :bordered="false" expand-icon-position="right">
@@ -73,8 +74,42 @@
                       </div>
                     </a-collapse-panel>
                   </a-collapse>
+                  <div class="money-received-wrapper pb-3">
+                    <h6 class="pb-1">Cash (₽)</h6>
+                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" />
+                  </div>
+                  <a-button type="primary" size="large" block @click="showModal">Create Order</a-button>
                 </a-card>
               </div>
+              <a-modal
+                  v-if="activePane.order.dataSource.length"
+                  v-model:visible="visible"
+                  :title="activePane.title"
+                  :confirm-loading="confirmLoading"
+                  ok-text="Create Order"
+                  @ok="handleOk"
+                  centered
+              >
+                <div class="create-order-wrapper d-flex flex-column gap-2">
+                  <div :key="service.id" v-for="service in activePane.order.groupedDataSource" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 fw-normal">{{ service.title }}</h6>
+                    <h5 class="m-0 value d-flex align-items-center"><span class="fw-normal fs-6">{{ service.amount }} x {{ service.price }}₽ =&nbsp;</span>{{ service.totalPrice }} ₽</h5>
+                  </div>
+                  <a-divider />
+                  <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 fw-normal">Total Price</h6>
+                    <h5 class="m-0 value">{{ activePane.order.totalPrice }} ₽</h5>
+                  </div>
+                  <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 fw-normal">Cash</h6>
+                    <h5 class="m-0 value">{{ activePane.order.cash }} ₽</h5>
+                  </div>
+                  <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 fw-normal">Change</h6>
+                    <h5 class="m-0 value">{{ activePane.order.change }} ₽</h5>
+                  </div>
+                </div>
+              </a-modal>
             </a-tab-pane>
           </a-tabs>
         </a-layout-content>
@@ -85,7 +120,8 @@
 <script lang="ts">
 import {computed, defineComponent, reactive, Ref, ref, UnwrapRef} from 'vue';
 import { cloneDeep } from "lodash-es";
-import {Service} from "@/api/services/types";
+import {NewOrder, Service} from "@/api/services/types";
+import { OrdersService } from "@/api/services";
 import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
 import { useStore } from 'vuex';
 import {Loader} from "@/utils";
@@ -103,6 +139,11 @@ class OrderState {
   public selectedService?: number = undefined;
   public dataSource: Array<DataItem> = [];
   public dataEditable: Record<string, DataItem> = {};
+  public cash = 0;
+
+  public get change() {
+    return this.cash - this.totalPrice;
+  }
 
   public get groupedDataSource() {
     const resultDataSource: Array<DataItem> = [];
@@ -120,6 +161,16 @@ class OrderState {
     }
 
     return resultDataSource;
+  }
+
+  public get uploadDataSource(): NewOrder {
+    return {
+      moneyReceived: this.cash,
+      services: this.groupedDataSource.map(service => ({
+        serviceId: service.id,
+        amount: service.amount,
+      })),
+    };
   }
 
   public get totalPrice() {
@@ -170,6 +221,30 @@ export default defineComponent({
     const newTabIndex = ref(1);
     const orderSummaryActiveKey = ref<Array<string>>([]);
     const store = useStore();
+
+    const visible = ref<boolean>(false);
+    const confirmLoading = ref<boolean>(false);
+
+    const showModal = () => {
+      visible.value = true;
+    };
+
+    const handleOk = async () => {
+      confirmLoading.value = true;
+
+      const newOrder = activePane.value?.order.uploadDataSource;
+
+      if (newOrder) {
+        const response = await OrdersService.Create(newOrder);
+
+        if (response.status) {
+          /* ToDo */
+        }
+      }
+
+      visible.value = false;
+      confirmLoading.value = false;
+    };
 
     const add = () => {
       activeKey.value = `newOrder${newTabIndex.value}`;
@@ -289,6 +364,10 @@ export default defineComponent({
       orderSummaryActiveKey,
       customServicesRow,
       orderSummaryOverflowed,
+      visible,
+      confirmLoading,
+      showModal,
+      handleOk,
     };
   },
 });
@@ -296,6 +375,10 @@ export default defineComponent({
 
 <style lang="less">
 @import "@/var.less";
+
+.change-value {
+  font-size: 1.2em;
+}
 
 .summary-service-wrapper {
   .summary-service {
@@ -327,6 +410,7 @@ export default defineComponent({
 .order-services-collapse {
   max-height: 600px;
   overflow-y: auto;
+  margin-bottom: 20px;
 }
 
 .order-create .ant-table-row.editing td {
