@@ -3,14 +3,14 @@
     <div class="container py-sm-4">
       <a-layout class="flex-grow-1 py-4">
         <a-layout-content>
-          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between pb-4 pb-md-2">
-            <h4 class="text-start d-flex align-items-center gap-3">
+          <div class="table-header-wrapper d-flex flex-row justify-content-between pb-4 pb-md-2">
+            <h4 class="text-start d-flex align-items-center m-0 gap-3">
               <span>Orders</span>
               <sync-outlined class="refresh-btn" @click="refreshOrders" />
               <a-switch checked-children="Archive" un-checked-children="Current" v-model:checked="showArchivedOrders" @change="refreshOrders" />
             </h4>
             <div class="btn-wrapper">
-              <a-button type="primary" size="large" class="col-12 col-md-auto">
+              <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'" class="col-12 col-sm-auto">
                 <router-link to="/orders/create" @click="() => $store.commit('addPane')">New Order</router-link>
               </a-button>
             </div>
