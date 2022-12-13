@@ -34,7 +34,7 @@ jobs:
         username: ${{ secrets.REMOTE_USR }}
         password: ${{ secrets.REMOTE_PWD }}
         port: 22
-        script: find ${{ secrets.REMOTE_PATH }} -type f,d ! -iname ".*" -delete
+        script: find ${{ secrets.REMOTE_PATH }} -type f,d ! -iname ".*" -delete -not -path ${{ secrets.REMOTE_PATH }}
     - name: Deploy build to remote server
       uses: Creepios/sftp-action@v1.0.3
       with:
