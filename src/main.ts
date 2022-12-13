@@ -11,6 +11,8 @@ import WindowSizePlugin from "@/plugins/windowSize";
 import ServicesPlugin from "@/plugins/services";
 
 import 'ant-design-vue/dist/antd.css';
+import './fonts.less';
+import './var.less';
 
 createApp(App)
     .use(store)
