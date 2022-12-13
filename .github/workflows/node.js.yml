@@ -27,6 +27,14 @@ jobs:
         cache: 'npm'
     - run: npm install
     - run: npm run build
+    - name: Removing old build from remote server
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USR }}
+        password: ${{ secrets.REMOTE_PWD }}
+        port: 22
+        script: find ${{ secrets.REMOTE_PATH }} -type f,d ! -iname ".*" -delete
     - name: Deploy build to remote server
       uses: Creepios/sftp-action@v1.0.3
       with:
