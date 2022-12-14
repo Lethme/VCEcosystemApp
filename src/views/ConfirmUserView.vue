@@ -8,8 +8,8 @@
               :model="formState"
               name="basic"
               autocomplete="off"
+              @submit="(event) => event.preventDefault()"
               @finish="onFinish"
-              @finishFailed="onFinishFailed"
           >
             <a-form-item class="d-flex justify-content-center">
               <div class="logo-wrapper py-4 col-12 d-flex justify-content-center">
@@ -18,19 +18,71 @@
             </a-form-item>
 
             <a-form-item class="d-flex justify-content-center">
-              <h3 class="greetings">{{ `Welcome to VC, ${username}!` }}</h3>
-              <h5 class="greetings">Set your new password to complete registration</h5>
+              <h3 v-if="user" class="greetings">{{ !confirmed ? `${username}, welcome to VC!` :  'Your account has been confirmed'}}</h3>
+              <h5 class="greetings">{{ !confirmed ? 'Set your password to complete registration' : 'You can Log In now' }}</h5>
             </a-form-item>
 
-            <a-form-item has-feedback label="Password" name="password" :rules="[{ required: true }]">
-              <a-input v-model:value="formState.password" type="password" autocomplete="off" />
+            <a-form-item v-if="!confirmed" has-feedback label="Password" name="password" autocomplete="off" :rules="[{ required: true, validator: validatePassword }]">
+              <a-input-password v-model:value="formState.password" type="password" autocomplete="off">
+                <template #prefix>
+                  <a-popover>
+                    <template #content>
+                      <h6
+                          v-memo="passwordState.map(s => s.state)"
+                          v-text="passwordState.every(s => s.state) ? 'Strong password' : 'Weak password'"
+                          :style="{color: passwordState.every(s => s.state) ? '#52C41A' : '#FF4D4F'}"
+                      />
+                      <a-divider />
+                      <h6 class="d-flex align-items-start align-items-sm-center text-start"
+                          v-memo="passwordState.map(s => s.state)"
+                          v-for="warning in passwordState"
+                          :key="warning.type"
+                      >
+                        <check-circle-filled v-if="warning.state" :style="{color: '#52C41A'}" />
+                        <close-circle-filled v-else :style="{color: '#FF4D4F'}" />
+                        &nbsp;{{ warning.text }}
+                      </h6>
+                    </template>
+                    <info-circle-outlined type="user" />
+                  </a-popover>
+                </template>
+              </a-input-password>
             </a-form-item>
-            <a-form-item has-feedback label="Confirm" name="passwordConfirm" :rules="[{ required: true, validator: validateConfirmPassword }]">
-              <a-input v-model:value="formState.passwordConfirm" type="password" autocomplete="off" />
+            <a-form-item v-if="!confirmed" has-feedback label="Confirm" name="passwordConfirm" autocomplete="off" :rules="[{ required: true, validator: validateConfirmPassword }]">
+              <a-input-password
+                  v-model:value="formState.passwordConfirm"
+                  type="password" autocomplete="off"
+              />
             </a-form-item>
+
+            <a-alert
+                v-if="formState.exception && !confirmed"
+                :message="formState.exception"
+                type="error"
+                closable
+            />
 
             <a-form-item>
-              <a-button type="primary" html-type="submit" class="submit-btn col-12 col-sm-auto px-4 mt-3">Confirm Account</a-button>
+              <a-button
+                  v-if="!confirmed"
+                  :disabled="!passwordConfirmValidated || !passwordValidated"
+                  size="large"
+                  type="primary"
+                  html-type="submit"
+                  class="submit-btn col-12 col-sm-auto px-4 mt-3"
+              >
+                Confirm Account
+              </a-button>
+              <a-button
+                  v-else
+                  size="large"
+                  type="primary"
+                  class="col-12 col-sm-auto px-4 mt-3"
+              >
+                <router-link to="/login">
+                  Log In
+                </router-link>
+              </a-button>
             </a-form-item>
           </a-form>
         </div>
@@ -40,29 +92,38 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, ref} from "vue";
+import {computed, defineComponent, reactive, ref} from "vue";
 import {Loader} from "@/utils";
-import {Message, User} from "@/api/services/types";
-import {UsersService} from "@/api/services";
+import {Message, PasswordState, User} from "@/api/services/types";
+import {ApiService, UsersService} from "@/api/services";
 import { Rule } from "ant-design-vue/lib/form";
 import {getFullUsername} from "@/api/utils/getFullUsername";
+import {useRoute, useRouter} from "vue-router";
+import { InfoCircleOutlined, CloseCircleFilled, CheckCircleFilled } from "@ant-design/icons-vue";
 
 interface FormState {
   password: string;
   passwordConfirm: string;
+  exception?: string;
 }
 
 export default defineComponent({
+  components: {
+    InfoCircleOutlined,
+    CloseCircleFilled,
+    CheckCircleFilled,
+  },
   computed: {
-    uuid(): string {
-      return this.$route.params.uuid as string;
-    },
     username(): string | undefined {
       if (this.user) {
         return `${this.user?.firstName[0].toLocaleUpperCase() + this.user?.firstName.substring(1)} ${this.user?.patronymic[0].toLocaleUpperCase() + this.user?.patronymic.substring(1)}`;
       }
 
       return undefined;
+    },
+    passwordState(): PasswordState {
+      const state = ApiService.PasswordState(this.formState.password);
+      return state;
     }
   },
   methods: {
@@ -72,41 +133,76 @@ export default defineComponent({
       if (response.status) {
         this.user = response.data as User;
       } else {
-        console.log((response.data as Message).message);
+        this.$router.push('/');
       }
     },
   },
   setup() {
+    const route = useRoute();
+    const router = useRouter();
+
+    const uuid = computed<string>(() => route.params.uuid as string);
+
+    const confirmed = ref<boolean>(false);
+
+    const passwordValidated = ref<boolean>(false);
+    const passwordConfirmValidated = ref<boolean>(false);
+
+    const uuidMatch = (route.params.uuid as string).match(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
+
+    if (!uuidMatch || !uuidMatch.length) {
+      router.push("/");
+    }
+
     const user = ref<User | undefined>();
     const formState = reactive<FormState>({
       password: '',
       passwordConfirm: '',
+      exception: undefined,
     });
 
-    const validateConfirmPassword = async (_rule: Rule, value: string) => {
-      if (value === '') {
-        return Promise.reject();
-      } else if (value !== formState.password) {
-        return Promise.reject("Passwords don't match")
-      } else {
-        return Promise.resolve();
+    const validatePassword = async (_rule: Rule, value: string) => {
+      if (!ApiService.PasswordMatch(value)) {
+        passwordValidated.value = false;
+        return Promise.reject("Weak password");
       }
+
+      passwordValidated.value = true;
+      return Promise.resolve();
     };
 
-    const onFinish = (formData: FormData) => {
-      console.log(formData);
+    const validateConfirmPassword = async (_rule: Rule, value: string) => {
+      if (value !== formState.password) {
+        passwordConfirmValidated.value = false;
+        return Promise.reject("Passwords don't match")
+      }
+
+      passwordConfirmValidated.value = true;
+      return Promise.resolve();
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-      console.log('Failed:', errorInfo);
+    const onFinish = async (formState: FormState) => {
+      await Loader.Use(async () => {
+        const response = await UsersService.ConfirmUserByUUID(uuid.value, formState.password);
+
+        if (response.status) {
+          confirmed.value = true;
+        } else {
+          formState.exception = (response.data as Message).message;
+        }
+      });
     };
 
     return {
+      uuid,
       user,
+      confirmed,
       formState,
       onFinish,
-      onFinishFailed,
+      validatePassword,
       validateConfirmPassword,
+      passwordValidated,
+      passwordConfirmValidated,
     }
   },
   mounted() {

@@ -14,6 +14,7 @@ import {Order} from "@/api/services/types/Order";
 import {OrderService} from "@/api/services/types/OrderService";
 import {DaysToRemoveOrders} from "@/api/services/types/DaysToRemoveOrders";
 import { NewOrder, NewOrderService } from "@/api/services/types/NewOrder";
+import { PasswordState, PasswordStateField, PasswordStateFieldType } from "@/api/services/types/PasswordState";
 
 export type {
     Service,
@@ -32,6 +33,8 @@ export type {
     DaysToRemoveOrders,
     NewOrder,
     NewOrderService,
+    PasswordState,
+    PasswordStateField,
 };
 
-export { App };
+export { App, PasswordStateFieldType };
