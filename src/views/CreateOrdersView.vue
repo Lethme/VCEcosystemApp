@@ -115,7 +115,7 @@
                 <div class="create-order-wrapper d-flex flex-column gap-2">
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h5 class="m-0 fw-normal">Service</h5>
-                    <h5 class="m-0">Price (₽)</h5>
+                    <h5 class="m-0">Price</h5>
                   </div>
                   <a-divider />
                   <div :key="service.id" v-for="service in activePane.order.groupedDataSource" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">

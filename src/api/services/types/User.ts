@@ -12,7 +12,7 @@ interface User extends Timestamp {
     roles: Array<Role>,
     rate?: Rate;
     preferences: Array<Preference>;
-    logout?: () => void;
+    logout: () => Promise<void>;
 }
 
 export default User;

@@ -8,6 +8,7 @@
               <span>Orders</span>
               <sync-outlined class="refresh-btn" @click="refreshOrders" />
               <a-switch checked-children="Archive" un-checked-children="Current" v-model:checked="showArchivedOrders" @change="refreshOrders" />
+              <a-switch v-if="$rootAccess" checked-children="All" un-checked-children="Own" v-model:checked="showAllOrders" @change="refreshOrders" />
             </h4>
             <div class="btn-wrapper">
               <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'" class="col-12 col-sm-auto">
@@ -36,13 +37,14 @@
 <script lang="ts">
 import {createVNode, defineComponent} from "vue";
 import {QuestionCircleOutlined, SyncOutlined} from '@ant-design/icons-vue';
-import {Order, OrderService} from "@/api/services/types";
+import {Order, OrderService, User} from "@/api/services/types";
 import {OrdersService} from "@/api/services";
 import {Loader} from "@/utils";
 import {formatDate} from "@/api/utils/formatDate";
 import {Modal} from "ant-design-vue";
 import {increaseDateByDays} from "@/api/utils/increaseDateByDays";
 import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
+import {getFullUsername} from "@/api/utils/getFullUsername";
 
 export interface OrderData extends Order {
   key: number;
@@ -50,6 +52,7 @@ export interface OrderData extends Order {
   change: number;
   removedIn?: string;
   remaining?: number;
+  username?: string;
 }
 
 export interface OrderInnerData extends OrderService {
@@ -64,6 +67,7 @@ export default defineComponent({
     return {
       expandedRowKeys: [],
       showArchivedOrders: (this.$route.query.archived && this.$route.query.archived == 'true') ? true : false,
+      showAllOrders: (this.$route.query.all && this.$route.query.all == 'true') ? true : false,
       ordersRaw: new Array<Order>(),
       innerColumns: [
         { title: 'Service Id', dataIndex: 'id', key: 'id' },
@@ -76,19 +80,20 @@ export default defineComponent({
   },
   computed: {
     columns(): Array<any> {
-      const archived = this.showArchivedOrders;
-
       return [
         { title: 'Id', dataIndex: 'id', key: 'id' },
         { title: 'Cash (₽)', dataIndex: 'moneyReceived', key: 'moneyReceived' },
         { title: 'Total Price (₽)', dataIndex: "price", key: 'price' },
         { title: 'Change (₽)', dataIndex: "change", key: 'change' },
         { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt' },
-        { title: archived ? 'Deleted At' : 'Updated At', dataIndex: archived ? 'deletedAt' : 'updatedAt', key: archived ? 'deletedAt' : 'updatedAt' },
-          archived ? {
+        // { title: archived ? 'Deleted At' : 'Updated At', dataIndex: archived ? 'deletedAt' : 'updatedAt', key: archived ? 'deletedAt' : 'updatedAt' },
+          this.$rootAccess && this.showAllOrders ? {
+            title: 'User', dataIndex: 'username', key: 'username'
+          } : null,
+          this.showArchivedOrders ? {
             title: 'Removed In', dataIndex: 'removedIn', key: 'removedIn'
           } : null,
-          archived ? {
+          this.showArchivedOrders ? {
             title: 'Remaining days', dataIndex: 'remaining', key: 'remaining'
           } : null,
         { title: 'Actions', key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
@@ -126,24 +131,33 @@ export default defineComponent({
               : undefined,
           price,
           change: order.moneyReceived - price,
+          username: getFullUsername(order.user),
         }
       })
-    }
+    },
   },
   methods: {
     async refreshOrders() {
-      this.showArchivedOrders
-          ? this.$router.push({ query: { archived: 'true' } })
-          : this.$router.push({ query: undefined });
+      this.$router.push({
+        query: {
+          ...this.$route.query,
+          archived: this.showArchivedOrders ? 'true' : undefined,
+          all: this.showAllOrders ? 'true' : undefined,
+        }
+      });
 
       this.ordersRaw = [];
 
       Loader.SetState(true);
 
       await this.refreshServices();
-      const response = await OrdersService.GetAll({
-        deleted: this.showArchivedOrders,
-      });
+      await this.loadOrders();
+    },
+    async loadOrders() {
+      const response = this.$rootAccess && this.showAllOrders
+          ? await OrdersService.GetAllPrivate({ deleted: this.showArchivedOrders })
+          : await OrdersService.GetAll({ deleted: this.showArchivedOrders });
+
 
       if (response.status) {
         this.ordersRaw = (response.data as Array<Order>)
@@ -200,12 +214,12 @@ export default defineComponent({
         okButtonProps: { danger: true },
         onOk: () => {
           Loader.Use(async () => {
-            const response = await OrdersService.Remove(record.id);
+            const response = this.$rootAccess && this.showAllOrders
+                ? await OrdersService.RemovePrivate(record.id)
+                : await OrdersService.Remove(record.id);
             await this.refreshOrders();
           });
         },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel: () => {},
       });
     },
     showRemoveOrderConfirm(record: OrderData) {
@@ -221,12 +235,12 @@ export default defineComponent({
         okButtonProps: { danger: true },
         onOk: () => {
           Loader.Use(async () => {
-            const response = await OrdersService.Remove(record.id, true);
+            const response = this.$rootAccess && this.showAllOrders
+                ? await OrdersService.RemovePrivate(record.id, true)
+                : await OrdersService.Remove(record.id, true);
             await this.refreshOrders();
           });
         },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel: () => {},
       });
     },
     showRestoreOrderConfirm(record: OrderData) {
@@ -241,13 +255,20 @@ export default defineComponent({
         autoFocusButton: "cancel",
         onOk: () => {
           Loader.Use(async () => {
-            const response = await OrdersService.Restore(record.id);
+            const response = this.$rootAccess && this.showAllOrders
+                ? await OrdersService.RestorePrivate(record.id)
+                : await OrdersService.Restore(record.id);
             await this.refreshOrders();
           });
         },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel: () => {},
       });
+    },
+  },
+  watch: {
+    $rootAccess(current: boolean, old: boolean) {
+      if (current) {
+        this.loadOrders();
+      }
     },
   },
   mounted() {

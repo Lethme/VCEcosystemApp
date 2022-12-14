@@ -20,7 +20,7 @@ export default defineComponent({
       dateIntervalHandler: 0,
     };
   },
-  created() {
+  async created() {
     this.dateIntervalHandler = setInterval(async () => {
       await this.$store.dispatch("updateDate");
     }, 1000);
@@ -29,7 +29,7 @@ export default defineComponent({
       await this.$store.dispatch("updateWindowSize");
     });
 
-    Loader.Use(async () => {
+    await Loader.Use(async () => {
       await this.$store.dispatch("updateDaysToRemoveOrders");
 
       const response = await this.$store.dispatch("updateUserInfo");

@@ -7,6 +7,7 @@ declare module "@vue/runtime-core" {
     $store: Store;
     $authorized: boolean;
     $user: User | undefined;
+    $rootAccess: boolean;
     $date: Date;
     $formattedDate: string;
     $windowSize: WindowSize,

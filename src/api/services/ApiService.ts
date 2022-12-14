@@ -7,10 +7,12 @@ import {
   RequestProtocol,
 } from "@/api/services/utils/types";
 
-import { Url } from "@/api/services";
-import axios, {AxiosError} from "axios";
+import {Url} from "@/api/services";
+import {HttpStatusCode} from "axios";
 import {ApiResponse} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
+import store from "@/store";
+import router from "@/router";
 
 class ApiService {
   public static get ApiToken(): string | null {
@@ -65,6 +67,13 @@ class ApiService {
       return await callback();
     } catch (ex) {
       console.log(ex);
+
+      const response: ApiResponse<Message> = (ex as any).response?.data;
+
+      if (response && (response.statusCode === 401 || response.statusCode === 403)) {
+          await store.dispatch("logout");
+      }
+
       return (ex as any).response.data;
     }
   }
