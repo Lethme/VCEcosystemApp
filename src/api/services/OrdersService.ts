@@ -11,7 +11,10 @@ interface SelectOrdersQuery {
 
 class OrdersService extends ApiService {
     private static get Path(): string {
-        return `orders`;
+        return "orders";
+    }
+    private static get PrivatePath(): string {
+        return "private_orders";
     }
 
     static async Create(order: NewOrder): Promise<ApiResponse<Order | Message>> {
@@ -55,6 +58,21 @@ class OrdersService extends ApiService {
         })
     }
 
+    static async GetAllPrivate(query?: SelectOrdersQuery): Promise<ApiResponse<Array<Order> | Message> > {
+        const url = this.CreateApiRequestUrl({
+            path: [App.GKassa, this.PrivatePath],
+            query,
+        });
+
+        return await this.Try<Array<Order>>(async () => {
+            const response = await axios.get<ApiResponse<Array<Order>>>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        })
+    }
+
     static async Remove(id: number, force = false): Promise<ApiResponse<Message | undefined>> {
         const url = this.CreateApiRequestUrl({
             path: [App.GKassa, this.Path, id],
@@ -70,9 +88,38 @@ class OrdersService extends ApiService {
         })
     }
 
+    static async RemovePrivate(id: number, force = false): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [App.GKassa, this.PrivatePath, id],
+            query: { force }
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.delete<ApiResponse>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        })
+    }
+
     static async Restore(id: number): Promise<ApiResponse<Message | Order>> {
         const url = this.CreateApiRequestUrl({
             path: [App.GKassa, this.Path, id],
+        });
+
+        return await this.Try<Order>(async () => {
+            const response = await axios.patch<ApiResponse<Order>>(url.Url, {}, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        })
+    }
+
+    static async RestorePrivate(id: number): Promise<ApiResponse<Message | Order>> {
+        const url = this.CreateApiRequestUrl({
+            path: [App.GKassa, this.PrivatePath, id],
         });
 
         return await this.Try<Order>(async () => {

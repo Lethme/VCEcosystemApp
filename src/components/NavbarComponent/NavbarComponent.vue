@@ -71,6 +71,7 @@ import {
     FileOutlined,
     BarsOutlined
 } from '@ant-design/icons-vue';
+import {getFullUsername} from "@/api/utils/getFullUsername";
 
 export default defineComponent({
   name: "VcNavbar",
@@ -91,13 +92,9 @@ export default defineComponent({
   },
   computed: {
     username() {
-      const fullName = [this.$user?.lastName, this.$user?.firstName, this.$user?.patronymic].map(str => str?.trim()).join(" ");
-
-      if (this.$windowWidth <= 576 && this.$user) {
-        return `${this.$user?.lastName[0].toLocaleUpperCase() + this.$user?.lastName.substring(1)} ${this.$user?.firstName[0].toLocaleUpperCase()}. ${this.$user?.patronymic[0].toLocaleUpperCase()}.`
-      }
-
-      return fullName;
+      return getFullUsername(this.$user, {
+        short: this.$windowWidth <= 576,
+      })
     },
     tempOrdersExist() {
       return this.$store.getters.panes.length > 1

@@ -37,6 +37,14 @@ const routes: Array<RouteRecordRaw> = [
         }
     },
     {
+        path: "/confirm/:uuid",
+        name: "confirm",
+        component: () => import('../views/ConfirmUserView.vue'),
+        meta: {
+            access: RouteAccess.PrivateWhileAuthorized,
+        }
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),

@@ -39,7 +39,14 @@
           </a-form-item>
 
           <a-form-item>
-            <a-button type="primary" html-type="submit" class="submit-btn col-12 col-sm-auto px-4">Login</a-button>
+            <a-button
+                size="large"
+                type="primary"
+                html-type="submit"
+                class="submit-btn col-12 col-sm-auto px-4"
+            >
+              Login
+            </a-button>
           </a-form-item>
 
           <a-alert
@@ -55,8 +62,9 @@
 </template>
 
 <script lang="ts">
+import {Rule} from "ant-design-vue/lib/form";
 import {defineComponent, PropType, reactive} from "vue";
-import {AuthService} from "@/api/services";
+import {ApiService, AuthService} from "@/api/services";
 import {Message} from "@/api/services/types/Message";
 import {Loader} from "@/utils";
 import {useRoute, useRouter} from "vue-router";
@@ -73,6 +81,14 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
 
+    const validatePassword = async (_rule: Rule, value: string) => {
+      if (!ApiService.PasswordMatch(value)) {
+        return Promise.reject("Weak password");
+      }
+
+      return Promise.resolve();
+    };
+
     const formState = reactive<FormState>({
       username: '',
       password: '',
@@ -81,6 +97,7 @@ export default defineComponent({
     });
     return {
       formState,
+      validatePassword,
     };
   },
   methods: {

@@ -1,6 +1,8 @@
 import store from "@/store";
 import {App} from "vue";
 import {Loader} from "@/utils";
+import {ApiRole} from "@/api/services/enums/ApiRole";
+import {User} from "@/api/services/types";
 
 class UserPlugin {
     static install(app: App) {
@@ -13,6 +15,18 @@ class UserPlugin {
                         await store.dispatch("logout");
                     }),
                 }
+            }
+        });
+
+        Object.defineProperty(app.config.globalProperties, "$rootAccess", {
+            get() {
+                const user = store.getters.userInfo;
+
+                if (user) {
+                    return (store.getters.userInfo as User)?.roles.some(role => role.value === ApiRole.Root);
+                }
+
+                return false;
             }
         });
     }
