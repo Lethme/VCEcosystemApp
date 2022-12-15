@@ -5,6 +5,7 @@ import Preference from "@/api/services/types/Preference";
 
 interface User extends Timestamp {
     id: number;
+    uuid: string;
     username: string;
     lastName: string;
     firstName: string;
