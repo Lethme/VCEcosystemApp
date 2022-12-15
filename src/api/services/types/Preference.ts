@@ -5,6 +5,8 @@ interface Preference extends Timestamp {
     day: number;
     shiftIndex: number;
     preference: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export default Preference;
