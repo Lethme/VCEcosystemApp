@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, User} from "@/api/services/types";
+import {ApiResponse, SetProfilePicture, User} from "@/api/services/types";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
 
@@ -52,6 +52,31 @@ class UsersService extends ApiService {
 
             return response.data;
         })
+    }
+
+    static async SetProfilePicture(dto: SetProfilePicture): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'picture'],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.post<ApiResponse<undefined>>(url.Url, dto, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        })
+    }
+
+    static async HasProfilePicture(uuid: string): Promise<boolean> {
+        const picUrl = this.GetProfilePicturePath(uuid);
+
+        try {
+            await axios.head(picUrl);
+            return true;
+        } catch {
+            return false;
+        }
     }
 }
 

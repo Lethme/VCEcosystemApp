@@ -45,6 +45,14 @@ const routes: Array<RouteRecordRaw> = [
         }
     },
     {
+        path: "/profile",
+        name: "profile",
+        component: () => import('../views/UserProfileView.vue'),
+        meta: {
+            access: RouteAccess.Private,
+        }
+    },
+    {
         path: '/about',
         name: 'about',
         component: () => import('../views/AboutView.vue'),

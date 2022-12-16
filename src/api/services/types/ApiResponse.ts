@@ -1,6 +1,6 @@
 import {HttpStatusCode} from "axios";
 
-interface ApiResponse<TData = any> {
+interface ApiResponse<TData = undefined> {
   status: boolean;
   statusCode: HttpStatusCode;
   data?: TData;

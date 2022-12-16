@@ -11,6 +11,7 @@ import {
 } from "@/api/services/utils/types";
 import {alphabetLowercase, alphabetUppercase, numbers, specialSymbols} from "@/api/utils/constans";
 import store from "@/store";
+import RequestPath from "./utils/types/RequestPath";
 
 class ApiService {
   public static get PasswordRegex(): RegExp {
@@ -45,11 +46,13 @@ class ApiService {
   protected static get ApiPrefix(): RequestPrefix {
     return process.env.VUE_APP_API_PREFIX || "";
   }
-  protected static CreateRequestUrl<T = never>(
-    host: RequestHost,
-    options?: RequestOptions<T>
-  ): Url<T> {
-    return Url.Create<T>(host, options);
+
+  public static GetProfilePicturePath(uuid: string) {
+    return this.CreateRequestUrl(this.ApiHost, {
+      protocol: this.ApiProtocol,
+      port: this.ApiPort,
+      path: ['public', 'img', 'users', 'profile_pics', `${uuid}.jpg`],
+    }).Url;
   }
 
   public static Match(str: string, regexp: RegExp): boolean {
@@ -89,6 +92,13 @@ class ApiService {
         state: specialSymbols.some(char => password.includes(char)),
       },
     ]
+  }
+
+  protected static CreateRequestUrl<T = never>(
+      host: RequestHost,
+      options?: RequestOptions<T>
+  ): Url<T> {
+    return Url.Create<T>(host, options);
   }
 
   protected static CreateApiRequestUrl<T = never>(options?: ApiRequestOptions<T>) {
