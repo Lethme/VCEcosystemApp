@@ -12,6 +12,7 @@
     "ant-design-vue": "^3.2.15",
     "axios": "^1.2.0",
     "core-js": "^3.8.3",
+    "file-select-dialog": "^1.5.4",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "vue": "^3.2.13",

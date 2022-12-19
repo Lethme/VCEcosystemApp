@@ -11,8 +11,11 @@
               <a-switch v-if="$rootAccess" checked-children="All" un-checked-children="Own" v-model:checked="showAllOrders" @change="refreshOrders" />
             </h4>
             <div class="btn-wrapper">
-              <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'" class="col-12 col-sm-auto">
-                <router-link to="/orders/create" @click="() => $store.commit('addPane')">New Order</router-link>
+              <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'" class="d-flex align-items-center gap-2 col-12 col-sm-auto">
+                <template #icon>
+                  <plus-outlined />
+                </template>
+                <router-link to="/orders/create" @click="() => $store.commit('addPane')" style="color: white">New Order</router-link>
               </a-button>
             </div>
           </div>
@@ -36,7 +39,7 @@
 
 <script lang="ts">
 import {createVNode, defineComponent} from "vue";
-import {QuestionCircleOutlined, SyncOutlined} from '@ant-design/icons-vue';
+import {QuestionCircleOutlined, SyncOutlined, PlusOutlined} from '@ant-design/icons-vue';
 import {Order, OrderService, User} from "@/api/services/types";
 import {OrdersService} from "@/api/services";
 import {Loader} from "@/utils";
@@ -62,6 +65,7 @@ export interface OrderInnerData extends OrderService {
 export default defineComponent({
   components: {
     SyncOutlined,
+    PlusOutlined,
   },
   data() {
     return {

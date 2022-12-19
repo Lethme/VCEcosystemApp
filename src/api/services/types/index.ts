@@ -16,6 +16,7 @@ import {DaysToRemoveOrders} from "@/api/services/types/DaysToRemoveOrders";
 import { NewOrder, NewOrderService } from "@/api/services/types/NewOrder";
 import { PasswordState, PasswordStateField, PasswordStateFieldType } from "@/api/services/types/PasswordState";
 import { SetProfilePicture } from "@/api/services/types/SetProfilePicture";
+import { PatchUserDto } from "@/api/services/types/PatchUserDto";
 
 export type {
     Service,
@@ -37,6 +38,7 @@ export type {
     PasswordState,
     PasswordStateField,
     SetProfilePicture,
+    PatchUserDto,
 };
 
 export { App, PasswordStateFieldType };

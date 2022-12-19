@@ -6,6 +6,9 @@ const getters = {
   userInfo(state: State): User | undefined {
     return state.user;
   },
+  hasProfilePicture(state: State): boolean {
+    return state.hasProfilePicture;
+  },
   authorized(state: State): boolean {
     return state.user !== undefined && ApiService.ApiToken !== null;
   }

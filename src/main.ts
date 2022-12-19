@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import antd from "ant-design-vue";
 import LayoutComponent from "@/components/LayoutComponent";
+import ProfilePictureComponent from "@/components/ProfilePictureComponent";
 
 import AuthorizedPlugin from "@/plugins/authorized";
 import UserPlugin from "@/plugins/user";
@@ -19,6 +20,7 @@ import './var.less';
 const app = createApp(App);
 
 app.component("VcLayout", LayoutComponent);
+app.component("VcProfilePicture", ProfilePictureComponent);
 
 app
     .use(store)

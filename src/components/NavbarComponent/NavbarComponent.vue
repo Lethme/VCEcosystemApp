@@ -19,9 +19,7 @@
           <a-sub-menu v-else key="userProfile1" style="margin-left: auto">
             <template #title>
 <!--              <user-outlined />-->
-              <vc-layout class="flex-grow-0" :style="{width: '30px', height: '30px', padding: 0, borderRadius: '50%', overflow: 'hidden', boxShadow: 'none'}">
-                <div class="profile-picture-img" :style="{ background: hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat', boxShadow: hasProfilePicture ? '' : 'none' }"></div>
-              </vc-layout>
+              <vc-profile-picture :shadow="false" width="30" height="30" />
               {{ username }}
             </template>
             <a-menu-item v-if="tempOrdersExist" key="setting:4" class="d-flex align-items-center">
@@ -64,8 +62,6 @@
 </template>
 
 <script lang="ts">
-import {UsersService} from "@/api/services";
-import {User} from "@/api/services/types";
 import {defineComponent, onMounted, ref, watch} from 'vue';
 import {
     LoginOutlined,
@@ -76,7 +72,6 @@ import {
     BarsOutlined,
 } from '@ant-design/icons-vue';
 import {getFullUsername} from "@/api/utils/getFullUsername";
-import {useStore} from "vuex";
 
 export default defineComponent({
   name: "VcNavbar",
@@ -89,26 +84,10 @@ export default defineComponent({
     BarsOutlined,
   },
   setup() {
-    const store = useStore();
     const current = ref<string[]>([]);
-    const hasProfilePicture = ref<boolean>(false);
-    const checkProfilePicture = async () => {
-      const user: User = store.getters.userInfo;
-
-      if (user) {
-        hasProfilePicture.value = await UsersService.HasProfilePicture(user.uuid);
-      }
-    }
-
-    onMounted(() => checkProfilePicture());
-    watch(() => store.getters.userInfo, () => {
-      checkProfilePicture();
-    });
 
     return {
       current,
-      hasProfilePicture,
-      checkProfilePicture,
     };
   },
   computed: {

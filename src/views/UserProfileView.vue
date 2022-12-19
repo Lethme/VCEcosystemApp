@@ -1,88 +1,235 @@
 <template>
-  <div class="test d-flex justify-content-center">
-    <vc-layout class="flex-grow-0" :style="{width: '200px', height: '200px', padding: 0, borderRadius: '50%', overflow: 'hidden'}">
-      <div class="profile-picture-img" :style="{ background: hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat', boxShadow: hasProfilePicture ? '' : 'none' }">
-        <div class="inner-layout d-flex flex-column justify-content-center align-items-center gap-1">
-          <camera-outlined class="icon" />
-          <h6 class="text m-0">Upload</h6>
+  <a-layout class="container py-4 gap-4">
+    <a-layout-sider :width="collapsed ? 'auto' : 256" :collapsible="$windowWidth <= 768" v-model:collapsed="collapsed">
+      <vc-layout class="px-0 py-2 h-100">
+        <div v-if="$windowWidth <= 768" class="container-fluid px-2">
+          <a-button type="primary" block @click="toggleCollapsed" style="margin-bottom: 16px">
+            <MenuUnfoldOutlined v-if="collapsed" />
+            <MenuFoldOutlined v-else />
+          </a-button>
         </div>
-      </div>
-    </vc-layout>
-  </div>
+        <a-menu
+            class="w-100"
+            mode="inline"
+            v-model:openKeys="openKeys"
+            v-model:selectedKeys="selectedKeys"
+        >
+          <a-menu-item key="1">
+            <template #icon>
+              <user-outlined />
+            </template>
+            Profile
+          </a-menu-item>
+<!--          <a-sub-menu key="sub1">-->
+<!--            <template #icon>-->
+<!--              <AppstoreOutlined />-->
+<!--            </template>-->
+<!--            <template #title>Navigation Three</template>-->
+<!--            <a-menu-item key="3">Option 3</a-menu-item>-->
+<!--            <a-menu-item key="4">Option 4</a-menu-item>-->
+<!--            <a-sub-menu key="sub1-2" title="Submenu">-->
+<!--              <a-menu-item key="5">Option 5</a-menu-item>-->
+<!--              <a-menu-item key="6">Option 6</a-menu-item>-->
+<!--            </a-sub-menu>-->
+<!--          </a-sub-menu>-->
+<!--          <a-sub-menu key="sub2">-->
+<!--            <template #icon>-->
+<!--              <SettingOutlined />-->
+<!--            </template>-->
+
+<!--            <template #title>Navigation Four</template>-->
+<!--            <a-menu-item key="7">Option 7</a-menu-item>-->
+<!--            <a-menu-item key="8">Option 8</a-menu-item>-->
+<!--            <a-menu-item key="9">Option 9</a-menu-item>-->
+<!--            <a-menu-item key="10">Option 10</a-menu-item>-->
+<!--          </a-sub-menu>-->
+        </a-menu>
+      </vc-layout>
+    </a-layout-sider>
+    <a-layout>
+      <a-layout-content>
+        <vc-layout class="h-100">
+          <div class="profile-header d-flex flex-column align-items-center gap-3">
+            <vc-profile-picture width="150" height="150" :uploadable="true" />
+            <h5 v-if="$authorized" class="usertag d-flex align-items-center gap-2">@{{ $user.username }}</h5>
+            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }} <edit-outlined class="edit" @click="showEditUserModal" /></h3>
+          </div>
+          <a-modal
+              :visible="editUserModalVisible"
+              title="Edit"
+              ok-text="Save"
+              :confirm-loading="confirmEditLoading"
+              @ok="onFinish"
+              @cancel="onCancel"
+              centered
+          >
+            <a-form
+                class="edit-form"
+                name="basic"
+                autocomplete="off"
+            >
+              <a-form-item
+                  label="Last name"
+                  name="lastname"
+                  :rules="[{ required: false }]"
+              >
+                <a-input v-model:value="lastName" />
+              </a-form-item>
+
+              <a-form-item
+                  label="First name"
+                  name="firstname"
+                  :rules="[{ required: false }]"
+              >
+                <a-input v-model:value="firstName" />
+              </a-form-item>
+
+              <a-form-item
+                  label="Patronymic"
+                  name="patronymic"
+                  :rules="[{ required: false }]"
+              >
+                <a-input v-model:value="patronymic" />
+              </a-form-item>
+            </a-form>
+          </a-modal>
+        </vc-layout>
+      </a-layout-content>
+    </a-layout>
+  </a-layout>
 </template>
 
 <script lang="ts">
-import {UsersService} from "@/api/services";
-import {User} from "@/api/services/types";
-import {defineComponent, onMounted, ref, watch} from "vue";
-import {CameraOutlined} from "@ant-design/icons-vue";
+import {defineComponent, reactive, ref, toRefs, watch} from "vue";
+import {
+    UserOutlined,
+    EditOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+} from '@ant-design/icons-vue';
+import {getFullUsername} from "@/api/utils/getFullUsername";
 import {useStore} from "vuex";
+import {Message, User} from "@/api/services/types";
+import {UsersService} from "@/api/services";
+
+interface FormState {
+  lastName: string;
+  firstName: string;
+  patronymic: string;
+}
 
 export default defineComponent({
   components: {
-    CameraOutlined,
+    UserOutlined,
+    EditOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+  },
+  computed: {
+    username() {
+      return getFullUsername(this.$user);
+    },
   },
   setup() {
     const store = useStore();
-    const hasProfilePicture = ref<boolean>(false);
-    const checkProfilePicture = async () => {
-      const user: User = store.getters.userInfo;
-
-      if (user) {
-        hasProfilePicture.value = await UsersService.HasProfilePicture(user.uuid);
-      }
-    }
-
-    onMounted(() => checkProfilePicture());
-    watch(() => store.getters.userInfo, () => {
-      checkProfilePicture();
+    const editUserModalVisible = ref(false);
+    const confirmEditLoading = ref<boolean>(false);
+    const state = reactive({
+      collapsed: false,
+      selectedKeys: ['1'],
+      openKeys: ['sub1'],
+      preOpenKeys: ['sub1'],
+    });
+    const userInfoState = reactive<FormState>({
+      lastName: '',
+      firstName: '',
+      patronymic: '',
     });
 
-    return {
-      hasProfilePicture,
-      checkProfilePicture,
+    watch(
+        () => state.openKeys,
+        (val, oldVal) => {
+          state.preOpenKeys = oldVal;
+        },
+    );
+
+    watch(() => store.getters.windowWidth, (val, oldVal) => {
+      if (val > 768 && state.collapsed) {
+        state.collapsed = false;
+      }
+
+      if (val <= 768 && !state.collapsed) {
+        state.collapsed = true;
+      }
+    });
+
+    watch(() => store.getters.userInfo, (user: User) => {
+      if (user) {
+        userInfoState.lastName = user.lastName;
+        userInfoState.firstName = user.firstName;
+        userInfoState.patronymic = user.patronymic;
+      } else {
+        userInfoState.lastName = '';
+        userInfoState.firstName = '';
+        userInfoState.patronymic = '';
+      }
+    })
+    
+    const showEditUserModal = () => {
+      editUserModalVisible.value = true;
+    }
+
+    const toggleCollapsed = () => {
+      state.collapsed = !state.collapsed;
+      state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
-  },
+
+    const onFinish = async () => {
+      confirmEditLoading.value = true;
+
+      const response = await UsersService.EditUserData(userInfoState);
+
+      if (response.status) {
+        await store.dispatch("updateUserInfo");
+      } else {
+        console.log((response.data as Message).message);
+      }
+
+      confirmEditLoading.value = false;
+      editUserModalVisible.value = false;
+    };
+    const onCancel = () => {
+      userInfoState.lastName = store.getters.userInfo.lastName;
+      userInfoState.firstName = store.getters.userInfo.firstName;
+      userInfoState.patronymic = store.getters.userInfo.patronymic;
+      editUserModalVisible.value = false;
+    }
+
+    return {
+      ...toRefs(state),
+      ...toRefs(userInfoState),
+      editUserModalVisible,
+      confirmEditLoading,
+      showEditUserModal,
+      onFinish,
+      onCancel,
+      toggleCollapsed,
+    }
+  }
 });
 </script>
 
 <style lang="less" scoped>
-.profile-picture-img {
-  width: 100%;
-  height: 100%;
+.usertag {
+  color: #a0a0a0;
+}
+.edit {
+  cursor: pointer;
+  transition: all .2s ease;
 
-  border-radius: 50%;
-  box-shadow: 0px 0px 20px 4px rgba(0, 0, 0, 0.5) inset;
-
-  .inner-layout {
-    width: 100%;
-    height: 100%;
-
-    border-radius: 50%;
-
-    opacity: 0;
-    background: none;
-    transition: all .2s ease;
-
-    &:hover,
-    &:active {
-      cursor: pointer;
-      opacity: 1;
-      background: rgba(0, 0, 0, .5);
-      //box-shadow: inset 0px 10px 10px 0px rgba(0, 0, 0, .8);
-    }
-
-    & .text {
-      font-size: 1.5em;
-    }
-
-    & .icon {
-      font-size: 4em;
-    }
-
-    * {
-      color: #F0F0F0;
-    }
+  &:hover,
+  &:active {
+    color: rgb(24, 144, 255);
   }
 }
 </style>

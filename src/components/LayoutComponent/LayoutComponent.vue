@@ -25,11 +25,18 @@ export default defineComponent({
       default() {
         return null;
       },
+    },
+    shadow: {
+      type: Boolean as PropType<boolean>,
+      required: false,
+      default() {
+        return true;
+      },
     }
   },
   setup(props) {
     const layoutClass = computed(() => {
-      return `${(props as any).class ? `${(props as any).class}` : ''} vc-layout`;
+      return `${(props as any).class ? `${(props as any).class}` : ''} ${(props as any).shadow ? 'shadowed' : ''} vc-layout`;
     });
 
     const layoutInnerClass = computed(() => {
