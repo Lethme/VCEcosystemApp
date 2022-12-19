@@ -1,6 +1,6 @@
 <template>
   <a-layout class="container py-4 gap-4">
-    <a-layout-sider :width="collapsed ? 'auto' : 256" :collapsible="$windowWidth <= 768" v-model:collapsed="collapsed">
+    <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $windowWidth <= 768 ? 156 : 256" :collapsible="$windowWidth <= 768" v-model:collapsed="collapsed">
       <vc-layout class="px-0 py-2 h-100">
         <div v-if="$windowWidth <= 768" class="container-fluid px-2">
           <a-button type="primary" block @click="toggleCollapsed" style="margin-bottom: 16px">
