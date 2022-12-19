@@ -14,6 +14,7 @@ interface User extends Timestamp {
     rate?: Rate;
     preferences: Array<Preference>;
     logout: () => Promise<void>;
+    getProfilePictureUrl: () => string;
 }
 
 export default User;

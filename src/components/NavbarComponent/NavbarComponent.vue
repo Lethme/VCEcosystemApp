@@ -18,7 +18,8 @@
           </a-menu-item>
           <a-sub-menu v-else key="userProfile1" style="margin-left: auto">
             <template #title>
-              <user-outlined />
+<!--              <user-outlined />-->
+              <vc-profile-picture :shadow="false" width="30" height="30" />
               {{ username }}
             </template>
             <a-menu-item v-if="tempOrdersExist" key="setting:4" class="d-flex align-items-center">
@@ -42,9 +43,9 @@
             <a-divider class="m-0" />
             <a-menu-item key="setting:1" class="d-flex align-items-center">
               <template #icon>
-                <setting-outlined />
+                <user-outlined />
               </template>
-              Settings
+              <router-link to="/profile">Account</router-link>
             </a-menu-item>
             <a-divider class="m-0" />
             <a-menu-item key="setting:0" class="log-out d-flex align-items-center" @click="$user.logout">
@@ -61,15 +62,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import {defineComponent, onMounted, ref, watch} from 'vue';
 import {
     LoginOutlined,
     LogoutOutlined,
     SolutionOutlined,
     UserOutlined,
-    SettingOutlined,
     FileOutlined,
-    BarsOutlined
+    BarsOutlined,
 } from '@ant-design/icons-vue';
 import {getFullUsername} from "@/api/utils/getFullUsername";
 
@@ -80,12 +80,12 @@ export default defineComponent({
     LogoutOutlined,
     SolutionOutlined,
     UserOutlined,
-    SettingOutlined,
     FileOutlined,
     BarsOutlined,
   },
   setup() {
     const current = ref<string[]>([]);
+
     return {
       current,
     };

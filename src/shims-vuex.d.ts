@@ -15,6 +15,7 @@ declare module "@vue/runtime-core" {
     $windowWidth: number;
     $services: Array<Service>;
     $daysToRemoveOrders: number;
+    $pictureFallback: string;
 
     refreshServices: () => Promise<void>;
   }

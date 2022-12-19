@@ -4,6 +4,7 @@ import userinfo from "./userinfo";
 import date from "./date";
 import services from "./services";
 import orders from "./orders";
+import locales from "./locales";
 
 export default {
     window,
@@ -12,4 +13,5 @@ export default {
     date,
     services,
     orders,
+    locales,
 };

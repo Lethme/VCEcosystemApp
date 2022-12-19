@@ -21,8 +21,14 @@ const actions = {
         localStorage.removeItem("api_token");
         context.commit("setUserInfo", undefined);
       } else {
-        context.commit("setUserInfo", (response as ApiResponse<User>).data);
+        const user = (response as ApiResponse<User>).data;
+        context.commit("setUserInfo", user);
         context.commit("loadState");
+
+        if (user) {
+          const hasProfilePicture = await UsersService.HasProfilePicture(user.uuid);
+          context.commit("setUserHasProfilePicture", hasProfilePicture);
+        }
       }
 
       return response;
@@ -35,6 +41,7 @@ const actions = {
       context.commit("setUserInfo", undefined);
       context.commit("clearState");
       localStorage.removeItem("api_token");
+      context.commit("setUserHasProfilePicture", false);
       await router.push("/login");
     }
   }
