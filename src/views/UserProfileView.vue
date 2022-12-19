@@ -135,7 +135,7 @@ export default defineComponent({
     const editUserModalVisible = ref(false);
     const confirmEditLoading = ref<boolean>(false);
     const state = reactive({
-      collapsed: false,
+      collapsed: true,
       selectedKeys: ['1'],
       openKeys: ['sub1'],
       preOpenKeys: ['sub1'],
