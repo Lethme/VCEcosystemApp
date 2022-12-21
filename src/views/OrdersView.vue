@@ -48,18 +48,21 @@ import {Modal} from "ant-design-vue";
 import {increaseDateByDays} from "@/api/utils/increaseDateByDays";
 import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
 import {getFullUsername} from "@/api/utils/getFullUsername";
+import {formatPrice} from "@/api/utils/formatPrice";
 
 export interface OrderData extends Order {
   key: number;
-  price: number;
-  change: number;
+  cash: string;
+  price: string;
+  change: string;
   removedIn?: string;
   remaining?: number;
   username?: string;
 }
 
 export interface OrderInnerData extends OrderService {
-  totalPrice: number;
+  totalPrice: string;
+  unitPrice: string;
 }
 
 export default defineComponent({
@@ -76,9 +79,15 @@ export default defineComponent({
       innerColumns: [
         { title: 'Service Id', dataIndex: 'id', key: 'id' },
         { title: 'Service Title', dataIndex: 'title', key: 'title' },
-        { title: 'Total Number', dataIndex: 'amount', key: 'amount' },
-        { title: 'Price (₽/unit)', dataIndex: 'price', key: 'price' },
-        { title: 'Total Price (₽)', dataIndex: 'totalPrice', key: 'totalPrice' },
+        { title: 'Total Amount', dataIndex: 'amount', key: 'amount', align: 'right' },
+        { title: 'Price, ₽/unit', dataIndex: 'unitPrice', key: 'unitPrice', align: 'right' },
+        { title: 'Total Price, ₽', dataIndex: 'totalPrice', key: 'totalPrice', align: 'right', customCell(record: any) {
+          return {
+            style: {
+              fontWeight: 700,
+            },
+          };
+        }},
       ],
     };
   },
@@ -86,19 +95,25 @@ export default defineComponent({
     columns(): Array<any> {
       return [
         { title: 'Id', dataIndex: 'id', key: 'id' },
-        { title: 'Cash (₽)', dataIndex: 'moneyReceived', key: 'moneyReceived' },
-        { title: 'Total Price (₽)', dataIndex: "price", key: 'price' },
-        { title: 'Change (₽)', dataIndex: "change", key: 'change' },
-        { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt' },
+        { title: 'Total Price, ₽', dataIndex: "price", key: 'price', align: "right", customCell(record: any) {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            };
+        }},
+        { title: 'Cash, ₽', dataIndex: 'cash', key: 'cash', align: 'right' },
+        { title: 'Change, ₽', dataIndex: "change", key: 'change', align: 'right' },
+        { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt', align: 'right' },
         // { title: archived ? 'Deleted At' : 'Updated At', dataIndex: archived ? 'deletedAt' : 'updatedAt', key: archived ? 'deletedAt' : 'updatedAt' },
           this.$rootAccess && this.showAllOrders ? {
-            title: 'User', dataIndex: 'username', key: 'username'
+            title: 'User', dataIndex: 'username', key: 'username', align: 'right'
           } : null,
           this.showArchivedOrders ? {
-            title: 'Removed In', dataIndex: 'removedIn', key: 'removedIn'
+            title: 'Removed In', dataIndex: 'removedIn', key: 'removedIn', align: 'right'
           } : null,
           this.showArchivedOrders ? {
-            title: 'Remaining days', dataIndex: 'remaining', key: 'remaining'
+            title: 'Remaining days', dataIndex: 'remaining', key: 'remaining', align: 'right'
           } : null,
         { title: 'Actions', key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
       ].filter(col => col);
@@ -107,7 +122,8 @@ export default defineComponent({
       return this.orders.map((o: OrderData) => o.services.map(service => {
         return {
           ...service,
-          totalPrice: service.amount * service.price,
+          unitPrice: formatPrice(service.price),
+          totalPrice: formatPrice(service.amount * service.price),
         }
       }).sort((f, s) => f.id - s.id));
     },
@@ -133,8 +149,9 @@ export default defineComponent({
           remaining: this.showArchivedOrders
               ? parseFloat((this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)).toFixed(2))
               : undefined,
-          price,
-          change: order.moneyReceived - price,
+          cash: formatPrice(order.moneyReceived),
+          price: formatPrice(price),
+          change: formatPrice(order.moneyReceived - price),
           username: getFullUsername(order.user),
         }
       })

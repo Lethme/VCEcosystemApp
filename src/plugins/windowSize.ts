@@ -22,6 +22,9 @@ class WindowSizePlugin {
         Object.defineProperty(app.config.globalProperties, "$windowHeight", {
             get() { return store.getters.windowHeight }
         });
+        Object.defineProperty(app.config.globalProperties, "$mobile", {
+            get() { return store.getters.mobile }
+        });
     }
 }
 

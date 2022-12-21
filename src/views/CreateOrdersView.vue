@@ -59,6 +59,7 @@
                             @cancel="cancel(record.key)"
                             centered
                         >
+                          <h6>Amount</h6>
                           <a-input-number type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="activePane.order.dataEditable[record.key].amount" :min="1" @pressEnter="save(record.key)" />
                         </a-modal>
                       </div>
@@ -79,8 +80,8 @@
                 <h5 class="py-lg-2">Order Summary</h5>
                 <a-card class="text-start" :title="activePane.title">
                   <template #extra>
-                    <h4 class="m-0 text-end">{{ activePane.order.totalPrice }} ₽</h4>
-                    <h4 class="m-0 text-end change-value">{{ activePane.order.change }} ₽</h4>
+                    <h4 class="m-0 text-end">{{ formatPrice(activePane.order.totalPrice) }}</h4>
+<!--                    <h4 class="m-0 text-end change-value">{{ formatPrice(activePane.order.change) }}</h4>-->
                   </template>
                   <h6 class="pb-1">Order Services</h6>
                   <a-collapse class="order-services-collapse" v-model:activeKey="activePane.order.summaryActiveKeys" :bordered="false" expand-icon-position="right" @change="() => $store.commit('saveState')">
@@ -88,10 +89,10 @@
                       <div class="summary-service-wrapper d-flex flex-row justify-content-between">
                         <div class="summary-service">
                           <h6 class="summary-service-amount">Total amount: <span class="value">{{ service.amount }}</span></h6>
-                          <h6 class="summary-service-price m-0">Price/Unit: <span class="value">{{ service.price }} ₽</span></h6>
+                          <h6 class="summary-service-price m-0">Price/Unit: <span class="value">{{ formatPrice(service.price) }}</span></h6>
                         </div>
                         <div class="summary-service-total-price d-flex flex-column justify-content-center align-items-stretch">
-                          <h5 class="m-0 value">{{ service.totalPrice }} ₽</h5>
+                          <h5 class="m-0 value">{{ formatPrice(service.totalPrice) }}</h5>
                         </div>
                       </div>
                     </a-collapse-panel>
@@ -120,20 +121,20 @@
                   <a-divider />
                   <div :key="service.id" v-for="service in activePane.order.groupedDataSource" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-normal">{{ service.title }}</h6>
-                    <h5 class="m-0 value d-flex align-items-center"><span class="fw-normal fs-6">{{ service.amount }} x {{ service.price }}₽ =&nbsp;</span>{{ service.totalPrice }} ₽</h5>
+                    <h5 class="m-0 value d-flex align-items-center"><span class="fw-normal fs-6">{{ service.amount }} x {{ formatPrice(service.price) }} =&nbsp;</span>{{ formatPrice(service.totalPrice) }}</h5>
                   </div>
                   <a-divider />
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-normal">Total Price</h6>
-                    <h5 class="m-0 value">{{ activePane.order.totalPrice }} ₽</h5>
+                    <h5 class="m-0 value">{{ formatPrice(activePane.order.totalPrice) }}</h5>
                   </div>
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-normal">Cash</h6>
-                    <h5 class="m-0 value">{{ activePane.order.cash }} ₽</h5>
+                    <h5 class="m-0 value">{{ formatPrice(activePane.order.cash) }}</h5>
                   </div>
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-normal">Change</h6>
-                    <h5 class="m-0 value">{{ activePane.order.change }} ₽</h5>
+                    <h5 class="m-0 value">{{ formatPrice(activePane.order.change) }}</h5>
                   </div>
                 </div>
               </a-modal>
@@ -152,6 +153,7 @@ import { OrdersService } from "@/api/services";
 import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
 import { useStore } from 'vuex';
 import { Pane } from "@/store/modules/orders/types";
+import {formatPrice} from "@/api/utils/formatPrice";
 
 export default defineComponent({
   components: {
@@ -167,6 +169,7 @@ export default defineComponent({
     filterOption(input: string, option: any) {
       return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
     },
+    formatPrice: formatPrice,
   },
   created() {
     this.$store.dispatch("updateServices");
@@ -249,14 +252,29 @@ export default defineComponent({
         dataIndex: 'title',
       },
       {
-        title: 'Price (₽/unit)',
+        title: 'Price, ₽/unit',
         width: '15%',
         dataIndex: 'price',
+        align: 'right',
+        customRender({ record }: any) {
+          return formatPrice(record.price);
+        },
       },
       {
-        title: 'Total Price (₽)',
+        title: 'Total Price, ₽',
         width: '18%',
         dataIndex: 'totalPrice',
+        align: 'right',
+        customCell(record: any) {
+          return {
+            style: {
+              fontWeight: 700,
+            },
+          }
+        },
+        customRender({ record }: any) {
+          return formatPrice(record.totalPrice);
+        },
       },
       {
         title: 'Amount',

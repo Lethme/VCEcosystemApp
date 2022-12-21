@@ -1,8 +1,8 @@
 <template>
   <a-layout class="container py-4 gap-4">
-    <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $windowWidth <= 768 ? 156 : 256" :collapsible="$windowWidth <= 768" v-model:collapsed="collapsed">
+    <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $mobile ? 156 : 256" :collapsible="$mobile" v-model:collapsed="collapsed">
       <vc-layout class="px-0 py-2 h-100">
-        <div v-if="$windowWidth <= 768" class="container-fluid px-2">
+        <div v-if="$mobile" class="container-fluid px-2">
           <a-button type="primary" block @click="toggleCollapsed" style="margin-bottom: 16px">
             <MenuUnfoldOutlined v-if="collapsed" />
             <MenuFoldOutlined v-else />
@@ -52,9 +52,10 @@
           <div class="profile-header d-flex flex-column align-items-center gap-3">
             <vc-profile-picture width="150" height="150" :uploadable="true" />
             <h5 v-if="$authorized" class="usertag d-flex align-items-center gap-2">@{{ $user.username }}</h5>
-            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }} <edit-outlined class="edit" @click="showEditUserModal" /></h3>
+            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }}<edit-outlined v-if="false" class="edit" @click="showEditUserModal" /></h3>
           </div>
           <a-modal
+              v-if="false"
               :visible="editUserModalVisible"
               title="Edit"
               ok-text="Save"
@@ -130,12 +131,12 @@ export default defineComponent({
       return getFullUsername(this.$user);
     },
   },
-  setup() {
+  setup(props, context) {
     const store = useStore();
     const editUserModalVisible = ref(false);
     const confirmEditLoading = ref<boolean>(false);
     const state = reactive({
-      collapsed: true,
+      collapsed: store.getters.mobile,
       selectedKeys: ['1'],
       openKeys: ['sub1'],
       preOpenKeys: ['sub1'],
@@ -153,14 +154,8 @@ export default defineComponent({
         },
     );
 
-    watch(() => store.getters.windowWidth, (val, oldVal) => {
-      if (val > 768 && state.collapsed) {
-        state.collapsed = false;
-      }
-
-      if (val <= 768 && !state.collapsed) {
-        state.collapsed = true;
-      }
+    watch(() => store.getters.mobile, (val, oldVal) => {
+      state.collapsed = val;
     });
 
     watch(() => store.getters.userInfo, (user: User) => {

@@ -13,6 +13,7 @@ declare module "@vue/runtime-core" {
     $windowSize: WindowSize,
     $windowHeight: number;
     $windowWidth: number;
+    $mobile: boolean;
     $services: Array<Service>;
     $daysToRemoveOrders: number;
     $pictureFallback: string;

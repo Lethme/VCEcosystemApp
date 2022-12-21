@@ -7,6 +7,9 @@ const getters = {
   windowHeight(state: State): number {
     return state.windowHeight;
   },
+  mobile(state: State): boolean {
+    return state.windowWidth <= 768;
+  },
 };
 
 export default getters;

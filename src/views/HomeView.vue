@@ -54,6 +54,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { SyncOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 import {Service} from "@/api/services/types";
+import {formatPrice} from "@/api/utils/formatPrice";
 
 @Options({
   components: {
@@ -65,20 +66,27 @@ import {Service} from "@/api/services/types";
     return {
       searchText: "",
       columns: [
-        {
-          title: "Id",
-          dataIndex: "id",
-          key: "id"
-        },
+        // {
+        //   title: "Id",
+        //   dataIndex: "id",
+        //   key: "id"
+        // },
         {
           title: "Title",
           dataIndex: "title",
           key: "title"
         },
         {
-          title: "Price (₽/unit)",
-          dataIndex: "price",
-          key: "price"
+          title: "Price, ₽/unit",
+          dataIndex: "formattedPrice",
+          key: "formattedPrice",
+          customCell() {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            };
+          },
         },
         // {
         //   title: "Description",
@@ -91,10 +99,11 @@ import {Service} from "@/api/services/types";
   computed: {
     services() {
       if (this.searchText) {
-        return this.$services.filter((s: Service) => s.title.toLocaleLowerCase().includes(this.searchText.toLocaleLowerCase()));
+        return this.$services.filter((s: Service) => s.title.toLocaleLowerCase().includes(this.searchText.toLocaleLowerCase()))
+            .map((service: Service) => ({ ...service, formattedPrice: formatPrice(service.price) }));
       }
 
-      return this.$services;
+      return this.$services.map((service: Service) => ({ ...service, formattedPrice: formatPrice(service.price) }));
     }
   },
   mounted() {
