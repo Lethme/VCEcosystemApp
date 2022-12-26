@@ -1,9 +1,10 @@
+import store from "@/store";
+import {Locale} from "@/store/modules/locales/types/Locale";
 import {ActionContext} from "vuex";
 import {State} from "./state";
 import {ApiService, UsersService} from "@/api/services";
 import {ApiResponse, User} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
-import {HttpStatusCode} from "axios";
 import {isAuthorized} from "@/utils";
 import router from "@/router";
 
@@ -23,9 +24,10 @@ const actions = {
       } else {
         const user = (response as ApiResponse<User>).data;
         context.commit("setUserInfo", user);
-        context.commit("loadState");
 
         if (user) {
+          context.commit("setLocale", user.locale);
+          context.commit("loadState");
           const hasProfilePicture = await UsersService.HasProfilePicture(user.uuid);
           context.commit("setUserHasProfilePicture", hasProfilePicture);
         }
@@ -40,6 +42,7 @@ const actions = {
     if (isAuthorized()) {
       context.commit("setUserInfo", undefined);
       context.commit("clearState");
+      context.commit("setLocale", Locale.Ru);
       localStorage.removeItem("api_token");
       context.commit("setUserHasProfilePicture", false);
       await router.push("/login");

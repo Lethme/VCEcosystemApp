@@ -26,6 +26,10 @@ export class OrderState {
         }
     }
 
+    public get empty() {
+        return this.dataSource.length === 0;
+    }
+
     public get change() {
         return this.cash - this.totalPrice;
     }

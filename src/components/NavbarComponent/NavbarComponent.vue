@@ -10,11 +10,11 @@
               </router-link>
             </div>
           </a-menu-item>
-          <a-menu-item v-if="!$authorized" class="d-flex align-items-center" key="userProfile" style="margin-left: auto">
+          <a-menu-item v-if="!$authorized" class="d-flex align-items-center" key="login" style="margin-left: auto">
             <template #icon>
               <login-outlined />
             </template>
-            <router-link to="/login">Log In</router-link>
+            <router-link to="/login">Войти</router-link>
           </a-menu-item>
           <a-sub-menu v-else key="userProfile1" style="margin-left: auto">
             <template #title>
@@ -22,37 +22,48 @@
               <vc-profile-picture :shadow="false" width="30" height="30" />
               {{ username }}
             </template>
-            <a-menu-item v-if="tempOrdersExist" key="setting:4" class="d-flex align-items-center">
+            <a-menu-item v-if="tempOrdersExist" key="editNewOrders" class="d-flex align-items-center">
               <template #icon>
                 <bars-outlined />
               </template>
-              <router-link to="/orders/create">Edit New Orders</router-link>
+              <router-link to="/orders/create">{{ $locale.mainMenuItemTitles.newOrder.edit }}</router-link>
             </a-menu-item>
-            <a-menu-item v-else key="setting:3" class="d-flex align-items-center">
+            <a-menu-item v-else key="newOrder" class="d-flex align-items-center">
               <template #icon>
                 <file-outlined />
               </template>
-              <router-link to="/orders/create">New Order</router-link>
+              <router-link to="/orders/create">{{ $locale.mainMenuItemTitles.newOrder.new }}</router-link>
             </a-menu-item>
-            <a-menu-item key="setting:2" class="d-flex align-items-center">
+            <a-menu-item key="orders" class="d-flex align-items-center">
               <template #icon>
                 <solution-outlined />
               </template>
-              <router-link to="/orders">Orders</router-link>
+              <router-link to="/orders">{{ $locale.mainMenuItemTitles.orders }}</router-link>
             </a-menu-item>
             <a-divider class="m-0" />
-            <a-menu-item key="setting:1" class="d-flex align-items-center">
+            <a-sub-menu key="locales" class="d-flex flex-row align-items-center">
+              <template #icon>
+                <zhihu-outlined />
+              </template>
+              <template #title>{{ $locale.mainMenuItemTitles.locales }}</template>
+              <a-menu-item v-for="locale in $localeRecords" :key="locale.locale" @click="$store.dispatch('setLocale', locale.locale)" :class="{ 'locale-selected': locale.locale === $locale.locale }">
+                {{ $locale.localeTitles[locale.locale] }}
+                <check-outlined v-if="locale.locale === $locale.locale" class="ms-auto" />
+              </a-menu-item>
+            </a-sub-menu>
+            <a-divider class="m-0" />
+            <a-menu-item key="account" class="d-flex align-items-center">
               <template #icon>
                 <user-outlined />
               </template>
-              <router-link to="/profile">Account</router-link>
+              <router-link to="/profile">{{ $locale.mainMenuItemTitles.account }}</router-link>
             </a-menu-item>
             <a-divider class="m-0" />
-            <a-menu-item key="setting:0" class="log-out d-flex align-items-center" @click="$user.logout">
+            <a-menu-item key="logout" class="log-out d-flex align-items-center" @click="$user.logout">
               <template #icon>
                 <logout-outlined />
               </template>
-              Log Out
+              {{ $locale.mainMenuItemTitles.logOut }}
             </a-menu-item>
           </a-sub-menu>
         </a-menu>
@@ -70,6 +81,8 @@ import {
     UserOutlined,
     FileOutlined,
     BarsOutlined,
+    ZhihuOutlined,
+    CheckOutlined,
 } from '@ant-design/icons-vue';
 import {getFullUsername} from "@/api/utils/getFullUsername";
 
@@ -82,6 +95,8 @@ export default defineComponent({
     UserOutlined,
     FileOutlined,
     BarsOutlined,
+    ZhihuOutlined,
+    CheckOutlined,
   },
   setup() {
     const current = ref<string[]>([]);

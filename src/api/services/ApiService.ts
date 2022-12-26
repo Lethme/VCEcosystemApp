@@ -68,27 +68,27 @@ class ApiService {
     return [
       {
         type: PasswordStateFieldType.Length,
-        text: "Password must have length from 8 to 24",
+        text: "Пароль должен содержать от 8 до 24 символов включительно",
         state: password.length >= 8 && password.length <= 24,
       },
       {
         type: PasswordStateFieldType.StartsUppercase,
-          text: "Password must start with uppercase latin letter",
+          text: "Пароль должен начинаться с заглавной латинской буквы",
           state: alphabetUppercase.some(char => password.startsWith(char)),
       },
       {
         type: PasswordStateFieldType.ContainsLatinLetters,
-        text: "Password mush have at least one lowercase latin letter",
+        text: "Пароль должен содержать хотя бы одну строчную латинскую букву",
         state: alphabetLowercase.some(char => password.includes(char)),
       },
       {
         type: PasswordStateFieldType.ContainsNumbers,
-        text: "Password mush have at least one digit",
+        text: "Пароль должен содержать хотя бы одну цифру",
         state: numbers.some(char => password.includes(char.toString())),
       },
       {
         type: PasswordStateFieldType.ContainsSpecialSymbols,
-        text: "Password mush have at least one special symbol",
+        text: "Пароль дожен содержать хотя бы один специальный символ",
         state: specialSymbols.some(char => password.includes(char)),
       },
     ]

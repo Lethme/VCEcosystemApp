@@ -4,11 +4,11 @@
       <a-layout class="flex-grow-1 w-100 py-4">
         <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between pb-4 pb-md-2">
           <h4 class="text-start d-flex align-items-center gap-3">
-            <span>Create New Orders</span>
+            <span>{{ $locale.newOrdersPage.title }}</span>
           </h4>
         </div>
         <a-layout-content>
-          <a-tabs class="unselectable" v-model:activeKey="activeKey" type="editable-card" @edit="paneAction">
+          <a-tabs class="unselectable" v-model:activeKey="activeKey" type="editable-card" @change="saveState" @edit="paneAction">
             <a-tab-pane class="d-flex flex-column flex-xxl-row justify-content-between gap-3" v-for="pane in panes" :key="pane.key" :tab="pane.title" :closable="true">
               <div class="pane-content-wrapper d-flex flex-column justify-content-start flex-grow-1 gap-3">
                 <div class="service-select-wrapper d-flex flex-column flex-md-row gap-2 justify-content-start">
@@ -22,14 +22,14 @@
                       :filter-option="filterOption"
                       class="text-start col-12 col-md-4 col-lg-3"
                   />
-                  <a-button size="large" class="col-12 col-md-auto" @click="refreshServices">Refresh Services</a-button>
+                  <a-button size="large" class="col-12 col-md-auto" @click="refreshServices">{{ $locale.newOrdersPage.refreshServicesButtonTitle }}</a-button>
                   <a-popconfirm
-                      title="Sure to clear this order?"
+                      :title="$locale.newOrdersPage.clearOrderButtonConfirm"
                       @confirm="clearOrder"
                   >
-                    <a-button type="primary" size="large" danger class="col-12 col-md-auto">Clear Order</a-button>
+                    <a-button type="primary" size="large" danger class="col-12 col-md-auto">{{ $locale.newOrdersPage.clearOrderButtonTitle }}</a-button>
                   </a-popconfirm>
-                  <a-button type="primary" size="large" class="col-12 col-md-auto" @click="addService">Add Service</a-button>
+                  <a-button type="primary" size="large" class="col-12 col-md-auto" @click="addService">{{ $locale.newOrdersPage.addServiceButtonTitle }}</a-button>
                 </div>
                 <a-table bordered :data-source="activePane.order.dataSource" :columns="columns" :custom-row="customServicesRow">
                   <template #amount="{ text, record }">
@@ -68,28 +68,28 @@
                   <template #operation="{ record }">
                     <a-popconfirm
                         v-if="activePane.order.dataSource.length"
-                        title="Sure to delete?"
+                        :title="$locale.newOrdersPage.orderServicesTableButtonsTitles.removeConfirm"
                         @confirm="removeService(record.key)"
                     >
-                      <a-button type="primary" danger>Remove</a-button>
+                      <a-button type="primary" danger>{{ $locale.newOrdersPage.orderServicesTableButtonsTitles.remove }}</a-button>
                     </a-popconfirm>
                   </template>
                 </a-table>
               </div>
               <div v-if="activePane.order.dataSource.length" class="pane-sider-wrapper d-flex flex-column col-12 col-xxl-3">
-                <h5 class="py-lg-2">Order Summary</h5>
+                <h5 class="py-lg-2">{{ $locale.newOrdersPage.orderSummary.title }}</h5>
                 <a-card class="text-start" :title="activePane.title">
                   <template #extra>
                     <h4 class="m-0 text-end">{{ formatPrice(activePane.order.totalPrice) }}</h4>
 <!--                    <h4 class="m-0 text-end change-value">{{ formatPrice(activePane.order.change) }}</h4>-->
                   </template>
-                  <h6 class="pb-1">Order Services</h6>
+                  <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.servicesTitle }}</h6>
                   <a-collapse class="order-services-collapse" v-model:activeKey="activePane.order.summaryActiveKeys" :bordered="false" expand-icon-position="right" @change="() => $store.commit('saveState')">
                     <a-collapse-panel class="text-start service-panel-header" v-for="service in activePane.order.groupedDataSource" :key="service.key" :header="service.title">
                       <div class="summary-service-wrapper d-flex flex-row justify-content-between">
                         <div class="summary-service">
-                          <h6 class="summary-service-amount">Total amount: <span class="value">{{ service.amount }}</span></h6>
-                          <h6 class="summary-service-price m-0">Price/Unit: <span class="value">{{ formatPrice(service.price) }}</span></h6>
+                          <h6 class="summary-service-amount">{{ $locale.newOrdersPage.orderSummary.services.amount }}: <span class="value">{{ service.amount }}</span></h6>
+                          <h6 class="summary-service-price m-0">{{ $locale.newOrdersPage.orderSummary.services.price }}: <span class="value">{{ formatPrice(service.price) }}</span></h6>
                         </div>
                         <div class="summary-service-total-price d-flex flex-column justify-content-center align-items-stretch">
                           <h5 class="m-0 value">{{ formatPrice(service.totalPrice) }}</h5>
@@ -98,10 +98,10 @@
                     </a-collapse-panel>
                   </a-collapse>
                   <div class="money-received-wrapper pb-3">
-                    <h6 class="pb-1">Cash (₽)</h6>
-                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" />
+                    <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.cash }}</h6>
+                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" @change="saveState" />
                   </div>
-                  <a-button type="primary" size="large" block @click="showModal">Create Order</a-button>
+                  <a-button type="primary" size="large" block @click="showModal">{{ $locale.newOrdersPage.orderSummary.createOrderButtonTitle }}</a-button>
                 </a-card>
               </div>
               <a-modal
@@ -109,14 +109,15 @@
                   v-model:visible="visible"
                   :title="activePane.title"
                   :confirm-loading="confirmLoading"
-                  ok-text="Create Order"
+                  :ok-text="$locale.newOrdersPage.orderSummary.createOrderModal.createOrderButtonTitle"
+                  :cancel-text="$locale.newOrdersPage.orderSummary.createOrderModal.cancelButtonTitle"
                   @ok="handleOk"
                   centered
               >
                 <div class="create-order-wrapper d-flex flex-column gap-2">
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
-                    <h5 class="m-0 fw-normal">Service</h5>
-                    <h5 class="m-0">Price</h5>
+                    <h5 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.servicesColumnTitle }}</h5>
+                    <h5 class="m-0">{{ $locale.newOrdersPage.orderSummary.createOrderModal.priceColumnTitle }}</h5>
                   </div>
                   <a-divider />
                   <div :key="service.id" v-for="service in activePane.order.groupedDataSource" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
@@ -125,15 +126,15 @@
                   </div>
                   <a-divider />
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 fw-normal">Total Price</h6>
+                    <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.totalPrice }}</h6>
                     <h5 class="m-0 value">{{ formatPrice(activePane.order.totalPrice) }}</h5>
                   </div>
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 fw-normal">Cash</h6>
+                    <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.cash }}</h6>
                     <h5 class="m-0 value">{{ formatPrice(activePane.order.cash) }}</h5>
                   </div>
                   <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 fw-normal">Change</h6>
+                    <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.change }}</h6>
                     <h5 class="m-0 value">{{ formatPrice(activePane.order.change) }}</h5>
                   </div>
                 </div>
@@ -146,8 +147,9 @@
   </a-layout>
 </template>
 <script lang="ts">
+import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 import {Loader} from "@/utils";
-import { computed, ComputedRef, defineComponent, ref, WritableComputedRef } from 'vue';
+import {computed, ComputedRef, defineComponent, reactive, ref, WritableComputedRef} from 'vue';
 import { Service } from "@/api/services/types";
 import { OrdersService } from "@/api/services";
 import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
@@ -164,6 +166,51 @@ export default defineComponent({
     servicesOptions() {
       return this.$store.getters.services.map((s: Service) => ({ label: s.title, value: s.id }));
     },
+    columns() {
+      return [
+        {
+          title: this.$locale.newOrdersPage.orderServicesTableHeaders.services,
+          dataIndex: 'title',
+        },
+        {
+          title: this.$locale.newOrdersPage.orderServicesTableHeaders.price,
+          width: '15%',
+          dataIndex: 'price',
+          align: 'right',
+          customRender({ record }: any) {
+            return formatPrice(record.price);
+          },
+        },
+        {
+          title: this.$locale.newOrdersPage.orderServicesTableHeaders.totalPrice,
+          width: '18%',
+          dataIndex: 'totalPrice',
+          align: 'right',
+          customCell(record: any) {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            }
+          },
+          customRender({ record }: any) {
+            return formatPrice(record.totalPrice);
+          },
+        },
+        {
+          title: this.$locale.newOrdersPage.orderServicesTableHeaders.amount,
+          dataIndex: 'amount',
+          width: '30%',
+          slots: { customRender: 'amount' },
+        },
+        {
+          title: this.$locale.newOrdersPage.orderServicesTableHeaders.actions,
+          dataIndex: 'operation',
+          align: "right",
+          slots: { customRender: 'operation' },
+        },
+      ]
+    }
   },
   methods: {
     filterOption(input: string, option: any) {
@@ -176,6 +223,7 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
+    const locale = computed<LocaleRecord>(() => store.getters.localeRecord);
     const panes = computed<Array<Pane>>(() => store.getters.panes);
     const activeKey: WritableComputedRef<string | undefined> = computed<string | undefined>({
       get() {
@@ -246,50 +294,6 @@ export default defineComponent({
       store.commit("addPane");
     }
 
-    const columns = [
-      {
-        title: 'Service',
-        dataIndex: 'title',
-      },
-      {
-        title: 'Price, ₽/unit',
-        width: '15%',
-        dataIndex: 'price',
-        align: 'right',
-        customRender({ record }: any) {
-          return formatPrice(record.price);
-        },
-      },
-      {
-        title: 'Total Price, ₽',
-        width: '18%',
-        dataIndex: 'totalPrice',
-        align: 'right',
-        customCell(record: any) {
-          return {
-            style: {
-              fontWeight: 700,
-            },
-          }
-        },
-        customRender({ record }: any) {
-          return formatPrice(record.totalPrice);
-        },
-      },
-      {
-        title: 'Amount',
-        dataIndex: 'amount',
-        width: '30%',
-        slots: { customRender: 'amount' },
-      },
-      {
-        title: 'Actions',
-        dataIndex: 'operation',
-        align: "right",
-        slots: { customRender: 'operation' },
-      },
-    ];
-
     const addService = () => {
       store.commit("addOrderService");
     }
@@ -310,6 +314,10 @@ export default defineComponent({
       store.commit("deleteOrderService", key);
     };
 
+    const saveState = () => {
+      store.commit("saveState");
+    }
+
     const customServicesRow = (record: any, index: number) => {
       return {
         class: {
@@ -326,12 +334,12 @@ export default defineComponent({
       activePane,
       paneAction,
       clearOrder,
-      columns,
       removeService,
       edit,
       save,
       cancel,
       addService,
+      saveState,
       customServicesRow,
       orderSummaryOverflowed,
       mobileAmountEditVisible,
@@ -414,7 +422,8 @@ export default defineComponent({
 
   .editable-cell-icon {
     margin-top: 4px;
-    display: none;
+    //display: none;
+    display: inline-block;
   }
 
   .editable-cell-icon-check {
@@ -431,7 +440,7 @@ export default defineComponent({
     margin-bottom: 8px;
   }
 }
-.editable-cell:hover .editable-cell-icon {
-  display: inline-block;
-}
+//.editable-cell:hover .editable-cell-icon {
+//  display: inline-block;
+//}
 </style>

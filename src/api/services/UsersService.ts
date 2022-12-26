@@ -1,5 +1,6 @@
 import ApiService from "@/api/services/ApiService";
 import {ApiResponse, PatchUserDto, SetProfilePicture, User} from "@/api/services/types";
+import {Locale} from "@/store/modules/locales/types/Locale";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
 
@@ -54,6 +55,34 @@ class UsersService extends ApiService {
         })
     }
 
+    static async GetUsersPrivate(): Promise<ApiResponse<Array<User> | Message>> {
+        const url = this.CreateApiRequestUrl({
+            path: this.Path
+        });
+
+        return await this.Try<Array<User>>(async () => {
+            const response = await axios.get<ApiResponse<Array<User>>>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
+    static async DisableUserAccountPrivate(id: number): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'disable', id]
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.delete<ApiResponse>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
     static async EditUserData(dto: PatchUserDto): Promise<ApiResponse<User | Message>> {
         const url = this.CreateApiRequestUrl({
             path: this.Path,
@@ -80,6 +109,20 @@ class UsersService extends ApiService {
 
             return response.data;
         })
+    }
+
+    static async SetLocale(locale: Locale): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'locale'],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.post<ApiResponse<undefined>>(url.Url, { locale }, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
     }
 
     static async HasProfilePicture(uuid: string): Promise<boolean> {

@@ -18,18 +18,18 @@
             </a-form-item>
 
             <a-form-item class="d-flex justify-content-center">
-              <h3 v-if="user" class="greetings">{{ !confirmed ? `${username}, welcome to VC!` :  'Your account has been confirmed'}}</h3>
-              <h5 class="greetings">{{ !confirmed ? 'Set your password to complete registration' : 'You can Log In now' }}</h5>
+              <h3 v-if="user" class="greetings">{{ !confirmed ? `${username}, добро пожаловать в ВЦ!` :  'Ваш аккаунт успешно подтверждён'}}</h3>
+              <h5 class="greetings">{{ !confirmed ? 'Задайте Ваш пароль для входа в систему' : 'Теперь Вы можете авторизоваться' }}</h5>
             </a-form-item>
 
-            <a-form-item v-if="!confirmed" has-feedback label="Password" name="password" autocomplete="off" :rules="[{ required: true, validator: validatePassword }]">
+            <a-form-item v-if="!confirmed" has-feedback label="Пароль" name="password" class="d-flex flex-wrap" :label-col="{ span: 24 }" autocomplete="off" :rules="[{ required: true, validator: validatePassword }]">
               <a-input-password v-model:value="formState.password" type="password" autocomplete="off">
                 <template #prefix>
                   <a-popover>
                     <template #content>
                       <h6
                           v-memo="passwordState.map(s => s.state)"
-                          v-text="passwordState.every(s => s.state) ? 'Strong password' : 'Weak password'"
+                          v-text="formState.password ? (passwordState.every(s => s.state) ? 'Надёжный пароль' : 'Слабый пароль') : 'Введите пароль'"
                           :style="{color: passwordState.every(s => s.state) ? '#52C41A' : '#FF4D4F'}"
                       />
                       <a-divider />
@@ -48,7 +48,7 @@
                 </template>
               </a-input-password>
             </a-form-item>
-            <a-form-item v-if="!confirmed" has-feedback label="Confirm" name="passwordConfirm" autocomplete="off" :rules="[{ required: true, validator: validateConfirmPassword }]">
+            <a-form-item v-if="!confirmed" has-feedback label="Повторите пароль" name="passwordConfirm" class="d-flex flex-wrap" :label-col="{ span: 24 }" autocomplete="off" :rules="[{ required: true, validator: validateConfirmPassword }]">
               <a-input-password
                   v-model:value="formState.passwordConfirm"
                   type="password" autocomplete="off"
@@ -71,7 +71,7 @@
                   html-type="submit"
                   class="submit-btn col-12 col-sm-auto px-4 mt-3"
               >
-                Confirm Account
+                Активировать аккаунт
               </a-button>
               <a-button
                   v-else
@@ -80,7 +80,7 @@
                   class="col-12 col-sm-auto px-4 mt-3"
               >
                 <router-link to="/login">
-                  Log In
+                  Войти
                 </router-link>
               </a-button>
             </a-form-item>
@@ -162,9 +162,13 @@ export default defineComponent({
     });
 
     const validatePassword = async (_rule: Rule, value: string) => {
+      if (!value) {
+        return Promise.reject("Введите пароль");
+      }
+
       if (!ApiService.PasswordMatch(value)) {
         passwordValidated.value = false;
-        return Promise.reject("Weak password");
+        return Promise.reject("Слабый пароль");
       }
 
       passwordValidated.value = true;
@@ -174,7 +178,7 @@ export default defineComponent({
     const validateConfirmPassword = async (_rule: Rule, value: string) => {
       if (value !== formState.password) {
         passwordConfirmValidated.value = false;
-        return Promise.reject("Passwords don't match")
+        return Promise.reject("Пароли не совпадают")
       }
 
       passwordConfirmValidated.value = true;

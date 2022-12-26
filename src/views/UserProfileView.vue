@@ -1,49 +1,40 @@
 <template>
   <a-layout class="container py-4 gap-4">
-    <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $mobile ? 156 : 256" :collapsible="$mobile" v-model:collapsed="collapsed">
-      <vc-layout class="px-0 py-2 h-100">
-        <div v-if="$mobile" class="container-fluid px-2">
-          <a-button type="primary" block @click="toggleCollapsed" style="margin-bottom: 16px">
-            <MenuUnfoldOutlined v-if="collapsed" />
-            <MenuFoldOutlined v-else />
-          </a-button>
+    <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $mobile ? 168 : 256" :collapsible="$mobile" v-model:collapsed="collapsed">
+      <vc-layout class="px-0 py-2 h-100 position-relative">
+        <div class="menu-wrapper position-sticky">
+          <div v-if="$mobile" class="container-fluid px-2">
+            <a-button type="primary" block @click="toggleCollapsed" style="margin-bottom: 16px">
+              <MenuUnfoldOutlined v-if="collapsed" />
+              <MenuFoldOutlined v-else />
+            </a-button>
+          </div>
+          <a-menu
+              class="w-100"
+              mode="inline"
+              v-model:openKeys="openKeys"
+              v-model:selectedKeys="selectedKeys"
+          >
+            <a-menu-item key="profile">
+              <template #icon>
+                <user-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.profile }}
+            </a-menu-item>
+            <a-menu-item key="users" v-if="$rootAccess">
+              <template #icon>
+                <team-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.users }}
+            </a-menu-item>
+            <a-menu-item key="rates" v-if="$rootAccess">
+              <template #icon>
+                <schedule-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.rates }}
+            </a-menu-item>
+          </a-menu>
         </div>
-        <a-menu
-            class="w-100"
-            mode="inline"
-            v-model:openKeys="openKeys"
-            v-model:selectedKeys="selectedKeys"
-        >
-          <a-menu-item key="1">
-            <template #icon>
-              <user-outlined />
-            </template>
-            Profile
-          </a-menu-item>
-<!--          <a-sub-menu key="sub1">-->
-<!--            <template #icon>-->
-<!--              <AppstoreOutlined />-->
-<!--            </template>-->
-<!--            <template #title>Navigation Three</template>-->
-<!--            <a-menu-item key="3">Option 3</a-menu-item>-->
-<!--            <a-menu-item key="4">Option 4</a-menu-item>-->
-<!--            <a-sub-menu key="sub1-2" title="Submenu">-->
-<!--              <a-menu-item key="5">Option 5</a-menu-item>-->
-<!--              <a-menu-item key="6">Option 6</a-menu-item>-->
-<!--            </a-sub-menu>-->
-<!--          </a-sub-menu>-->
-<!--          <a-sub-menu key="sub2">-->
-<!--            <template #icon>-->
-<!--              <SettingOutlined />-->
-<!--            </template>-->
-
-<!--            <template #title>Navigation Four</template>-->
-<!--            <a-menu-item key="7">Option 7</a-menu-item>-->
-<!--            <a-menu-item key="8">Option 8</a-menu-item>-->
-<!--            <a-menu-item key="9">Option 9</a-menu-item>-->
-<!--            <a-menu-item key="10">Option 10</a-menu-item>-->
-<!--          </a-sub-menu>-->
-        </a-menu>
       </vc-layout>
     </a-layout-sider>
     <a-layout>
@@ -94,6 +85,8 @@
               </a-form-item>
             </a-form>
           </a-modal>
+          <a-divider />
+          <vc-profile-content :selected-key="selectedKey" />
         </vc-layout>
       </a-layout-content>
     </a-layout>
@@ -101,17 +94,22 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, ref, toRefs, watch} from "vue";
-import {
-    UserOutlined,
-    EditOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons-vue';
-import {getFullUsername} from "@/api/utils/getFullUsername";
-import {useStore} from "vuex";
-import {Message, User} from "@/api/services/types";
 import {UsersService} from "@/api/services";
+import {ApiRole} from "@/api/services/enums/ApiRole";
+import {Message, User} from "@/api/services/types";
+import {getFullUsername} from "@/api/utils/getFullUsername";
+import VcProfileContent from "@/components/ProfileContentComponent/ProfileContentComponent.vue";
+import {
+  EditOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  ScheduleOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons-vue';
+import {computed, defineComponent, reactive, ref, toRefs, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {useStore} from "vuex";
 
 interface FormState {
   lastName: string;
@@ -119,25 +117,48 @@ interface FormState {
   patronymic: string;
 }
 
+interface MenuKey {
+  key: string;
+  rootAccess?: boolean;
+}
+
+interface MenuKeyState {
+  profile: MenuKey;
+  users: MenuKey;
+  rates: MenuKey;
+}
+
 export default defineComponent({
   components: {
+    VcProfileContent,
     UserOutlined,
     EditOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    TeamOutlined,
+    ScheduleOutlined
   },
   computed: {
     username() {
       return getFullUsername(this.$user);
     },
   },
-  setup(props, context) {
+  setup() {
     const store = useStore();
-    const editUserModalVisible = ref(false);
+    const router = useRouter();
+    const route = useRoute();
+    const user = computed(() => store.getters.userInfo as User);
+    const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
+    const menuKeys = ref<MenuKeyState>({
+      profile: { key: 'profile' },
+      users: { key: 'users', rootAccess: true },
+      rates: { key: 'rates', rootAccess: true },
+    });
+    const editUserModalVisible = ref<boolean>(false);
     const confirmEditLoading = ref<boolean>(false);
     const state = reactive({
       collapsed: store.getters.mobile,
-      selectedKeys: ['1'],
+      selectedKeys: [ menuKeys.value.profile.key ],
       openKeys: ['sub1'],
       preOpenKeys: ['sub1'],
     });
@@ -146,6 +167,8 @@ export default defineComponent({
       firstName: '',
       patronymic: '',
     });
+
+    const selectedKey = computed(() => state.selectedKeys[0]);
 
     watch(
         () => state.openKeys,
@@ -168,7 +191,13 @@ export default defineComponent({
         userInfoState.firstName = '';
         userInfoState.patronymic = '';
       }
-    })
+    });
+
+    // watch(() => selectedKey.value, (key, newKey) => {
+    //   router.push({
+    //     query: { key }
+    //   });
+    // });
     
     const showEditUserModal = () => {
       editUserModalVisible.value = true;
@@ -203,6 +232,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       ...toRefs(userInfoState),
+      selectedKey,
       editUserModalVisible,
       confirmEditLoading,
       showEditUserModal,
@@ -215,6 +245,9 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
+.menu-wrapper {
+  top: 60px;
+}
 .usertag {
   color: #a0a0a0;
 }

@@ -12,6 +12,7 @@ import DatePlugin from "@/plugins/date";
 import WindowSizePlugin from "@/plugins/windowSize";
 import ServicesPlugin from "@/plugins/services";
 import UtilsPlugin from "@/plugins/utils";
+import LocalesPlugin from "@/plugins/locales";
 
 import 'ant-design-vue/dist/antd.css';
 import './fonts.less';
@@ -32,4 +33,5 @@ app
     .use(WindowSizePlugin)
     .use(ServicesPlugin)
     .use(UtilsPlugin)
+    .use(LocalesPlugin)
     .mount('#app');

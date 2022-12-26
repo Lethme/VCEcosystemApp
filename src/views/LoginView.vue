@@ -19,23 +19,27 @@
           </a-form-item>
 
           <a-form-item
-              label="Username"
+              label="Логин"
               name="username"
-              :rules="[{ required: true, message: 'Please input your username' }]"
+              class="d-flex flex-wrap"
+              :label-col="{ span: 24 }"
+              :rules="[{ required: true, message: 'Введите Ваш логин' }]"
           >
             <a-input v-model:value="formState.username" />
           </a-form-item>
 
           <a-form-item
-              label="Password"
+              label="Пароль"
               name="password"
-              :rules="[{ required: true, message: 'Please input your password!' }]"
+              class="d-flex flex-wrap"
+              :label-col="{ span: 24 }"
+              :rules="[{ required: true, message: 'Введите Ваш пароль' }]"
           >
             <a-input-password v-model:value="formState.password" />
           </a-form-item>
 
           <a-form-item name="remember">
-            <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
+            <a-checkbox v-model:checked="formState.remember">Запомнить меня</a-checkbox>
           </a-form-item>
 
           <a-form-item>
@@ -45,7 +49,7 @@
                 html-type="submit"
                 class="submit-btn col-12 col-sm-auto px-4"
             >
-              Login
+              Войти
             </a-button>
           </a-form-item>
 
