@@ -7,7 +7,10 @@ const getters = {
     return state.locale;
   },
   localeRecord(state: State): LocaleRecord {
-    return state[state.locale];
+    return state.locales[state.locale];
+  },
+  localeRecords(state: State): Array<LocaleRecord> {
+    return Object.values(state.locales);
   },
 };
 

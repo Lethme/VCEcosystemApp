@@ -1,3 +1,4 @@
+import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 import {isAuthorized} from "@/utils";
 import {State, StateJSON} from "./state";
 import {OrderState, Pane} from "@/store/modules/orders/types";
@@ -23,18 +24,26 @@ const mutations = {
             };
           });
           state.tabIndex = storedState.tabIndex;
+          state.activeKey = storedState.activeKey;
 
-          if (storedState.panes.length) {
-            state.activeKey = storedState.panes[0].key;
-            setTimeout(() => {
-              state.activeKey = storedState.activeKey;
-            }, 1);
-          }
+          store.commit('localizeOrders');
+          store.commit('saveState');
         }
       } catch {
         localStorage.removeItem(`temp_orders_${user.id}`);
       }
     }
+  },
+  localizeOrders(state: State) {
+    state.panes = state.panes.map(pane => {
+      const tabIndex = pane.key.split("newOrder")[1];
+      return {
+        ...pane,
+        title: `${(store.getters.localeRecord as LocaleRecord).newOrdersPage.newOrderTitle} (${tabIndex})`,
+      }
+    });
+
+    store.commit("saveState");
   },
   saveState(state: State) {
     if (isAuthorized()) {
@@ -49,23 +58,23 @@ const mutations = {
   },
   setActiveKey(state: State, payload?: string) {
     state.activeKey = payload;
-    store.dispatch("saveState");
+    store.commit("saveState");
   },
   addPane(state: State) {
     state.activeKey = `newOrder${state.tabIndex}`;
     state.panes.push({
-      title: `New Order (${state.tabIndex})`,
+      title: `${(store.getters.localeRecord as LocaleRecord).newOrdersPage.newOrderTitle} (${state.tabIndex})`,
       key: state.activeKey,
       order: new OrderState(),
     });
     state.tabIndex += 1;
-    store.dispatch("saveState");
+    store.commit("saveState");
   },
   removePane(state: State, payload: string) {
     if (state.panes.length === 1) {
       state.tabIndex = 2;
       state.panes[0].key = "newOrder1";
-      state.panes[0].title = "New Order (1)";
+      state.panes[0].title = `${(store.getters.localeRecord as LocaleRecord).newOrdersPage.newOrderTitle} (1)`;
       state.panes[0].order = new OrderState();
       state.activeKey = state.panes[0].key;
       store.commit("saveState");

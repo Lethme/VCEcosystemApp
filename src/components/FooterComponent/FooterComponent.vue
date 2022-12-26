@@ -2,7 +2,7 @@
   <a-layout class="flex-grow-0 mt-auto">
     <a-layout-footer>
       <div class="container d-flex flex-column justify-content-center">
-        <h6 class="copyright">&copy; 2022 VC://VPI. All rights reserved.</h6>
+        <h6 class="copyright" v-html="$locale.copyright" />
       </div>
     </a-layout-footer>
   </a-layout>

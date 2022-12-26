@@ -1,3 +1,5 @@
+@import './var';
+
 *,
 *::before,
 *::after {
@@ -12,6 +14,16 @@
   vertical-align: middle !important;
 }
 
+.ant-menu-submenu-title {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.locale-selected {
+  color: #1890ff;
+}
+
 table,
 [class^='ant-input'],
 [class^='ant-select'] {
@@ -21,6 +33,12 @@ table,
     font-size: 16px;
   }
 }
+
+//.table-wrapper table th,
+//.table-wrapper table td {
+//  max-width: 100%;
+//  white-space: nowrap;
+//}
 
 @media (max-width: 768px) {
   table th,

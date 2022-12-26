@@ -16,7 +16,7 @@
         <a-layout-content class="px-4">
           <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between">
             <h4 class="text-start d-flex align-items-center gap-3 pb-2">
-              <span>Current Price List</span>
+              <span>{{ $locale.homePage.priceListTitle }}</span>
               <sync-outlined class="refresh-btn" @click="refreshServices" />
             </h4>
             <div class="input-field col-12 col-md-6 col-lg-5">
@@ -25,7 +25,7 @@
                   <search-outlined />
                 </template>
                 <template #suffix>
-                  <a-tooltip title="Filter by substring included in service title (case insensitive)">
+                  <a-tooltip :title="$locale.homePage.priceListSearchTooltip">
                     <info-circle-outlined style="color: rgba(0, 0, 0, 0.45)" />
                   </a-tooltip>
                 </template>
@@ -33,7 +33,7 @@
             </div>
           </div>
           <a-table
-              v-if="$windowWidth <= 576"
+              v-if="$mobile"
               :scroll="{ y: 245 }"
               :pagination="{ pageSize: 100 }"
               :dataSource="services"
@@ -54,6 +54,7 @@
 import { Options, Vue } from 'vue-class-component';
 import { SyncOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons-vue';
 import {Service} from "@/api/services/types";
+import {formatPrice} from "@/api/utils/formatPrice";
 
 @Options({
   components: {
@@ -64,37 +65,47 @@ import {Service} from "@/api/services/types";
   data() {
     return {
       searchText: "",
-      columns: [
+    };
+  },
+  computed: {
+    columns() {
+      return [
+        // {
+        //   title: this.$locale.homePage.servicesTableHeaders.id,
+        //   dataIndex: "id",
+        //   key: "id"
+        // },
         {
-          title: "Id",
-          dataIndex: "id",
-          key: "id"
-        },
-        {
-          title: "Title",
+          title: this.$locale.homePage.servicesTableHeaders.title,
           dataIndex: "title",
           key: "title"
         },
         {
-          title: "Price (₽/unit)",
-          dataIndex: "price",
-          key: "price"
+          title: this.$locale.homePage.servicesTableHeaders.price,
+          dataIndex: "formattedPrice",
+          key: "formattedPrice",
+          customCell() {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            };
+          },
         },
         // {
-        //   title: "Description",
+        //   title: this.$locale.homePage.servicesTableHeaders.description,
         //   dataIndex: "description",
         //   key: "description"
         // },
       ]
-    };
-  },
-  computed: {
+    },
     services() {
       if (this.searchText) {
-        return this.$services.filter((s: Service) => s.title.toLocaleLowerCase().includes(this.searchText.toLocaleLowerCase()));
+        return this.$services.filter((s: Service) => s.title.toLocaleLowerCase().includes(this.searchText.toLocaleLowerCase()))
+            .map((service: Service) => ({ ...service, formattedPrice: formatPrice(service.price) }));
       }
 
-      return this.$services;
+      return this.$services.map((service: Service) => ({ ...service, formattedPrice: formatPrice(service.price) }));
     }
   },
   mounted() {

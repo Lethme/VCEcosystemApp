@@ -3,19 +3,19 @@
     <div class="container py-sm-4">
       <a-layout class="flex-grow-1 py-4">
         <a-layout-content>
-          <div class="table-header-wrapper d-flex flex-row justify-content-between pb-4 pb-md-2">
+          <div class="table-header-wrapper d-flex flex-column flex-sm-row gap-3 gap-sm-2 justify-content-between pb-4 pb-md-2">
             <h4 class="text-start d-flex align-items-center m-0 gap-3">
-              <span>Orders</span>
+              <span>{{ $locale.ordersPage.title }}</span>
               <sync-outlined class="refresh-btn" @click="refreshOrders" />
-              <a-switch checked-children="Archive" un-checked-children="Current" v-model:checked="showArchivedOrders" @change="refreshOrders" />
-              <a-switch v-if="$rootAccess" checked-children="All" un-checked-children="Own" v-model:checked="showAllOrders" @change="refreshOrders" />
+              <a-switch :checked-children="$locale.ordersPage.archivedSwitch.checked" :un-checked-children="$locale.ordersPage.archivedSwitch.unchecked" v-model:checked="showArchivedOrders" @change="refreshOrders" />
+              <a-switch v-if="$rootAccess" :checked-children="$locale.ordersPage.allOrdersSwitch.checked" :un-checked-children="$locale.ordersPage.allOrdersSwitch.unchecked" v-model:checked="showAllOrders" @change="refreshOrders" />
             </h4>
             <div class="btn-wrapper">
               <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'" class="d-flex align-items-center gap-2 col-12 col-sm-auto">
                 <template #icon>
                   <plus-outlined />
                 </template>
-                <router-link to="/orders/create" @click="() => $store.commit('addPane')" style="color: white">New Order</router-link>
+                <router-link to="/orders/create" @click="newOrder" style="color: white">{{ $locale.ordersPage.newOrderButtonTitle }}</router-link>
               </a-button>
             </div>
           </div>
@@ -24,10 +24,10 @@
               <a-table class="unselectable" :data-source="ordersInner.at(record.index)" :key="record.id" :columns="innerColumns" :pagination="false" :custom-row="(r, i) => customOrderServiceRow(record.record, r, i)" />
             </template>
             <template #recordsActions="record">
-              <a-button v-if="!showArchivedOrders" type="primary" danger @click="(e) => archiveOrderClick(e, record.record)">Archive</a-button>
+              <a-button v-if="!showArchivedOrders" type="primary" danger @click="(e) => archiveOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.archiveButtonTitle }}</a-button>
               <div class="archive-actions d-flex flex-row gap-2" v-else>
-                <a-button type="primary" @click="(e) => restoreOrderClick(e, record.record)">Restore</a-button>
-                <a-button type="primary" danger @click="(e) => removeOrderClick(e, record.record)">Remove</a-button>
+                <a-button type="primary" @click="(e) => restoreOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.restoreButtonTitle }}</a-button>
+                <a-button type="primary" danger @click="(e) => removeOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.removeButtonTitle }}</a-button>
               </div>
             </template>
           </a-table>
@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts">
+import {Pane} from "@/store/modules/orders/types";
 import {createVNode, defineComponent} from "vue";
 import {QuestionCircleOutlined, SyncOutlined, PlusOutlined} from '@ant-design/icons-vue';
 import {Order, OrderService, User} from "@/api/services/types";
@@ -48,18 +49,21 @@ import {Modal} from "ant-design-vue";
 import {increaseDateByDays} from "@/api/utils/increaseDateByDays";
 import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
 import {getFullUsername} from "@/api/utils/getFullUsername";
+import {formatPrice} from "@/api/utils/formatPrice";
 
 export interface OrderData extends Order {
   key: number;
-  price: number;
-  change: number;
+  cash: string;
+  price: string;
+  change: string;
   removedIn?: string;
   remaining?: number;
   username?: string;
 }
 
 export interface OrderInnerData extends OrderService {
-  totalPrice: number;
+  totalPrice: string;
+  unitPrice: string;
 }
 
 export default defineComponent({
@@ -73,41 +77,56 @@ export default defineComponent({
       showArchivedOrders: (this.$route.query.archived && this.$route.query.archived == 'true') ? true : false,
       showAllOrders: (this.$route.query.all && this.$route.query.all == 'true') ? true : false,
       ordersRaw: new Array<Order>(),
-      innerColumns: [
-        { title: 'Service Id', dataIndex: 'id', key: 'id' },
-        { title: 'Service Title', dataIndex: 'title', key: 'title' },
-        { title: 'Total Number', dataIndex: 'amount', key: 'amount' },
-        { title: 'Price (₽/unit)', dataIndex: 'price', key: 'price' },
-        { title: 'Total Price (₽)', dataIndex: 'totalPrice', key: 'totalPrice' },
-      ],
     };
   },
   computed: {
     columns(): Array<any> {
       return [
-        { title: 'Id', dataIndex: 'id', key: 'id' },
-        { title: 'Cash (₽)', dataIndex: 'moneyReceived', key: 'moneyReceived' },
-        { title: 'Total Price (₽)', dataIndex: "price", key: 'price' },
-        { title: 'Change (₽)', dataIndex: "change", key: 'change' },
-        { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt' },
+        { title: this.$locale.ordersPage.ordersTableHeaders.id, dataIndex: 'id', key: 'id' },
+        { title: this.$locale.ordersPage.ordersTableHeaders.totalPrice, dataIndex: "price", key: 'price', align: "right", customCell(record: any) {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            };
+        }},
+        { title: this.$locale.ordersPage.ordersTableHeaders.cash, dataIndex: 'cash', key: 'cash', align: 'right' },
+        { title: this.$locale.ordersPage.ordersTableHeaders.change, dataIndex: "change", key: 'change', align: 'right' },
+        { title: this.$locale.ordersPage.ordersTableHeaders.createdAt, dataIndex: 'createdAt', key: 'createdAt', align: 'right' },
         // { title: archived ? 'Deleted At' : 'Updated At', dataIndex: archived ? 'deletedAt' : 'updatedAt', key: archived ? 'deletedAt' : 'updatedAt' },
           this.$rootAccess && this.showAllOrders ? {
-            title: 'User', dataIndex: 'username', key: 'username'
+            title: this.$locale.ordersPage.ordersTableHeaders.user, dataIndex: 'username', key: 'username', align: 'right'
           } : null,
           this.showArchivedOrders ? {
-            title: 'Removed In', dataIndex: 'removedIn', key: 'removedIn'
+            title: this.$locale.ordersPage.ordersTableHeaders.removedIn, dataIndex: 'removedIn', key: 'removedIn', align: 'right'
           } : null,
           this.showArchivedOrders ? {
-            title: 'Remaining days', dataIndex: 'remaining', key: 'remaining'
+            title: this.$locale.ordersPage.ordersTableHeaders.remainingDays, dataIndex: 'remaining', key: 'remaining', align: 'right'
           } : null,
-        { title: 'Actions', key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
+        { title: this.$locale.ordersPage.ordersTableHeaders.actions, key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
       ].filter(col => col);
+    },
+    innerColumns(): Array<any> {
+      return [
+        { title: this.$locale.ordersPage.ordersServicesTableHeaders.id, dataIndex: 'id', key: 'id' },
+        { title: this.$locale.ordersPage.ordersServicesTableHeaders.title, dataIndex: 'title', key: 'title' },
+        { title: this.$locale.ordersPage.ordersServicesTableHeaders.amount, dataIndex: 'amount', key: 'amount', align: 'right' },
+        { title: this.$locale.ordersPage.ordersServicesTableHeaders.price, dataIndex: 'unitPrice', key: 'unitPrice', align: 'right' },
+        { title: this.$locale.ordersPage.ordersServicesTableHeaders.totalPrice, dataIndex: 'totalPrice', key: 'totalPrice', align: 'right', customCell(record: any) {
+            return {
+              style: {
+                fontWeight: 700,
+              },
+            };
+          }},
+      ];
     },
     ordersInner(): Array<Array<OrderInnerData>> {
       return this.orders.map((o: OrderData) => o.services.map(service => {
         return {
           ...service,
-          totalPrice: service.amount * service.price,
+          unitPrice: formatPrice(service.price),
+          totalPrice: formatPrice(service.amount * service.price),
         }
       }).sort((f, s) => f.id - s.id));
     },
@@ -133,8 +152,9 @@ export default defineComponent({
           remaining: this.showArchivedOrders
               ? parseFloat((this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)).toFixed(2))
               : undefined,
-          price,
-          change: order.moneyReceived - price,
+          cash: formatPrice(order.moneyReceived),
+          price: formatPrice(price),
+          change: formatPrice(order.moneyReceived - price),
           username: getFullUsername(order.user),
         }
       })
@@ -207,9 +227,9 @@ export default defineComponent({
     },
     showArchiveOrderConfirm(record: OrderData) {
       Modal.confirm({
-        title: () => 'Archive order confirmation',
+        title: () => this.$locale.ordersPage.modals.archive.title,
         icon: () => createVNode(QuestionCircleOutlined),
-        content: () => `Do you want to archive order ${record.id}`,
+        content: () => `${this.$locale.ordersPage.modals.archive.content} #${record.id}?`,
         class: "unselectable",
         centered: true,
         okText: "Archive Order",
@@ -228,9 +248,9 @@ export default defineComponent({
     },
     showRemoveOrderConfirm(record: OrderData) {
       Modal.confirm({
-        title: () => 'Remove order confirmation',
+        title: () => this.$locale.ordersPage.modals.remove.title,
         icon: () => createVNode(QuestionCircleOutlined),
-        content: () => `Do you want to completely remove order ${record.id}`,
+        content: () => `${this.$locale.ordersPage.modals.remove.content} #${record.id}?`,
         class: "unselectable",
         centered: true,
         okText: "Remove Order",
@@ -249,9 +269,9 @@ export default defineComponent({
     },
     showRestoreOrderConfirm(record: OrderData) {
       Modal.confirm({
-        title: () => 'Restore order confirmation',
+        title: () => this.$locale.ordersPage.modals.restore.title,
         icon: () => createVNode(QuestionCircleOutlined),
-        content: () => `Do you want to restore order ${record.id}`,
+        content: () => `${this.$locale.ordersPage.modals.restore.content} #${record.id}?`,
         class: "unselectable",
         centered: true,
         okText: "Restore Order",
@@ -267,6 +287,15 @@ export default defineComponent({
         },
       });
     },
+    newOrder() {
+      const panes = this.$store.getters.panes as Array<Pane>;
+
+      if (panes.length === 1 && panes[0].order.empty) {
+        return;
+      }
+
+      this.$store.commit("addPane");
+    }
   },
   watch: {
     $rootAccess(current: boolean, old: boolean) {
