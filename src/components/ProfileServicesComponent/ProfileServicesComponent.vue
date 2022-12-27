@@ -1,6 +1,6 @@
 <template>
-  <div class="header-wrapper d-flex pb-3 flex-column flex-md-row gap-3 justify-content-between align-items-center">
-    <div class="headers">
+  <div class="header-wrapper d-flex pb-3 flex-column flex-xl-row gap-3 justify-content-between align-items-center">
+    <div class="headers col-12 col-xl-auto">
       <h6 v-if="$mobile" class="text-start m-0 d-flex align-items-center gap-2">
         {{ $locale.userProfilePage.contentTitles.services }}
         <sync-outlined class="refresh-btn" @click="updateServicesList" />
@@ -10,8 +10,22 @@
         <sync-outlined class="refresh-btn" @click="updateServicesList" />
       </h4>
     </div>
-    <div v-if="$rootAccess" class="btn-wrapper">
-      <a-button type="primary" size="large">{{ $locale.userProfilePage.addServiceButtonTitle }}</a-button>
+    <div class="actions-wrapper d-flex flex-column flex-xl-row gap-3 gap-xl-2 col-12 col-xl-6">
+      <div class="input-field w-100">
+        <a-input v-model:value="searchText" size="large">
+          <template #prefix>
+            <search-outlined />
+          </template>
+          <template #suffix>
+            <a-tooltip :title="$locale.homePage.priceListSearchTooltip">
+              <info-circle-outlined style="color: rgba(0, 0, 0, 0.45)" />
+            </a-tooltip>
+          </template>
+        </a-input>
+      </div>
+      <div v-if="$rootAccess" class="btn-wrapper">
+        <a-button :block="$windowWidth <= 1200" type="primary" size="large">{{ $locale.userProfilePage.addServiceButtonTitle }}</a-button>
+      </div>
     </div>
   </div>
   <div class="table-wrapper">
@@ -74,7 +88,9 @@
 <script lang="ts">
 import {computed, defineComponent, onMounted, ref} from "vue";
 import {
-  SyncOutlined,
+    SyncOutlined,
+    InfoCircleOutlined,
+    SearchOutlined,
 } from "@ant-design/icons-vue";
 import {useStore} from "vuex";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
@@ -88,6 +104,8 @@ export default defineComponent({
   name: "VcProfileServices",
   components: {
     SyncOutlined,
+    InfoCircleOutlined,
+    SearchOutlined,
   },
   setup() {
     const store = useStore();
@@ -95,7 +113,10 @@ export default defineComponent({
     const user = computed(() => store.getters.userInfo as User);
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
 
-    const services = computed(() => store.getters.services as Array<Service>);
+    const services = computed(() => (store.getters.services as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase())));
+
+    const searchText = ref('');
+
     const editModalVisible = ref(false);
     const createModalVisible = ref(false);
     const createModalConfirmLoading = ref(false);
@@ -218,6 +239,7 @@ export default defineComponent({
     });
 
     return {
+      searchText,
       services,
       columns,
       showEditModal,

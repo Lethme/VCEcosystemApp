@@ -14,13 +14,13 @@
 <!--          <p class="date text-start" v-html="$formattedDate" />-->
 <!--        </a-layout-sider>-->
         <a-layout-content class="px-4">
-          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between">
-            <h4 class="text-start d-flex align-items-center gap-3 pb-2">
+          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between align-items-center py-2">
+            <h4 class="text-start d-flex align-items-center m-0 gap-3 pb-2">
               <span>{{ $locale.homePage.priceListTitle }}</span>
               <sync-outlined class="refresh-btn" @click="refreshServices" />
             </h4>
             <div class="input-field col-12 col-md-6 col-lg-5">
-              <a-input v-model:value="searchText">
+              <a-input v-model:value="searchText" size="large">
                 <template #prefix>
                   <search-outlined />
                 </template>
@@ -93,11 +93,11 @@ import {formatPrice} from "@/api/utils/formatPrice";
             };
           },
         },
-        // {
-        //   title: this.$locale.homePage.servicesTableHeaders.description,
-        //   dataIndex: "description",
-        //   key: "description"
-        // },
+        {
+          title: this.$locale.homePage.servicesTableHeaders.description,
+          dataIndex: "description",
+          key: "description"
+        },
       ]
     },
     services() {
