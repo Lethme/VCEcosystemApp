@@ -3,6 +3,14 @@ import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 export const en: LocaleRecord = {
     locale: "en",
     copyright: "&copy; 2022 VC://VPI. All rights reserved.",
+    saveText: "Save",
+    roles: {
+        ROOT: "Root",
+        MODERATOR: "Moderator",
+        ADMIN: "Admin",
+        OPERATOR: "Operator",
+        GUEST: "Guest",
+    },
     mainMenuItemTitles: {
         newOrder: {
             new: "New Order",
@@ -21,7 +29,10 @@ export const en: LocaleRecord = {
             title: "Title",
             price: "Price, ₽/unit",
             description: "Description",
+            actions: "Actions",
         },
+        servicesTableRemoveButtonTitle: "Remove",
+        servicesTableEditButtonTitle: "Edit",
     },
     ordersPage: {
         title: "Orders",
@@ -113,14 +124,17 @@ export const en: LocaleRecord = {
     userProfilePage: {
         addUserButtonTitle: "Register User",
         addRateButtonTitle: "Create Rate",
+        addServiceButtonTitle: "Create Service",
         mainMenu: {
             profile: "Profile",
             users: "Users",
             rates: "Rates",
+            services: "Services",
         },
         contentTitles: {
             users: "Users",
             rates: "Employee Rates",
+            services: "Services",
         },
         usersTableHeaders: {
             id: "Id",
@@ -128,6 +142,7 @@ export const en: LocaleRecord = {
             firstName: "First Name",
             patronymic: "Patronymic",
             username: "Username",
+            roles: "Roles",
             actions: "Actions",
             active: "Active",
         },

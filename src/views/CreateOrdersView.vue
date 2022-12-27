@@ -1,6 +1,6 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4 order-create">
-    <div class="container d-flex py-sm-4">
+    <div class="container-fluid d-flex py-sm-4">
       <a-layout class="flex-grow-1 w-100 py-4">
         <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between pb-4 pb-md-2">
           <h4 class="text-start d-flex align-items-center gap-3">
@@ -54,7 +54,7 @@
                             v-if="activePane.order.dataEditable[record.key] && $windowWidth < 768"
                             :visible="activePane.order.dataEditable[record.key] && $windowWidth < 768"
                             :title="record.title"
-                            ok-text="Save"
+                            :ok-text="$locale.saveText"
                             @ok="save(record.key)"
                             @cancel="cancel(record.key)"
                             centered
@@ -315,7 +315,9 @@ export default defineComponent({
     };
 
     const saveState = () => {
-      store.commit("saveState");
+      Loader.Use(500).then(() => {
+        store.commit("saveState");
+      });
     }
 
     const customServicesRow = (record: any, index: number) => {
@@ -379,6 +381,10 @@ export default defineComponent({
     //color: @mainColor;
     font-weight: 400;
   }
+}
+
+.pane-sider-wrapper {
+  max-width: 500px;
 }
 
 .service-panel-header {

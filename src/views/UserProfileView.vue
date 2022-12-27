@@ -1,5 +1,5 @@
 <template>
-  <a-layout class="container py-4 gap-4">
+  <a-layout class="container-fluid py-4 gap-4">
     <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $mobile ? 168 : 256" :collapsible="$mobile" v-model:collapsed="collapsed">
       <vc-layout class="px-0 py-2 h-100 position-relative">
         <div class="menu-wrapper position-sticky">
@@ -15,19 +15,25 @@
               v-model:openKeys="openKeys"
               v-model:selectedKeys="selectedKeys"
           >
-            <a-menu-item key="profile">
+            <a-menu-item :key="menuKeys.profile.key">
               <template #icon>
                 <user-outlined />
               </template>
               {{ $locale.userProfilePage.mainMenu.profile }}
             </a-menu-item>
-            <a-menu-item key="users" v-if="$rootAccess">
+            <a-menu-item :key="menuKeys.users.key" v-if="$rootAccess">
               <template #icon>
                 <team-outlined />
               </template>
               {{ $locale.userProfilePage.mainMenu.users }}
             </a-menu-item>
-            <a-menu-item key="rates" v-if="$rootAccess">
+            <a-menu-item :key="menuKeys.services.key">
+              <template #icon>
+                <unordered-list-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.services }}
+            </a-menu-item>
+            <a-menu-item :key="menuKeys.rates.key" v-if="$rootAccess">
               <template #icon>
                 <schedule-outlined />
               </template>
@@ -86,7 +92,7 @@
             </a-form>
           </a-modal>
           <a-divider />
-          <vc-profile-content :selected-key="selectedKey" />
+          <vc-profile-content :selected-key="selectedKey" :menu-keys="menuKeys" />
         </vc-layout>
       </a-layout-content>
     </a-layout>
@@ -100,12 +106,13 @@ import {Message, User} from "@/api/services/types";
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import VcProfileContent from "@/components/ProfileContentComponent/ProfileContentComponent.vue";
 import {
-  EditOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  ScheduleOutlined,
-  TeamOutlined,
-  UserOutlined,
+    EditOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    ScheduleOutlined,
+    TeamOutlined,
+    UserOutlined,
+    UnorderedListOutlined,
 } from '@ant-design/icons-vue';
 import {computed, defineComponent, reactive, ref, toRefs, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -117,15 +124,16 @@ interface FormState {
   patronymic: string;
 }
 
-interface MenuKey {
+export interface MenuKey {
   key: string;
   rootAccess?: boolean;
 }
 
-interface MenuKeyState {
+export interface MenuKeyState {
   profile: MenuKey;
   users: MenuKey;
   rates: MenuKey;
+  services: MenuKey;
 }
 
 export default defineComponent({
@@ -136,7 +144,8 @@ export default defineComponent({
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     TeamOutlined,
-    ScheduleOutlined
+    ScheduleOutlined,
+    UnorderedListOutlined,
   },
   computed: {
     username() {
@@ -151,6 +160,7 @@ export default defineComponent({
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
     const menuKeys = ref<MenuKeyState>({
       profile: { key: 'profile' },
+      services: { key: 'services' },
       users: { key: 'users', rootAccess: true },
       rates: { key: 'rates', rootAccess: true },
     });
@@ -232,6 +242,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       ...toRefs(userInfoState),
+      menuKeys,
       selectedKey,
       editUserModalVisible,
       confirmEditLoading,

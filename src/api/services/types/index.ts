@@ -17,6 +17,8 @@ import { NewOrder, NewOrderService } from "@/api/services/types/NewOrder";
 import { PasswordState, PasswordStateField, PasswordStateFieldType } from "@/api/services/types/PasswordState";
 import { SetProfilePicture } from "@/api/services/types/SetProfilePicture";
 import { PatchUserDto } from "@/api/services/types/PatchUserDto";
+import { PostServiceDto } from "@/api/services/types/PostServiceDto";
+import { PatchServiceDto } from "@/api/services/types/PatchServiceDto";
 
 export type {
     Service,
@@ -39,6 +41,8 @@ export type {
     PasswordStateField,
     SetProfilePicture,
     PatchUserDto,
+    PostServiceDto,
+    PatchServiceDto,
 };
 
 export { App, PasswordStateFieldType };

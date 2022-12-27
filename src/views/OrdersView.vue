@@ -1,6 +1,6 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4 orders">
-    <div class="container py-sm-4">
+    <div class="container-fluid py-sm-4">
       <a-layout class="flex-grow-1 py-4">
         <a-layout-content>
           <div class="table-header-wrapper d-flex flex-column flex-sm-row gap-3 gap-sm-2 justify-content-between pb-4 pb-md-2">

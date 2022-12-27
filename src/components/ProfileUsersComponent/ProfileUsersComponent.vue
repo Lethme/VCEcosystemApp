@@ -28,12 +28,15 @@
           </a-popconfirm>
         </div>
       </template>
+      <template #roles="{ record }">
+        <span class="roles">{{ record.roles.map(role => $locale.roles[role.value]).join(', ') }}</span>
+      </template>
       <template #active="{ record }">
         <check-circle-filled v-if="record.active" :style="{color: '#52C41A'}" />
         <close-circle-filled v-else :style="{color: '#FF4D4F'}" />
       </template>
     </a-table>
-    <a-table v-else bordered :data-source="users" :columns="columns">
+    <a-table v-else bordered :data-source="users" :columns="columns" :pagination="{ pageSize: 8 }">
       <template #operation="{ record }">
         <div class="btn-wrapper d-flex justify-content-end gap-2">
           <a-button v-if="!record.active" type="primary" @click="() => showConfirmLinkModal(record)">{{ $locale.userProfilePage.usersTableButtonsTitles.confirmLink }}</a-button>
@@ -45,6 +48,9 @@
             <a-button type="primary" danger>{{ $locale.userProfilePage.usersTableButtonsTitles.deactivate }}</a-button>
           </a-popconfirm>
         </div>
+      </template>
+      <template #roles="{ record }">
+        <span class="roles">{{ record.roles.map(role => $locale.roles[role.value]).join(', ') }}</span>
       </template>
       <template #active="{ record }">
         <check-circle-filled v-if="record.active" :style="{color: '#52C41A'}" />
@@ -85,7 +91,7 @@ export default defineComponent({
       await Loader.Use(async () => {
         const response = await UsersService.GetUsersPrivate();
         if (response.status) {
-          users.value = response.data as Array<User>;
+          users.value = (response.data as Array<User>).sort((f, s) => f.id - s.id);
         } else {
           users.value = [];
         }
@@ -98,6 +104,7 @@ export default defineComponent({
           title: locale.value.userProfilePage.usersTableHeaders.id,
           dataIndex: 'id',
           key: 'id',
+          fixed: !store.getters.mobile ? 'left' : false,
         },
         {
           title: locale.value.userProfilePage.usersTableHeaders.lastName,
@@ -120,16 +127,23 @@ export default defineComponent({
           key: 'username',
         },
         {
+          title: locale.value.userProfilePage.usersTableHeaders.roles,
+          dataIndex: 'roles',
+          key: 'roles',
+          slots: { customRender: "roles" },
+        },
+        {
           title: locale.value.userProfilePage.usersTableHeaders.active,
           dataIndex: 'active',
           key: 'active',
           slots: { customRender: 'active' },
         },
         {
-          title: locale.value.newOrdersPage.orderServicesTableHeaders.actions,
+          title: locale.value.userProfilePage.usersTableHeaders.actions,
           dataIndex: 'operation',
           key: 'operation',
           align: "right",
+          fixed: !store.getters.mobile ? 'right' : false,
           slots: { customRender: 'operation' },
         },
       ]
@@ -140,7 +154,8 @@ export default defineComponent({
     });
 
     const showConfirmLinkModal = (record: User) => {
-      Modal.info({
+      navigator.clipboard.writeText(`${window.location.origin}/confirm/${record.uuid}`);
+      Modal.success({
         title: () => getFullUsername(record, {
           short: store.getters.windowWidth <= 576,
         }),

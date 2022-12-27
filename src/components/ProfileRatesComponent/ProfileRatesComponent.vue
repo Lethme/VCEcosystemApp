@@ -16,7 +16,7 @@
   </div>
   <div class="table-wrapper">
     <a-table v-if="$mobile" :row-key="record => record.id" table-layout="auto" bordered :data-source="rates" :columns="columns" :pagination="{ pageSize: 1000 }" :scroll="{ y: 327 }" />
-    <a-table v-else bordered :data-source="rates" :columns="columns" />
+    <a-table v-else bordered :data-source="rates" :columns="columns" :pagination="{ pageSize: 8 }" />
   </div>
 </template>
 

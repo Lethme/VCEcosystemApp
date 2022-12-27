@@ -1,6 +1,14 @@
 export interface LocaleRecord {
     locale: string;
     copyright: string;
+    saveText: string;
+    roles: {
+      ROOT: string;
+      MODERATOR: string;
+      OPERATOR: string;
+      ADMIN: string;
+      GUEST: string;
+    };
     mainMenuItemTitles: {
         newOrder: {
             new: string;
@@ -19,7 +27,10 @@ export interface LocaleRecord {
             title: string;
             price: string;
             description: string;
+            actions: string;
         };
+        servicesTableRemoveButtonTitle: string;
+        servicesTableEditButtonTitle: string;
     };
     ordersPage: {
         title: string;
@@ -111,14 +122,17 @@ export interface LocaleRecord {
     userProfilePage: {
         addUserButtonTitle: string;
         addRateButtonTitle: string;
+        addServiceButtonTitle: string;
         mainMenu: {
             profile: string;
             users: string;
             rates: string;
+            services: string;
         };
         contentTitles: {
             users: string;
             rates: string;
+            services: string;
         };
         usersTableHeaders: {
             id: string;
@@ -126,6 +140,7 @@ export interface LocaleRecord {
             firstName: string;
             patronymic: string;
             username: string;
+            roles: string;
             actions: string;
             active: string;
         };

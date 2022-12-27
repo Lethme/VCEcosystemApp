@@ -1,6 +1,6 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4">
-    <div class="container py-sm-4">
+    <div class="container-fluid py-sm-4">
       <a-layout-header class="h-auto py-sm-4">
         <div class="container d-flex flex-column justify-content-center align-items-center pt-4 py-sm-4">
           <div class="img-wrapper col-12 col-sm-8 col-md-6 col-lg-4">
@@ -84,6 +84,7 @@ import {formatPrice} from "@/api/utils/formatPrice";
           title: this.$locale.homePage.servicesTableHeaders.price,
           dataIndex: "formattedPrice",
           key: "formattedPrice",
+          align: "right",
           customCell() {
             return {
               style: {
