@@ -79,10 +79,15 @@ export default defineComponent({
       ordersRaw: new Array<Order>(),
     };
   },
+  created() {
+    this.$store.dispatch("updateServices");
+  },
   computed: {
     columns(): Array<any> {
       return [
-        { title: this.$locale.ordersPage.ordersTableHeaders.id, dataIndex: 'id', key: 'id' },
+        this.$rootAccess
+          ? { title: this.$locale.ordersPage.ordersTableHeaders.id, dataIndex: 'id', key: 'id', fixed: !this.$mobile ? 'left' : false }
+          : null,
         { title: this.$locale.ordersPage.ordersTableHeaders.totalPrice, dataIndex: "price", key: 'price', align: "right", customCell(record: any) {
             return {
               style: {
@@ -103,12 +108,14 @@ export default defineComponent({
           this.showArchivedOrders ? {
             title: this.$locale.ordersPage.ordersTableHeaders.remainingDays, dataIndex: 'remaining', key: 'remaining', align: 'right'
           } : null,
-        { title: this.$locale.ordersPage.ordersTableHeaders.actions, key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
+        { title: this.$locale.ordersPage.ordersTableHeaders.actions, key: 'actions', align: "right", fixed: !this.$mobile ? 'right' : false, slots: { customRender: "recordsActions" } },
       ].filter(col => col);
     },
     innerColumns(): Array<any> {
       return [
-        { title: this.$locale.ordersPage.ordersServicesTableHeaders.id, dataIndex: 'id', key: 'id' },
+        this.$rootAccess
+          ? { title: this.$locale.ordersPage.ordersServicesTableHeaders.id, dataIndex: 'id', key: 'id', fixed: !this.$mobile ? 'left' : false }
+          : null,
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.title, dataIndex: 'title', key: 'title' },
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.amount, dataIndex: 'amount', key: 'amount', align: 'right' },
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.price, dataIndex: 'unitPrice', key: 'unitPrice', align: 'right' },
@@ -119,7 +126,7 @@ export default defineComponent({
               },
             };
           }},
-      ];
+      ].filter(col => col);
     },
     ordersInner(): Array<Array<OrderInnerData>> {
       return this.orders.map((o: OrderData) => o.services.map(service => {

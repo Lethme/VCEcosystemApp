@@ -4,6 +4,7 @@ export const en: LocaleRecord = {
     locale: "en",
     copyright: "&copy; 2022 VC://VPI. All rights reserved.",
     saveText: "Save",
+    cancelText: "Cancel",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
@@ -33,6 +34,7 @@ export const en: LocaleRecord = {
         },
         servicesTableRemoveButtonTitle: "Remove",
         servicesTableEditButtonTitle: "Edit",
+        servicesTableRestoreButtonTitle: "Restore",
     },
     ordersPage: {
         title: "Orders",
@@ -89,6 +91,7 @@ export const en: LocaleRecord = {
         clearOrderButtonTitle: "Clear Order",
         clearOrderButtonConfirm: "Sure to clear this order?",
         addServiceButtonTitle: "Add Service",
+        selectServicePlaceholder: "Select Service",
         orderServicesTableHeaders: {
             services: "Service",
             price: "Price, ₽/unit",
@@ -125,6 +128,12 @@ export const en: LocaleRecord = {
         addUserButtonTitle: "Register User",
         addRateButtonTitle: "Create Rate",
         addServiceButtonTitle: "Create Service",
+        createServiceModal: {
+            exceptions: {
+                emptyTitle: "Title should not be empty",
+                zeroOrNegativePrice: "Price has to be at least 1₽",
+            },
+        },
         mainMenu: {
             profile: "Profile",
             users: "Users",
@@ -145,6 +154,8 @@ export const en: LocaleRecord = {
             roles: "Roles",
             actions: "Actions",
             active: "Active",
+            rate: "Rate",
+            shifts: "Shifts Amount",
         },
         ratesTableHeaders: {
             title: "Title",

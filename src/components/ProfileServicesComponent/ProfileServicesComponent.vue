@@ -24,17 +24,17 @@
         </a-input>
       </div>
       <div v-if="$rootAccess" class="btn-wrapper">
-        <a-button :block="$windowWidth <= 1200" type="primary" size="large">{{ $locale.userProfilePage.addServiceButtonTitle }}</a-button>
+        <a-button :block="$windowWidth <= 1200" type="primary" size="large" @click="showCreateModal">{{ $locale.userProfilePage.addServiceButtonTitle }}</a-button>
       </div>
     </div>
   </div>
   <div class="table-wrapper">
-    <a-table v-if="$mobile" :row-key="record => record.id" table-layout="auto" bordered :data-source="services" :columns="columns" :pagination="{ pageSize: 1000 }" :scroll="{ y: 327 }">
+    <a-table v-if="$mobile" :row-key="record => record.id" table-layout="auto" bordered :data-source="services" :columns="columns" :pagination="{ pageSize: 1000 }" :scroll="{ y: 327 }" :custom-row="customServicesRow">
       <template #price="{ record }">
         {{ formatPrice(record.price) }}
       </template>
       <template #operation="{ record }">
-        <div class="btn-wrapper d-flex justify-content-end gap-2">
+        <div v-if="!record.deletedAt" class="btn-wrapper d-flex justify-content-end gap-2">
           <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.homePage.servicesTableEditButtonTitle }}</a-button>
           <a-popconfirm
               :title="$locale.homePage.servicesTableRemoveButtonTitle + '?'"
@@ -43,20 +43,36 @@
             <a-button type="primary" danger>{{ $locale.homePage.servicesTableRemoveButtonTitle }}</a-button>
           </a-popconfirm>
         </div>
+        <div v-else class="btn-wrapper d-flex justify-content-end gap-2">
+          <a-popconfirm
+              :title="$locale.homePage.servicesTableRestoreButtonTitle + '?'"
+              @confirm="() => restoreService(record.id)"
+          >
+            <a-button type="primary">{{ $locale.homePage.servicesTableRestoreButtonTitle }}</a-button>
+          </a-popconfirm>
+        </div>
       </template>
     </a-table>
-    <a-table v-else bordered :data-source="services" :columns="columns" :pagination="{ pageSize: 8 }">
+    <a-table v-else bordered :data-source="services" :columns="columns" :pagination="{ pageSize: 8 }" :custom-row="customServicesRow">
       <template #price="{ record }">
         {{ formatPrice(record.price) }}
       </template>
       <template #operation="{ record }">
-        <div class="btn-wrapper d-flex justify-content-end gap-2">
+        <div v-if="!record.deletedAt" class="btn-wrapper d-flex justify-content-end gap-2">
           <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.homePage.servicesTableEditButtonTitle }}</a-button>
           <a-popconfirm
               :title="$locale.homePage.servicesTableRemoveButtonTitle + '?'"
               @confirm="() => removeService(record.id)"
           >
             <a-button type="primary" danger>{{ $locale.homePage.servicesTableRemoveButtonTitle }}</a-button>
+          </a-popconfirm>
+        </div>
+        <div v-else class="btn-wrapper d-flex justify-content-end gap-2">
+          <a-popconfirm
+              :title="$locale.homePage.servicesTableRestoreButtonTitle + '?'"
+              @confirm="() => restoreService(record.id)"
+          >
+            <a-button type="primary">{{ $locale.homePage.servicesTableRestoreButtonTitle }}</a-button>
           </a-popconfirm>
         </div>
       </template>
@@ -64,6 +80,7 @@
     <a-modal
         :visible="editModalVisible"
         :title="editModalStateService.title"
+        :confirm-loading="editModalConfirmLoading"
         :ok-text="$locale.saveText"
         :onOk="saveService"
         :onCancel="() => editModalVisible = false"
@@ -81,6 +98,37 @@
         <h6>{{ $locale.homePage.servicesTableHeaders.description }}</h6>
         <a-input :disabled="editModalConfirmLoading" class="w-100" v-model:value="editModalState.description" @pressEnter="saveService" />
       </div>
+    </a-modal>
+    <a-modal
+        :visible="createModalVisible"
+        :title="$locale.userProfilePage.addServiceButtonTitle"
+        :ok-text="$locale.userProfilePage.addServiceButtonTitle"
+        :cancel-text="$locale.cancelText"
+        :confirm-loading="createModalConfirmLoading"
+        :onOk="createService"
+        :onCancel="() => createModalVisible = false"
+        centered
+    >
+      <div class="input-wrapper d-flex flex-column align-items-start py-2">
+        <h6>{{ $locale.homePage.servicesTableHeaders.title }}</h6>
+        <a-input required :disabled="createModalConfirmLoading" class="w-100" v-model:value="createModalState.title" @pressEnter="createService" />
+      </div>
+      <div class="input-wrapper d-flex flex-column align-items-start py-2">
+        <h6>{{ $locale.homePage.servicesTableHeaders.price }}</h6>
+        <a-input-number :disabled="createModalConfirmLoading" type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="createModalState.price" :min="1" @pressEnter="createService" />
+      </div>
+      <div class="input-wrapper d-flex flex-column align-items-start py-2">
+        <h6>{{ $locale.homePage.servicesTableHeaders.description }}</h6>
+        <a-input :disabled="createModalConfirmLoading" class="w-100" v-model:value="createModalState.description" @pressEnter="createService" />
+      </div>
+      <a-alert
+          class="mt-2"
+          v-if="createModalException"
+          :message="createModalException"
+          type="error"
+          :after-close="() => createModalException = ''"
+          closable
+      />
     </a-modal>
   </div>
 </template>
@@ -113,20 +161,24 @@ export default defineComponent({
     const user = computed(() => store.getters.userInfo as User);
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
 
-    const services = computed(() => (store.getters.services as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase())));
+    const services = computed(
+        rootAccess.value
+            ? () => (store.getters.allServices as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
+            : () => (store.getters.services as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
+    );
 
     const searchText = ref('');
 
     const editModalVisible = ref(false);
     const createModalVisible = ref(false);
     const createModalConfirmLoading = ref(false);
+    const editModalConfirmLoading = ref(false);
     const editModalStateService = ref<Service>({
       id: -1,
       title: '',
       description: '',
       price: 0,
     });
-    const editModalConfirmLoading = ref(false);
     const editModalState = ref<PatchServiceDto>({
       title: '',
       price: undefined,
@@ -134,9 +186,11 @@ export default defineComponent({
     });
     const createModalState = ref<PostServiceDto>({
       title: '',
-      price: 0,
+      price: 1,
       description: '',
     });
+    const createModalException = ref('');
+
     const updateServicesList = async () => {
       await Loader.Use(async () => {
         await store.dispatch("updateServices");
@@ -151,6 +205,19 @@ export default defineComponent({
         }
       });
     }
+    const restoreService = async (id: number) => {
+      await Loader.Use(async () => {
+        const response = await ServicesService.RestoreServicePrivate(id);
+
+        if (response && response.status) {
+          await store.dispatch("updateServices");
+        }
+      });
+    }
+
+    const customServicesRow = (record: Service, index: number) => {
+      return {};
+    };
 
     const showEditModal = (record: Service) => {
       editModalStateService.value = record;
@@ -161,7 +228,7 @@ export default defineComponent({
     }
 
     const showCreateModal = (record: Service) => {
-      /* ToDo */
+      createModalVisible.value = true;
     }
 
     const saveService = async () => {
@@ -185,6 +252,33 @@ export default defineComponent({
 
       editModalConfirmLoading.value = false;
       editModalVisible.value = false;
+    }
+
+    const createService = async () => {
+      if (!createModalState.value.title) {
+        createModalException.value = locale.value.userProfilePage.createServiceModal.exceptions.emptyTitle;
+        return;
+      }
+
+      if (createModalState.value.price < 1) {
+        createModalException.value = locale.value.userProfilePage.createServiceModal.exceptions.zeroOrNegativePrice;
+        return;
+      }
+
+      createModalConfirmLoading.value = true;
+
+      const response = await ServicesService.CreateServicePrivate(createModalState.value);
+
+      if (response && response.status) {
+        await store.dispatch("updateServices");
+      }
+
+      createModalState.value.title = '';
+      createModalState.value.price = 1;
+      createModalState.value.description = '';
+
+      createModalConfirmLoading.value = false;
+      createModalVisible.value = false;
     }
 
     const columns = computed(() => {
@@ -251,10 +345,14 @@ export default defineComponent({
       createModalState,
       editModalConfirmLoading,
       createModalConfirmLoading,
+      createModalException,
       saveService,
+      createService,
       updateServicesList,
       formatPrice,
       removeService,
+      restoreService,
+      customServicesRow,
     }
   }
 });

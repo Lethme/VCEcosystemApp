@@ -16,7 +16,7 @@
                       v-model:value="activePane.order.selectedService"
                       show-search
                       size="large"
-                      placeholder="Select service"
+                      :placeholder="$locale.newOrdersPage.selectServicePlaceholder"
                       @change="() => $store.commit('saveState')"
                       :options="servicesOptions"
                       :filter-option="filterOption"
@@ -99,7 +99,7 @@
                   </a-collapse>
                   <div class="money-received-wrapper pb-3">
                     <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.cash }}</h6>
-                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" @change="saveState" />
+                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" @change="() => saveState(false)" />
                   </div>
                   <a-button type="primary" size="large" block @click="showModal">{{ $locale.newOrdersPage.orderSummary.createOrderButtonTitle }}</a-button>
                 </a-card>
@@ -314,10 +314,14 @@ export default defineComponent({
       store.commit("deleteOrderService", key);
     };
 
-    const saveState = () => {
-      Loader.Use(500).then(() => {
+    const saveState = (useLoader = true) => {
+      if (useLoader) {
+        Loader.Use(500).then(() => {
+          store.commit("saveState");
+        });
+      } else {
         store.commit("saveState");
-      });
+      }
     }
 
     const customServicesRow = (record: any, index: number) => {

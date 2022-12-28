@@ -7,6 +7,9 @@ class ServicesPlugin {
         Object.defineProperty(app.config.globalProperties, "$services", {
             get() { return store.getters.services; }
         });
+        Object.defineProperty(app.config.globalProperties, "$allServices", {
+            get() { return store.getters.allServices; }
+        });
         Object.defineProperty(app.config.globalProperties, "$daysToRemoveOrders", {
             get() { return store.getters.daysToRemoveOrders; }
         });

@@ -4,6 +4,7 @@ export const ru: LocaleRecord = {
     locale: "ru",
     copyright: "&copy; 2022 VC://VPI. Все права защищены.",
     saveText: "Сохранить",
+    cancelText: "Отмена",
     roles: {
         ROOT: "Администратор",
         MODERATOR: "Модератор",
@@ -33,6 +34,7 @@ export const ru: LocaleRecord = {
         },
         servicesTableRemoveButtonTitle: "Удалить",
         servicesTableEditButtonTitle: "Изменить",
+        servicesTableRestoreButtonTitle: "Восстановить",
     },
     ordersPage: {
         title: "Заказы",
@@ -89,6 +91,7 @@ export const ru: LocaleRecord = {
         clearOrderButtonTitle: "Очистить заказ",
         clearOrderButtonConfirm: "Вы действительно хотите очистить этот заказ?",
         addServiceButtonTitle: "Добавить услугу",
+        selectServicePlaceholder: "Выберите услугу",
         orderServicesTableHeaders: {
             services: "Услуга",
             price: "Цена, ₽/штука",
@@ -125,6 +128,12 @@ export const ru: LocaleRecord = {
         addUserButtonTitle: "Добавить пользователя",
         addRateButtonTitle: "Создать ставку",
         addServiceButtonTitle: "Создать услугу",
+        createServiceModal: {
+            exceptions: {
+                emptyTitle: "Название услуги не может быть пустым",
+                zeroOrNegativePrice: "Минимально допустимая цена - 1₽",
+            },
+        },
         mainMenu: {
             profile: "Профиль",
             users: "Пользователи",
@@ -145,6 +154,8 @@ export const ru: LocaleRecord = {
             roles: "Роли",
             actions: "Действия",
             active: "Активен",
+            rate: "Ставка",
+            shifts: "Число смен",
         },
         ratesTableHeaders: {
             title: "Название",

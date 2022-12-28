@@ -133,6 +133,14 @@ export default defineComponent({
           slots: { customRender: "roles" },
         },
         {
+          title: locale.value.userProfilePage.usersTableHeaders.shifts,
+          dataIndex: 'rate',
+          key: 'rate',
+          customRender({ record }: { record: User }) {
+            return record.rate ? record.rate.rate : null;
+          }
+        },
+        {
           title: locale.value.userProfilePage.usersTableHeaders.active,
           dataIndex: 'active',
           key: 'active',

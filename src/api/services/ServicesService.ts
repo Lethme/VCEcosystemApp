@@ -8,9 +8,10 @@ class ServicesService extends ApiService {
         return `services`;
     }
 
-    static async GetAll(): Promise<ApiResponse<Array<Service> | Message>> {
+    static async GetAll(force = true): Promise<ApiResponse<Array<Service> | Message>> {
         const url = this.CreateApiRequestUrl({
             path: [App.GKassa, this.Path],
+            query: { force },
         });
 
         return await this.Try<Array<Service>>(async () => {
@@ -26,6 +27,20 @@ class ServicesService extends ApiService {
 
         return await this.Try(async () => {
             const response = await axios.delete<ApiResponse>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
+    static async RestoreServicePrivate(id: number): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [App.GKassa, this.Path, 'restore', id],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.patch<ApiResponse>(url.Url, null, {
                 headers: this.ApiRequestHeaders,
             });
 

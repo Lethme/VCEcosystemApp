@@ -2,6 +2,7 @@ export interface LocaleRecord {
     locale: string;
     copyright: string;
     saveText: string;
+    cancelText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
@@ -31,6 +32,7 @@ export interface LocaleRecord {
         };
         servicesTableRemoveButtonTitle: string;
         servicesTableEditButtonTitle: string;
+        servicesTableRestoreButtonTitle: string;
     };
     ordersPage: {
         title: string;
@@ -87,6 +89,7 @@ export interface LocaleRecord {
         clearOrderButtonTitle: string;
         clearOrderButtonConfirm: string;
         addServiceButtonTitle: string;
+        selectServicePlaceholder: string;
         orderServicesTableHeaders: {
             services: string;
             price: string;
@@ -123,6 +126,12 @@ export interface LocaleRecord {
         addUserButtonTitle: string;
         addRateButtonTitle: string;
         addServiceButtonTitle: string;
+        createServiceModal: {
+            exceptions: {
+                emptyTitle: string;
+                zeroOrNegativePrice: string;
+            };
+        };
         mainMenu: {
             profile: string;
             users: string;
@@ -143,6 +152,8 @@ export interface LocaleRecord {
             roles: string;
             actions: string;
             active: string;
+            rate: string;
+            shifts: string;
         };
         ratesTableHeaders: {
             title: string;
