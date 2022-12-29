@@ -3,8 +3,11 @@ import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 export const ru: LocaleRecord = {
     locale: "ru",
     copyright: "&copy; 2022 VC://VPI. Все права защищены.",
+    editText: "Изменить",
     saveText: "Сохранить",
     cancelText: "Отмена",
+    removeText: "Удалить",
+    restoreText: "Восстановить",
     roles: {
         ROOT: "Администратор",
         MODERATOR: "Модератор",
@@ -134,6 +137,11 @@ export const ru: LocaleRecord = {
                 zeroOrNegativePrice: "Минимально допустимая цена - 1₽",
             },
         },
+        createRateModal: {
+            exceptions: {
+                emptyTitle: "Название ставки не может быть пустым",
+            },
+        },
         mainMenu: {
             profile: "Профиль",
             users: "Пользователи",
@@ -158,12 +166,22 @@ export const ru: LocaleRecord = {
             shifts: "Число смен",
         },
         ratesTableHeaders: {
+            id: "Id",
             title: "Название",
             rate: "Количество смен",
+            actions: "Действия"
         },
         usersTableButtonsTitles: {
             confirmLink: "Ссылка активации",
             deactivate: "Деактивировать",
+        },
+        removedServicesSwitch: {
+            checked: "Удалённые",
+            unchecked: "Текущие",
+        },
+        removedRatesSwitch: {
+            checked: "Удалённые",
+            unchecked: "Текущие",
         },
     },
     localeTitles: {

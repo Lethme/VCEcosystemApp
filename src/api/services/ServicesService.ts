@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, App, PatchServiceDto, PostServiceDto, Service} from "@/api/services/types";
+import {ApiResponse, App, EditServiceDto, CreateServiceDto, Service} from "@/api/services/types";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
 
@@ -48,7 +48,7 @@ class ServicesService extends ApiService {
         });
     }
 
-    static async CreateServicePrivate(dto: PostServiceDto): Promise<ApiResponse<Message | undefined>> {
+    static async CreateServicePrivate(dto: CreateServiceDto): Promise<ApiResponse<Message | undefined>> {
         const url = this.CreateApiRequestUrl({
             path: [App.GKassa, this.Path],
         });
@@ -62,7 +62,7 @@ class ServicesService extends ApiService {
         });
     }
 
-    static async EditServicePrivate(id: number, dto: PatchServiceDto): Promise<ApiResponse<Message | undefined>> {
+    static async EditServicePrivate(id: number, dto: EditServiceDto): Promise<ApiResponse<Message | undefined>> {
         const url = this.CreateApiRequestUrl({
             path: [App.GKassa, this.Path, id],
         });

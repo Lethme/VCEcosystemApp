@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrapper d-flex pb-3 flex-column flex-xl-row gap-3 justify-content-between align-items-center">
-    <div class="headers col-12 col-xl-auto">
+    <div class="headers d-flex gap-3 align-items-center col-12 col-xl-auto">
       <h6 v-if="$mobile" class="text-start m-0 d-flex align-items-center gap-2">
         {{ $locale.userProfilePage.contentTitles.services }}
         <sync-outlined class="refresh-btn" @click="updateServicesList" />
@@ -9,6 +9,7 @@
         {{ $locale.userProfilePage.contentTitles.services }}
         <sync-outlined class="refresh-btn" @click="updateServicesList" />
       </h4>
+      <a-switch v-if="$rootAccess" :checked-children="$locale.userProfilePage.removedServicesSwitch.checked" :un-checked-children="$locale.userProfilePage.removedServicesSwitch.unchecked" v-model:checked="showRemovedServices" @change="refreshServices" />
     </div>
     <div class="actions-wrapper d-flex flex-column flex-xl-row gap-3 gap-xl-2 col-12 col-xl-6">
       <div class="input-field w-100">
@@ -34,17 +35,17 @@
         {{ formatPrice(record.price) }}
       </template>
       <template #operation="{ record }">
-        <div v-if="!record.deletedAt" class="btn-wrapper d-flex justify-content-end gap-2">
+        <div class="btn-wrapper d-flex justify-content-end gap-2">
           <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.homePage.servicesTableEditButtonTitle }}</a-button>
           <a-popconfirm
+              v-if="!record.deletedAt"
               :title="$locale.homePage.servicesTableRemoveButtonTitle + '?'"
               @confirm="() => removeService(record.id)"
           >
             <a-button type="primary" danger>{{ $locale.homePage.servicesTableRemoveButtonTitle }}</a-button>
           </a-popconfirm>
-        </div>
-        <div v-else class="btn-wrapper d-flex justify-content-end gap-2">
           <a-popconfirm
+              v-else
               :title="$locale.homePage.servicesTableRestoreButtonTitle + '?'"
               @confirm="() => restoreService(record.id)"
           >
@@ -58,17 +59,17 @@
         {{ formatPrice(record.price) }}
       </template>
       <template #operation="{ record }">
-        <div v-if="!record.deletedAt" class="btn-wrapper d-flex justify-content-end gap-2">
+        <div class="btn-wrapper d-flex justify-content-end gap-2">
           <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.homePage.servicesTableEditButtonTitle }}</a-button>
           <a-popconfirm
+              v-if="!record.deletedAt"
               :title="$locale.homePage.servicesTableRemoveButtonTitle + '?'"
               @confirm="() => removeService(record.id)"
           >
             <a-button type="primary" danger>{{ $locale.homePage.servicesTableRemoveButtonTitle }}</a-button>
           </a-popconfirm>
-        </div>
-        <div v-else class="btn-wrapper d-flex justify-content-end gap-2">
           <a-popconfirm
+              v-else
               :title="$locale.homePage.servicesTableRestoreButtonTitle + '?'"
               @confirm="() => restoreService(record.id)"
           >
@@ -142,7 +143,7 @@ import {
 } from "@ant-design/icons-vue";
 import {useStore} from "vuex";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
-import {PatchServiceDto, PostServiceDto, Service, User} from "@/api/services/types";
+import {EditServiceDto, CreateServiceDto, Service, User} from "@/api/services/types";
 import {Loader} from "@/utils";
 import {formatPrice} from "@/api/utils/formatPrice";
 import {ServicesService} from "@/api/services";
@@ -162,12 +163,13 @@ export default defineComponent({
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
 
     const services = computed(
-        rootAccess.value
-            ? () => (store.getters.allServices as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
-            : () => (store.getters.services as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
+        () => showRemovedServices.value && rootAccess.value
+          ? (store.getters.removedServices as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
+          : (store.getters.services as Array<Service>).filter(service => service.title.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase()))
     );
 
     const searchText = ref('');
+    const showRemovedServices = ref(false);
 
     const editModalVisible = ref(false);
     const createModalVisible = ref(false);
@@ -179,12 +181,12 @@ export default defineComponent({
       description: '',
       price: 0,
     });
-    const editModalState = ref<PatchServiceDto>({
+    const editModalState = ref<EditServiceDto>({
       title: '',
       price: undefined,
       description: '',
     });
-    const createModalState = ref<PostServiceDto>({
+    const createModalState = ref<CreateServiceDto>({
       title: '',
       price: 1,
       description: '',
@@ -334,6 +336,7 @@ export default defineComponent({
 
     return {
       searchText,
+      showRemovedServices,
       services,
       columns,
       showEditModal,

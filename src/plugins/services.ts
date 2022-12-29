@@ -10,13 +10,16 @@ class ServicesPlugin {
         Object.defineProperty(app.config.globalProperties, "$allServices", {
             get() { return store.getters.allServices; }
         });
+        Object.defineProperty(app.config.globalProperties, "$removedServices", {
+            get() { return store.getters.removedServices; }
+        });
         Object.defineProperty(app.config.globalProperties, "$daysToRemoveOrders", {
             get() { return store.getters.daysToRemoveOrders; }
         });
         app.config.globalProperties.refreshServices = async () => {
-            Loader.SetState(true);
-            await store.dispatch("updateServices");
-            Loader.SetState(false);
+            await Loader.Use(async () => {
+                await store.dispatch("updateServices");
+            });
         }
     }
 }

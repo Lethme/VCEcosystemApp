@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, PatchUserDto, SetProfilePicture, User} from "@/api/services/types";
+import {ApiResponse, EditUserDto, SetProfilePicture, User} from "@/api/services/types";
 import {Locale} from "@/store/modules/locales/types/Locale";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
@@ -83,7 +83,7 @@ class UsersService extends ApiService {
         });
     }
 
-    static async EditUserData(dto: PatchUserDto): Promise<ApiResponse<User | Message>> {
+    static async EditUserData(dto: EditUserDto): Promise<ApiResponse<User | Message>> {
         const url = this.CreateApiRequestUrl({
             path: this.Path,
         });

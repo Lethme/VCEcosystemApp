@@ -1,8 +1,11 @@
 export interface LocaleRecord {
     locale: string;
     copyright: string;
+    editText: string;
     saveText: string;
     cancelText: string;
+    removeText: string;
+    restoreText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
@@ -132,6 +135,11 @@ export interface LocaleRecord {
                 zeroOrNegativePrice: string;
             };
         };
+        createRateModal: {
+            exceptions: {
+                emptyTitle: string;
+            };
+        };
         mainMenu: {
             profile: string;
             users: string;
@@ -156,12 +164,22 @@ export interface LocaleRecord {
             shifts: string;
         };
         ratesTableHeaders: {
+            id: string;
             title: string;
             rate: string;
+            actions: string;
         };
         usersTableButtonsTitles: {
             confirmLink: string;
             deactivate: string;
+        };
+        removedServicesSwitch: {
+            checked: string;
+            unchecked: string;
+        };
+        removedRatesSwitch: {
+            checked: string;
+            unchecked: string;
         };
     };
     localeTitles: {

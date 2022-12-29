@@ -19,6 +19,7 @@ declare module "@vue/runtime-core" {
     $mobile: boolean;
     $services: Array<Service>;
     $allServices: Array<Service>;
+    $removedServices: Array<Service>;
     $daysToRemoveOrders: number;
     $pictureFallback: string;
 

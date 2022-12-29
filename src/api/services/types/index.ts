@@ -16,9 +16,10 @@ import {DaysToRemoveOrders} from "@/api/services/types/DaysToRemoveOrders";
 import { NewOrder, NewOrderService } from "@/api/services/types/NewOrder";
 import { PasswordState, PasswordStateField, PasswordStateFieldType } from "@/api/services/types/PasswordState";
 import { SetProfilePicture } from "@/api/services/types/SetProfilePicture";
-import { PatchUserDto } from "@/api/services/types/PatchUserDto";
-import { PostServiceDto } from "@/api/services/types/PostServiceDto";
-import { PatchServiceDto } from "@/api/services/types/PatchServiceDto";
+import { EditUserDto } from "@/api/services/types/EditUserDto";
+import { CreateServiceDto } from "@/api/services/types/CreateServiceDto";
+import { EditServiceDto } from "@/api/services/types/EditServiceDto";
+import { CreateRateDto } from "@/api/services/types/CreateRateDto";
 
 export type {
     Service,
@@ -40,9 +41,10 @@ export type {
     PasswordState,
     PasswordStateField,
     SetProfilePicture,
-    PatchUserDto,
-    PostServiceDto,
-    PatchServiceDto,
+    EditUserDto,
+    CreateServiceDto,
+    EditServiceDto,
+    CreateRateDto,
 };
 
 export { App, PasswordStateFieldType };

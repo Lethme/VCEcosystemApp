@@ -3,8 +3,11 @@ import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 export const en: LocaleRecord = {
     locale: "en",
     copyright: "&copy; 2022 VC://VPI. All rights reserved.",
+    editText: "Edit",
     saveText: "Save",
     cancelText: "Cancel",
+    removeText: "Remove",
+    restoreText: "Restore",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
@@ -134,6 +137,11 @@ export const en: LocaleRecord = {
                 zeroOrNegativePrice: "Price has to be at least 1₽",
             },
         },
+        createRateModal: {
+            exceptions: {
+                emptyTitle: "Title should not be empty",
+            },
+        },
         mainMenu: {
             profile: "Profile",
             users: "Users",
@@ -158,12 +166,22 @@ export const en: LocaleRecord = {
             shifts: "Shifts Amount",
         },
         ratesTableHeaders: {
+            id: "Id",
             title: "Title",
             rate: "Shifts Amount",
+            actions: "Actions",
         },
         usersTableButtonsTitles: {
             confirmLink: "Confirm Link",
             deactivate: "Deactivate",
+        },
+        removedServicesSwitch: {
+            checked: "Removed",
+            unchecked: "Current",
+        },
+        removedRatesSwitch: {
+            checked: "Removed",
+            unchecked: "Current",
         },
     },
     localeTitles: {
