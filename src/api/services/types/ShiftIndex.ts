@@ -1,0 +1,1 @@
+export type ShiftIndex = 1 | 2;

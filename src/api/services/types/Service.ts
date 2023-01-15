@@ -5,6 +5,7 @@ interface Service extends Timestamp {
     title: string;
     price: number;
     description?: string;
+    customerDescription?: string;
 }
 
 export default Service;

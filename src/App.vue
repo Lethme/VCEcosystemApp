@@ -34,15 +34,6 @@ export default defineComponent({
 
       const response = await this.$store.dispatch("updateUserInfo");
 
-      if (response && !response.status) {
-        this.$router.push({
-          name: "login",
-          state: {
-            exception: "Your session has expired",
-          },
-        });
-      }
-
       if (response && response.status) {
         await this.$store.dispatch("loadState");
       }

@@ -1,7 +1,7 @@
 <template>
   <a-layout class="flex-grow-0 sticky-top t-0">
     <a-layout-content>
-      <div class="container-fluid container-sm">
+      <div class="container-fluid">
         <a-menu v-model:selectedKeys="current" :selectable="false" mode="horizontal" class="vc-navbar">
           <a-menu-item key="logo" class="logo-item">
             <div class="logo">

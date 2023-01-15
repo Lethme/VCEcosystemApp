@@ -1,5 +1,5 @@
 <template>
-  <a-layout class="container py-4 gap-4">
+  <a-layout class="container-fluid py-4 gap-4">
     <a-layout-sider class="p-0" :width="collapsed ? 'auto' : $mobile ? 168 : 256" :collapsible="$mobile" v-model:collapsed="collapsed">
       <vc-layout class="px-0 py-2 h-100 position-relative">
         <div class="menu-wrapper position-sticky">
@@ -15,19 +15,31 @@
               v-model:openKeys="openKeys"
               v-model:selectedKeys="selectedKeys"
           >
-            <a-menu-item key="profile">
+            <a-menu-item :key="menuKeys.profile.key">
               <template #icon>
                 <user-outlined />
               </template>
               {{ $locale.userProfilePage.mainMenu.profile }}
             </a-menu-item>
-            <a-menu-item key="users" v-if="$rootAccess">
+            <a-menu-item :key="menuKeys.preferences.key" v-if="$operatorAccess">
+              <template #icon>
+                <coffee-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.preferences }}
+            </a-menu-item>
+            <a-menu-item :key="menuKeys.users.key" v-if="$rootAccess">
               <template #icon>
                 <team-outlined />
               </template>
               {{ $locale.userProfilePage.mainMenu.users }}
             </a-menu-item>
-            <a-menu-item key="rates" v-if="$rootAccess">
+            <a-menu-item :key="menuKeys.services.key">
+              <template #icon>
+                <unordered-list-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.services }}
+            </a-menu-item>
+            <a-menu-item :key="menuKeys.rates.key" v-if="$rootAccess">
               <template #icon>
                 <schedule-outlined />
               </template>
@@ -43,50 +55,11 @@
           <div class="profile-header d-flex flex-column align-items-center gap-3">
             <vc-profile-picture width="150" height="150" :uploadable="true" />
             <h5 v-if="$authorized" class="usertag d-flex align-items-center gap-2">@{{ $user.username }}</h5>
-            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }}<edit-outlined v-if="false" class="edit" @click="showEditUserModal" /></h3>
+            <h6 v-if="$authorized" class="userroles d-flex align-items-center mb-1 gap-2">{{ $user.roles.map(role => $locale.roles[role.value]).join(', ') }}</h6>
+            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }}<sync-outlined class="refresh-btn" @click="refreshUserInfo(true)" /></h3>
           </div>
-          <a-modal
-              v-if="false"
-              :visible="editUserModalVisible"
-              title="Edit"
-              ok-text="Save"
-              :confirm-loading="confirmEditLoading"
-              @ok="onFinish"
-              @cancel="onCancel"
-              centered
-          >
-            <a-form
-                class="edit-form"
-                name="basic"
-                autocomplete="off"
-            >
-              <a-form-item
-                  label="Last name"
-                  name="lastname"
-                  :rules="[{ required: false }]"
-              >
-                <a-input v-model:value="lastName" />
-              </a-form-item>
-
-              <a-form-item
-                  label="First name"
-                  name="firstname"
-                  :rules="[{ required: false }]"
-              >
-                <a-input v-model:value="firstName" />
-              </a-form-item>
-
-              <a-form-item
-                  label="Patronymic"
-                  name="patronymic"
-                  :rules="[{ required: false }]"
-              >
-                <a-input v-model:value="patronymic" />
-              </a-form-item>
-            </a-form>
-          </a-modal>
           <a-divider />
-          <vc-profile-content :selected-key="selectedKey" />
+          <vc-profile-content :selected-key="selectedKey" :menu-keys="menuKeys" />
         </vc-layout>
       </a-layout-content>
     </a-layout>
@@ -94,20 +67,22 @@
 </template>
 
 <script lang="ts">
-import {UsersService} from "@/api/services";
 import {ApiRole} from "@/api/services/enums/ApiRole";
-import {Message, User} from "@/api/services/types";
+import {User} from "@/api/services/types";
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import VcProfileContent from "@/components/ProfileContentComponent/ProfileContentComponent.vue";
+import {Loader} from "@/utils";
 import {
-  EditOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  ScheduleOutlined,
-  TeamOutlined,
-  UserOutlined,
+    SyncOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    ScheduleOutlined,
+    TeamOutlined,
+    UserOutlined,
+    UnorderedListOutlined,
+    CoffeeOutlined,
 } from '@ant-design/icons-vue';
-import {computed, defineComponent, reactive, ref, toRefs, watch} from "vue";
+import {computed, defineComponent, onMounted, reactive, ref, toRefs, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 
@@ -117,26 +92,32 @@ interface FormState {
   patronymic: string;
 }
 
-interface MenuKey {
+export interface MenuKey {
   key: string;
   rootAccess?: boolean;
+  moderAccess?: boolean;
+  operatorAccess?: boolean;
 }
 
-interface MenuKeyState {
+export interface MenuKeyState {
   profile: MenuKey;
+  preferences: MenuKey;
   users: MenuKey;
   rates: MenuKey;
+  services: MenuKey;
 }
 
 export default defineComponent({
   components: {
     VcProfileContent,
     UserOutlined,
-    EditOutlined,
+    SyncOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     TeamOutlined,
-    ScheduleOutlined
+    ScheduleOutlined,
+    UnorderedListOutlined,
+    CoffeeOutlined,
   },
   computed: {
     username() {
@@ -149,8 +130,12 @@ export default defineComponent({
     const route = useRoute();
     const user = computed(() => store.getters.userInfo as User);
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
+    const moderAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Moderator) : false);
+    const operatorAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Operator) : false);
     const menuKeys = ref<MenuKeyState>({
       profile: { key: 'profile' },
+      preferences: { key: "preferences", operatorAccess: true },
+      services: { key: 'services' },
       users: { key: 'users', rootAccess: true },
       rates: { key: 'rates', rootAccess: true },
     });
@@ -162,13 +147,8 @@ export default defineComponent({
       openKeys: ['sub1'],
       preOpenKeys: ['sub1'],
     });
-    const userInfoState = reactive<FormState>({
-      lastName: '',
-      firstName: '',
-      patronymic: '',
-    });
 
-    const selectedKey = computed(() => state.selectedKeys[0]);
+    const selectedKey = computed(() => state.selectedKeys[0] || menuKeys.value.profile.key);
 
     watch(
         () => state.openKeys,
@@ -183,21 +163,31 @@ export default defineComponent({
 
     watch(() => store.getters.userInfo, (user: User) => {
       if (user) {
-        userInfoState.lastName = user.lastName;
-        userInfoState.firstName = user.firstName;
-        userInfoState.patronymic = user.patronymic;
-      } else {
-        userInfoState.lastName = '';
-        userInfoState.firstName = '';
-        userInfoState.patronymic = '';
+        const key = route.query.key as string || menuKeys.value.profile.key;
+        const menuKey = (menuKeys.value as any)[key] as MenuKey;
+
+        if (
+            (menuKey.rootAccess && rootAccess.value) ||
+            (menuKey.moderAccess && moderAccess.value) ||
+            (menuKey.operatorAccess && operatorAccess.value) ||
+            (!menuKey.rootAccess && !menuKey.moderAccess && !menuKey.operatorAccess)
+        ) {
+          state.selectedKeys = [menuKey.key];
+        } else {
+          state.selectedKeys = [menuKeys.value.profile.key];
+          router.push({
+            query: { key: undefined }
+          });
+        }
       }
     });
 
-    // watch(() => selectedKey.value, (key, newKey) => {
-    //   router.push({
-    //     query: { key }
-    //   });
-    // });
+    watch(() => selectedKey.value, (key, oldKey) => {
+      state.selectedKeys = [key];
+      router.push({
+        query: { key: key !== menuKeys.value.profile.key ? key : undefined }
+      });
+    });
     
     const showEditUserModal = () => {
       editUserModalVisible.value = true;
@@ -208,36 +198,17 @@ export default defineComponent({
       state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
 
-    const onFinish = async () => {
-      confirmEditLoading.value = true;
-
-      const response = await UsersService.EditUserData(userInfoState);
-
-      if (response.status) {
-        await store.dispatch("updateUserInfo");
-      } else {
-        console.log((response.data as Message).message);
-      }
-
-      confirmEditLoading.value = false;
-      editUserModalVisible.value = false;
-    };
-    const onCancel = () => {
-      userInfoState.lastName = store.getters.userInfo.lastName;
-      userInfoState.firstName = store.getters.userInfo.firstName;
-      userInfoState.patronymic = store.getters.userInfo.patronymic;
-      editUserModalVisible.value = false;
-    }
+    onMounted(async () => {
+      await Loader.Use(async () => await store.dispatch("updateUserInfo"));
+    })
 
     return {
       ...toRefs(state),
-      ...toRefs(userInfoState),
+      menuKeys,
       selectedKey,
       editUserModalVisible,
       confirmEditLoading,
       showEditUserModal,
-      onFinish,
-      onCancel,
       toggleCollapsed,
     }
   }
@@ -248,7 +219,8 @@ export default defineComponent({
 .menu-wrapper {
   top: 60px;
 }
-.usertag {
+.usertag,
+.userroles {
   color: #a0a0a0;
 }
 .edit {

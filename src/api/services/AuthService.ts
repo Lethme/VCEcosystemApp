@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, Auth} from "@/api/services/types";
+import {ApiResponse, Auth, CreateUserDto, User} from "@/api/services/types";
 import {Token} from "@/api/services/types/Token";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
@@ -24,6 +24,20 @@ class AuthService extends ApiService {
 
             return response.data;
         })
+    }
+
+    static async RegisterPrivate(dto: CreateUserDto): Promise<ApiResponse<User | Message>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, "register"],
+        });
+
+        return await this.Try<User>(async () => {
+            const response = await axios.post<ApiResponse<User>>(url.Url, dto, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
     }
 }
 

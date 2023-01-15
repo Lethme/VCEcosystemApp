@@ -15,12 +15,19 @@ const actions = {
     if (token) {
       const response = await UsersService.WhoAmI();
 
-      if (!response.status) {
+      if (!response.status || !response) {
         /* ToDo | Here must be a redirect to login page since any exception occurred on authorize via saved token */
         console.log((response as ApiResponse<Message>).data?.message);
 
         localStorage.removeItem("api_token");
         context.commit("setUserInfo", undefined);
+
+        await router.push({
+          name: "login",
+          state: {
+            exception: "Время сеанса истекло",
+          },
+        });
       } else {
         const user = (response as ApiResponse<User>).data;
         context.commit("setUserInfo", user);

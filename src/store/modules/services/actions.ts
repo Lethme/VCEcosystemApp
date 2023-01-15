@@ -11,7 +11,11 @@ const actions = {
     const response = await ServicesService.GetAll();
 
     if (response.status) {
-      context.commit("setServices", response.data);
+      context.commit("setServices", (response.data as Array<Service>)
+          .sort((f, s) => {
+            return (f.title.toLocaleLowerCase().charCodeAt(0) - s.title.toLocaleLowerCase().charCodeAt(0)) || (f.id - s.id)
+          })
+      );
 
       const panes: Array<Pane> = store.getters.panes;
       const services = response.data as Array<Service>;

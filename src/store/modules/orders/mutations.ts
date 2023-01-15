@@ -163,6 +163,7 @@ const mutations = {
 
     if (activePane) {
       activePane.order.dataSource = activePane.order.dataSource.filter(item => item.key !== payload);
+      delete activePane.order.dataEditable[payload];
       store.commit("saveState");
     }
   }

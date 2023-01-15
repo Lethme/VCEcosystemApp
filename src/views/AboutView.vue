@@ -1,7 +1,7 @@
 <template>
   <div class="about" style="height: 700px">
     <h1>This is an about page</h1>
-    <div class="container">
+    <div class="container-fluid">
       <vc-layout :class="{ test: true, con: true }">
         Test
       </vc-layout>

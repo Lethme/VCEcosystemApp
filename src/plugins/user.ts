@@ -23,12 +23,42 @@ class UserPlugin {
             }
         });
 
+        app.config.globalProperties.refreshUserInfo = async (useLoader = false) => {
+            useLoader && Loader.SetState(true);
+            await store.dispatch("updateUserInfo");
+            useLoader && Loader.SetState(false);
+        };
+
         Object.defineProperty(app.config.globalProperties, "$rootAccess", {
             get() {
                 const user = store.getters.userInfo;
 
                 if (user) {
                     return (store.getters.userInfo as User)?.roles.some(role => role.value === ApiRole.Root);
+                }
+
+                return false;
+            }
+        });
+
+        Object.defineProperty(app.config.globalProperties, "$moderAccess", {
+            get() {
+                const user = store.getters.userInfo;
+
+                if (user) {
+                    return (store.getters.userInfo as User)?.roles.some(role => role.value === ApiRole.Moderator);
+                }
+
+                return false;
+            }
+        });
+
+        Object.defineProperty(app.config.globalProperties, "$operatorAccess", {
+            get() {
+                const user = store.getters.userInfo;
+
+                if (user) {
+                    return (store.getters.userInfo as User)?.roles.some(role => role.value === ApiRole.Operator);
                 }
 
                 return false;

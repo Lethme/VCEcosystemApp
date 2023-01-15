@@ -9,6 +9,8 @@ declare module "@vue/runtime-core" {
     $authorized: boolean;
     $user: User | undefined;
     $rootAccess: boolean;
+    $moderAccess: boolean;
+    $operatorAccess: boolean;
     $locale: LocaleRecord;
     $localeRecords: Array<LocaleRecord>;
     $date: Date;
@@ -18,9 +20,12 @@ declare module "@vue/runtime-core" {
     $windowWidth: number;
     $mobile: boolean;
     $services: Array<Service>;
+    $allServices: Array<Service>;
+    $removedServices: Array<Service>;
     $daysToRemoveOrders: number;
     $pictureFallback: string;
 
     refreshServices: () => Promise<void>;
+    refreshUserInfo: (useLoader?: boolean) => Promise<void>;
   }
 }

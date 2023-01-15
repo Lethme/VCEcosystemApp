@@ -1,5 +1,13 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, PatchUserDto, SetProfilePicture, User} from "@/api/services/types";
+import {
+    ApiResponse,
+    CreatePreferenceDto,
+    CreateUserDto, EditPreferenceDto,
+    EditUserDto,
+    SetProfilePicture,
+    Token,
+    User
+} from "@/api/services/types";
 import {Locale} from "@/store/modules/locales/types/Locale";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
@@ -83,9 +91,9 @@ class UsersService extends ApiService {
         });
     }
 
-    static async EditUserData(dto: PatchUserDto): Promise<ApiResponse<User | Message>> {
+    static async EditUserPrivate(id: number, dto: EditUserDto): Promise<ApiResponse<User | Message>> {
         const url = this.CreateApiRequestUrl({
-            path: this.Path,
+            path: [this.Path, id],
         });
 
         return await this.Try<User>(async () => {
@@ -134,6 +142,48 @@ class UsersService extends ApiService {
         } catch {
             return false;
         }
+    }
+
+    static async AddPreference(dto: CreatePreferenceDto): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'preferences'],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.post<ApiResponse>(url.Url, dto, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
+    static async EditPreference(id: number, dto: EditPreferenceDto): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'preferences', id],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.patch<ApiResponse>(url.Url, dto, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
+    static async RemovePreference(id: number): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'preferences', id],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.delete<ApiResponse>(url.Url, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
     }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4 orders">
-    <div class="container py-sm-4">
+    <div class="container-fluid py-sm-4">
       <a-layout class="flex-grow-1 py-4">
         <a-layout-content>
           <div class="table-header-wrapper d-flex flex-column flex-sm-row gap-3 gap-sm-2 justify-content-between pb-4 pb-md-2">
@@ -23,14 +23,58 @@
             <template v-slot:expandedRowRender="record">
               <a-table class="unselectable" :data-source="ordersInner.at(record.index)" :key="record.id" :columns="innerColumns" :pagination="false" :custom-row="(r, i) => customOrderServiceRow(record.record, r, i)" />
             </template>
-            <template #recordsActions="record">
-              <a-button v-if="!showArchivedOrders" type="primary" danger @click="(e) => archiveOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.archiveButtonTitle }}</a-button>
-              <div class="archive-actions d-flex flex-row gap-2" v-else>
-                <a-button type="primary" @click="(e) => restoreOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.restoreButtonTitle }}</a-button>
-                <a-button type="primary" danger @click="(e) => removeOrderClick(e, record.record)">{{ $locale.ordersPage.ordersTableActions.removeButtonTitle }}</a-button>
+            <template #recordsActions="{ record }">
+              <div class="btn-wrapper d-flex gap-2 justify-content-end">
+                <a-button type="primary" @click="(e) => showReceiptModal(e, record)">{{ $locale.ordersPage.ordersTableActions.receiptButtonTitle }}</a-button>
+                <a-button v-if="!showArchivedOrders" type="primary" danger @click="(e) => archiveOrderClick(e, record)">{{ $locale.ordersPage.ordersTableActions.archiveButtonTitle }}</a-button>
+                <div class="archive-actions d-flex flex-row gap-2" v-else>
+                  <a-button type="primary" @click="(e) => restoreOrderClick(e, record)">{{ $locale.ordersPage.ordersTableActions.restoreButtonTitle }}</a-button>
+                  <a-button type="primary" danger @click="(e) => removeOrderClick(e, record)">{{ $locale.ordersPage.ordersTableActions.removeButtonTitle }}</a-button>
+                </div>
               </div>
             </template>
           </a-table>
+          <a-modal
+              v-if="receiptOrder"
+              v-model:visible="receiptVisible"
+              :title="`${$locale.orderText} #${receiptOrder.id} ${$locale.fromText.toLocaleLowerCase()} ${receiptOrder.createdAt}`"
+              :ok-text="$locale.closeText"
+              :onOk="() => receiptVisible = false"
+              :after-close="() => receiptOrder = undefined"
+              :cancel-button-props="{ style: { display: 'none' }}"
+              centered
+              closable
+          >
+            <div class="create-order-wrapper d-flex flex-column gap-2">
+              <div v-if="showAllOrders" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 fw-normal">{{ $locale.executorText }}</h6>
+                <h6 class="m-0 value">{{ receiptOrder.username }}</h6>
+              </div>
+              <a-divider v-if="showAllOrders" />
+              <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h5 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.servicesColumnTitle }}</h5>
+                <h5 class="m-0">{{ $locale.newOrdersPage.orderSummary.createOrderModal.priceColumnTitle }}</h5>
+              </div>
+              <a-divider />
+              <div :key="service.id" v-for="service in receiptOrder.services" class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 fw-normal">{{ service.title }}</h6>
+                <h5 class="m-0 value d-flex align-items-center"><span class="fw-normal fs-6">{{ service.amount }} x {{ formatPrice(service.price) }} =&nbsp;</span>{{ formatPrice(service.amount * service.price) }}</h5>
+              </div>
+              <a-divider />
+              <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.totalPrice }}</h6>
+                <h5 class="m-0 value">{{ receiptOrder.price }}</h5>
+              </div>
+              <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.cash }}</h6>
+                <h5 class="m-0 value">{{ receiptOrder.cash }}</h5>
+              </div>
+              <div class="summary-service-total-price col-12 d-flex flex-row justify-content-between align-items-center">
+                <h6 class="m-0 fw-normal">{{ $locale.newOrdersPage.orderSummary.createOrderModal.change }}</h6>
+                <h5 class="m-0 value">{{ receiptOrder.change }}</h5>
+              </div>
+            </div>
+          </a-modal>
         </a-layout-content>
       </a-layout>
     </div>
@@ -39,7 +83,7 @@
 
 <script lang="ts">
 import {Pane} from "@/store/modules/orders/types";
-import {createVNode, defineComponent} from "vue";
+import {createVNode, defineComponent, ref} from "vue";
 import {QuestionCircleOutlined, SyncOutlined, PlusOutlined} from '@ant-design/icons-vue';
 import {Order, OrderService, User} from "@/api/services/types";
 import {OrdersService} from "@/api/services";
@@ -56,6 +100,9 @@ export interface OrderData extends Order {
   cash: string;
   price: string;
   change: string;
+  priceRaw: number;
+  cashRaw: number;
+  changeRaw: number;
   removedIn?: string;
   remaining?: number;
   username?: string;
@@ -79,10 +126,33 @@ export default defineComponent({
       ordersRaw: new Array<Order>(),
     };
   },
+  created() {
+    this.$store.dispatch("updateServices");
+  },
+  setup() {
+    const receiptOrder = ref<OrderData>();
+    const receiptVisible = ref(false);
+
+    const showReceiptModal = (e: Event, order: OrderData) => {
+      e.stopPropagation();
+
+      receiptOrder.value = order;
+      receiptVisible.value = true;
+    }
+
+    return {
+      receiptOrder,
+      receiptVisible,
+      showReceiptModal,
+      formatPrice,
+    }
+  },
   computed: {
     columns(): Array<any> {
       return [
-        { title: this.$locale.ordersPage.ordersTableHeaders.id, dataIndex: 'id', key: 'id' },
+        this.$rootAccess
+          ? { title: this.$locale.ordersPage.ordersTableHeaders.id, dataIndex: 'id', key: 'id', fixed: !this.$mobile ? 'left' : false }
+          : null,
         { title: this.$locale.ordersPage.ordersTableHeaders.totalPrice, dataIndex: "price", key: 'price', align: "right", customCell(record: any) {
             return {
               style: {
@@ -103,12 +173,14 @@ export default defineComponent({
           this.showArchivedOrders ? {
             title: this.$locale.ordersPage.ordersTableHeaders.remainingDays, dataIndex: 'remaining', key: 'remaining', align: 'right'
           } : null,
-        { title: this.$locale.ordersPage.ordersTableHeaders.actions, key: 'actions', align: "right", slots: { customRender: "recordsActions" } },
+        { title: this.$locale.ordersPage.ordersTableHeaders.actions, key: 'actions', align: "right", fixed: !this.$mobile ? 'right' : false, slots: { customRender: "recordsActions" } },
       ].filter(col => col);
     },
     innerColumns(): Array<any> {
       return [
-        { title: this.$locale.ordersPage.ordersServicesTableHeaders.id, dataIndex: 'id', key: 'id' },
+        this.$rootAccess
+          ? { title: this.$locale.ordersPage.ordersServicesTableHeaders.id, dataIndex: 'id', key: 'id', fixed: !this.$mobile ? 'left' : false }
+          : null,
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.title, dataIndex: 'title', key: 'title' },
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.amount, dataIndex: 'amount', key: 'amount', align: 'right' },
         { title: this.$locale.ordersPage.ordersServicesTableHeaders.price, dataIndex: 'unitPrice', key: 'unitPrice', align: 'right' },
@@ -119,7 +191,7 @@ export default defineComponent({
               },
             };
           }},
-      ];
+      ].filter(col => col);
     },
     ordersInner(): Array<Array<OrderInnerData>> {
       return this.orders.map((o: OrderData) => o.services.map(service => {
@@ -133,6 +205,7 @@ export default defineComponent({
     orders(): Array<OrderData> {
       return this.ordersRaw.map((order: Order) => {
         const price = order.services.map(service => service.amount * service.price).reduce((prev, cur) => prev + cur);
+        const change = order.moneyReceived - price;
         const deletedAt = new Date(order.deletedAt as string);
         const currentDate = new Date();
 
@@ -154,8 +227,11 @@ export default defineComponent({
               : undefined,
           cash: formatPrice(order.moneyReceived),
           price: formatPrice(price),
-          change: formatPrice(order.moneyReceived - price),
-          username: getFullUsername(order.user),
+          change: formatPrice(change),
+          cashRaw: order.moneyReceived,
+          priceRaw: price,
+          changeRaw: change,
+          username: getFullUsername(order.user, { short: this.$mobile }),
         }
       })
     },

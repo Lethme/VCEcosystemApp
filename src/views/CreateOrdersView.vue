@@ -1,6 +1,6 @@
 <template>
   <a-layout class="layout flex-grow-1 py-sm-4 order-create">
-    <div class="container d-flex py-sm-4">
+    <div class="container-fluid d-flex py-sm-4">
       <a-layout class="flex-grow-1 w-100 py-4">
         <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between pb-4 pb-md-2">
           <h4 class="text-start d-flex align-items-center gap-3">
@@ -16,7 +16,7 @@
                       v-model:value="activePane.order.selectedService"
                       show-search
                       size="large"
-                      placeholder="Select service"
+                      :placeholder="$locale.newOrdersPage.selectServicePlaceholder"
                       @change="() => $store.commit('saveState')"
                       :options="servicesOptions"
                       :filter-option="filterOption"
@@ -54,7 +54,7 @@
                             v-if="activePane.order.dataEditable[record.key] && $windowWidth < 768"
                             :visible="activePane.order.dataEditable[record.key] && $windowWidth < 768"
                             :title="record.title"
-                            ok-text="Save"
+                            :ok-text="$locale.saveText"
                             @ok="save(record.key)"
                             @cancel="cancel(record.key)"
                             centered
@@ -99,7 +99,7 @@
                   </a-collapse>
                   <div class="money-received-wrapper pb-3">
                     <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.cash }}</h6>
-                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" @change="saveState" />
+                    <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0" @change="() => saveState(false)" />
                   </div>
                   <a-button type="primary" size="large" block @click="showModal">{{ $locale.newOrdersPage.orderSummary.createOrderButtonTitle }}</a-button>
                 </a-card>
@@ -314,8 +314,14 @@ export default defineComponent({
       store.commit("deleteOrderService", key);
     };
 
-    const saveState = () => {
-      store.commit("saveState");
+    const saveState = (useLoader = true) => {
+      if (useLoader) {
+        Loader.Use(500).then(() => {
+          store.commit("saveState");
+        });
+      } else {
+        store.commit("saveState");
+      }
     }
 
     const customServicesRow = (record: any, index: number) => {
@@ -379,6 +385,10 @@ export default defineComponent({
     //color: @mainColor;
     font-weight: 400;
   }
+}
+
+.pane-sider-wrapper {
+  max-width: 500px;
 }
 
 .service-panel-header {

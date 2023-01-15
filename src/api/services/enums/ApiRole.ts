@@ -3,5 +3,5 @@ export enum ApiRole {
     Moderator = "MODERATOR",
     Admin = "ADMIN",
     Operator = "OPERATOR",
-    Guest = "GUEST"
+    Guest = "GUEST",
 }
