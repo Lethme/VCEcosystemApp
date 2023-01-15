@@ -18,8 +18,8 @@
             </a-form-item>
 
             <a-form-item class="d-flex justify-content-center">
-              <h3 v-if="user" class="greetings">{{ !confirmed ? `${username}, добро пожаловать в ВЦ!` :  'Ваш аккаунт успешно подтверждён'}}</h3>
-              <h5 class="greetings">{{ !confirmed ? 'Задайте Ваш пароль для входа в систему' : 'Теперь Вы можете авторизоваться' }}</h5>
+              <h3 v-if="user">{{ !confirmed ? `${username}, добро пожаловать в ВЦ!` :  'Ваш аккаунт успешно подтверждён'}}</h3>
+              <h5>{{ !confirmed ? 'Задайте Ваш пароль для входа в систему' : 'Теперь Вы можете авторизоваться' }}</h5>
             </a-form-item>
 
             <a-form-item v-if="!confirmed" has-feedback label="Пароль" name="password" class="d-flex flex-wrap" :label-col="{ span: 24 }" autocomplete="off" :rules="[{ required: true, validator: validatePassword }]">

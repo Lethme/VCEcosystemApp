@@ -1,17 +1,32 @@
+import {ApiDay} from "@/api/services/enums/ApiDay";
+
 export interface LocaleRecord {
     locale: string;
     copyright: string;
     editText: string;
     saveText: string;
+    closeText: string;
     cancelText: string;
     removeText: string;
     restoreText: string;
+    orderText: string;
+    fromText: string;
+    executorText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
       OPERATOR: string;
       ADMIN: string;
       GUEST: string;
+    };
+    daysOfWeek: {
+      [ApiDay.Monday]: string;
+      [ApiDay.Tuesday]: string;
+      [ApiDay.Wednesday]: string;
+      [ApiDay.Thursday]: string;
+      [ApiDay.Friday]: string;
+      [ApiDay.Saturday]: string;
+      [ApiDay.Sunday]: string;
     };
     mainMenuItemTitles: {
         newOrder: {
@@ -31,6 +46,7 @@ export interface LocaleRecord {
             title: string;
             price: string;
             description: string;
+            customerDescription: string;
             actions: string;
         };
         servicesTableRemoveButtonTitle: string;
@@ -76,6 +92,7 @@ export interface LocaleRecord {
             archiveButtonTitle: string;
             restoreButtonTitle: string;
             removeButtonTitle: string;
+            receiptButtonTitle: string;
         };
         ordersServicesTableHeaders: {
             id: string;
@@ -129,6 +146,7 @@ export interface LocaleRecord {
         addUserButtonTitle: string;
         addRateButtonTitle: string;
         addServiceButtonTitle: string;
+        addPreferenceButtonTitle: string;
         createServiceModal: {
             exceptions: {
                 emptyTitle: string;
@@ -142,6 +160,7 @@ export interface LocaleRecord {
         };
         mainMenu: {
             profile: string;
+            preferences: string;
             users: string;
             rates: string;
             services: string;
@@ -150,6 +169,7 @@ export interface LocaleRecord {
             users: string;
             rates: string;
             services: string;
+            preferences: string;
         };
         usersTableHeaders: {
             id: string;
@@ -169,6 +189,17 @@ export interface LocaleRecord {
             rate: string;
             actions: string;
         };
+        preferencesTableHeaders: {
+            day: string;
+            shift: string;
+            preference: string;
+            actions: string;
+        },
+        usersDeactivateOwnAccountTitle: string;
+        createUserModal: {
+            selectRolesPlaceholder: string;
+            selectRatePlaceholder: string;
+        };
         usersTableButtonsTitles: {
             confirmLink: string;
             deactivate: string;
@@ -181,6 +212,10 @@ export interface LocaleRecord {
             checked: string;
             unchecked: string;
         };
+        preferenceSwitch: {
+            checked: string;
+            unchecked: string;
+        }
     };
     localeTitles: {
         ru: string;

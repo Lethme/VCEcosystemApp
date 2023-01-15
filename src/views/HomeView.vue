@@ -95,8 +95,8 @@ import {formatPrice} from "@/api/utils/formatPrice";
         },
         {
           title: this.$locale.homePage.servicesTableHeaders.description,
-          dataIndex: "description",
-          key: "description"
+          dataIndex: "customerDescription",
+          key: "customerDescription"
         },
       ]
     },

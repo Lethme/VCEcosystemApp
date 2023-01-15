@@ -21,6 +21,12 @@
               </template>
               {{ $locale.userProfilePage.mainMenu.profile }}
             </a-menu-item>
+            <a-menu-item :key="menuKeys.preferences.key" v-if="$operatorAccess">
+              <template #icon>
+                <coffee-outlined />
+              </template>
+              {{ $locale.userProfilePage.mainMenu.preferences }}
+            </a-menu-item>
             <a-menu-item :key="menuKeys.users.key" v-if="$rootAccess">
               <template #icon>
                 <team-outlined />
@@ -50,7 +56,7 @@
             <vc-profile-picture width="150" height="150" :uploadable="true" />
             <h5 v-if="$authorized" class="usertag d-flex align-items-center gap-2">@{{ $user.username }}</h5>
             <h6 v-if="$authorized" class="userroles d-flex align-items-center mb-1 gap-2">{{ $user.roles.map(role => $locale.roles[role.value]).join(', ') }}</h6>
-            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }}<edit-outlined v-if="false" class="edit" @click="showEditUserModal" /></h3>
+            <h3 v-if="$authorized" class="username d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2">{{ username }}<sync-outlined class="refresh-btn" @click="refreshUserInfo(true)" /></h3>
           </div>
           <a-divider />
           <vc-profile-content :selected-key="selectedKey" :menu-keys="menuKeys" />
@@ -61,21 +67,22 @@
 </template>
 
 <script lang="ts">
-import {UsersService} from "@/api/services";
 import {ApiRole} from "@/api/services/enums/ApiRole";
-import {Message, User} from "@/api/services/types";
+import {User} from "@/api/services/types";
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import VcProfileContent from "@/components/ProfileContentComponent/ProfileContentComponent.vue";
+import {Loader} from "@/utils";
 import {
-    EditOutlined,
+    SyncOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     ScheduleOutlined,
     TeamOutlined,
     UserOutlined,
     UnorderedListOutlined,
+    CoffeeOutlined,
 } from '@ant-design/icons-vue';
-import {computed, defineComponent, reactive, ref, toRefs, watch} from "vue";
+import {computed, defineComponent, onMounted, reactive, ref, toRefs, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 
@@ -88,10 +95,13 @@ interface FormState {
 export interface MenuKey {
   key: string;
   rootAccess?: boolean;
+  moderAccess?: boolean;
+  operatorAccess?: boolean;
 }
 
 export interface MenuKeyState {
   profile: MenuKey;
+  preferences: MenuKey;
   users: MenuKey;
   rates: MenuKey;
   services: MenuKey;
@@ -101,12 +111,13 @@ export default defineComponent({
   components: {
     VcProfileContent,
     UserOutlined,
-    EditOutlined,
+    SyncOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     TeamOutlined,
     ScheduleOutlined,
     UnorderedListOutlined,
+    CoffeeOutlined,
   },
   computed: {
     username() {
@@ -119,8 +130,11 @@ export default defineComponent({
     const route = useRoute();
     const user = computed(() => store.getters.userInfo as User);
     const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
+    const moderAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Moderator) : false);
+    const operatorAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Operator) : false);
     const menuKeys = ref<MenuKeyState>({
       profile: { key: 'profile' },
+      preferences: { key: "preferences", operatorAccess: true },
       services: { key: 'services' },
       users: { key: 'users', rootAccess: true },
       rates: { key: 'rates', rootAccess: true },
@@ -134,7 +148,7 @@ export default defineComponent({
       preOpenKeys: ['sub1'],
     });
 
-    const selectedKey = computed(() => state.selectedKeys[0]);
+    const selectedKey = computed(() => state.selectedKeys[0] || menuKeys.value.profile.key);
 
     watch(
         () => state.openKeys,
@@ -152,7 +166,12 @@ export default defineComponent({
         const key = route.query.key as string || menuKeys.value.profile.key;
         const menuKey = (menuKeys.value as any)[key] as MenuKey;
 
-        if (menuKey.rootAccess && rootAccess.value || !menuKey.rootAccess) {
+        if (
+            (menuKey.rootAccess && rootAccess.value) ||
+            (menuKey.moderAccess && moderAccess.value) ||
+            (menuKey.operatorAccess && operatorAccess.value) ||
+            (!menuKey.rootAccess && !menuKey.moderAccess && !menuKey.operatorAccess)
+        ) {
           state.selectedKeys = [menuKey.key];
         } else {
           state.selectedKeys = [menuKeys.value.profile.key];
@@ -164,6 +183,7 @@ export default defineComponent({
     });
 
     watch(() => selectedKey.value, (key, oldKey) => {
+      state.selectedKeys = [key];
       router.push({
         query: { key: key !== menuKeys.value.profile.key ? key : undefined }
       });
@@ -177,6 +197,10 @@ export default defineComponent({
       state.collapsed = !state.collapsed;
       state.openKeys = state.collapsed ? [] : state.preOpenKeys;
     };
+
+    onMounted(async () => {
+      await Loader.Use(async () => await store.dispatch("updateUserInfo"));
+    })
 
     return {
       ...toRefs(state),

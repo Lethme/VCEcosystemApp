@@ -20,6 +20,10 @@ import { EditUserDto } from "@/api/services/types/EditUserDto";
 import { CreateServiceDto } from "@/api/services/types/CreateServiceDto";
 import { EditServiceDto } from "@/api/services/types/EditServiceDto";
 import { CreateRateDto } from "@/api/services/types/CreateRateDto";
+import { CreateUserDto } from "@/api/services/types/CreateUserDto";
+import { ShiftIndex } from "@/api/services/types/ShiftIndex";
+import { CreatePreferenceDto } from "@/api/services/types/CreatePreferenceDto";
+import { EditPreferenceDto } from "@/api/services/types/EditPreferenceDto";
 
 export type {
     Service,
@@ -45,6 +49,10 @@ export type {
     CreateServiceDto,
     EditServiceDto,
     CreateRateDto,
+    CreateUserDto,
+    ShiftIndex,
+    CreatePreferenceDto,
+    EditPreferenceDto,
 };
 
 export { App, PasswordStateFieldType };

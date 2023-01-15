@@ -75,7 +75,7 @@
     <a-modal
         :visible="createModalVisible"
         :title="$locale.userProfilePage.addRateButtonTitle"
-        :ok-text="$locale.userProfilePage.addServiceButtonTitle"
+        :ok-text="$locale.userProfilePage.addRateButtonTitle"
         :cancel-text="$locale.cancelText"
         :confirm-loading="createModalConfirmLoading"
         :onOk="createRate"
@@ -110,11 +110,11 @@
     >
       <div class="input-wrapper d-flex flex-column align-items-start py-2">
         <h6>{{ $locale.userProfilePage.ratesTableHeaders.title }}</h6>
-        <a-input required :disabled="createModalConfirmLoading" class="w-100" v-model:value="editModalState.title" @pressEnter="saveRate" />
+        <a-input size="large" required :disabled="createModalConfirmLoading" class="w-100" v-model:value="editModalState.title" @pressEnter="saveRate" />
       </div>
       <div class="input-wrapper d-flex flex-column align-items-start py-2">
         <h6>{{ $locale.userProfilePage.ratesTableHeaders.rate }}</h6>
-        <a-input-number :disabled="createModalConfirmLoading" type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="editModalState.rate" :min="1" @pressEnter="saveRate" />
+        <a-input-number size="large" :disabled="createModalConfirmLoading" type="number" pattern="[0-9]*" inputmode="numeric" class="w-100" v-model:value="editModalState.rate" :min="1" @pressEnter="saveRate" />
       </div>
     </a-modal>
   </div>

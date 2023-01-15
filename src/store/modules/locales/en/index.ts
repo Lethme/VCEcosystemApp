@@ -1,3 +1,4 @@
+import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 
 export const en: LocaleRecord = {
@@ -6,14 +7,27 @@ export const en: LocaleRecord = {
     editText: "Edit",
     saveText: "Save",
     cancelText: "Cancel",
+    closeText: "Close",
     removeText: "Remove",
     restoreText: "Restore",
+    orderText: "Order",
+    fromText: "From",
+    executorText: "Executor",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
         ADMIN: "Admin",
         OPERATOR: "Operator",
         GUEST: "Guest",
+    },
+    daysOfWeek: {
+        [ApiDay.Monday]: "Monday",
+        [ApiDay.Tuesday]: "Tuesday",
+        [ApiDay.Wednesday]: "Wednesday",
+        [ApiDay.Thursday]: "Thursday",
+        [ApiDay.Friday]: "Friday",
+        [ApiDay.Saturday]: "Saturday",
+        [ApiDay.Sunday]: "Sunday",
     },
     mainMenuItemTitles: {
         newOrder: {
@@ -33,6 +47,7 @@ export const en: LocaleRecord = {
             title: "Title",
             price: "Price, ₽/unit",
             description: "Description",
+            customerDescription: "Customers Description",
             actions: "Actions",
         },
         servicesTableRemoveButtonTitle: "Remove",
@@ -78,6 +93,7 @@ export const en: LocaleRecord = {
             archiveButtonTitle: "Archive",
             restoreButtonTitle: "Restore",
             removeButtonTitle: "Remove",
+            receiptButtonTitle: "Receipt",
         },
         ordersServicesTableHeaders: {
             id: "Service Id",
@@ -131,6 +147,7 @@ export const en: LocaleRecord = {
         addUserButtonTitle: "Register User",
         addRateButtonTitle: "Create Rate",
         addServiceButtonTitle: "Create Service",
+        addPreferenceButtonTitle: "Add Preference",
         createServiceModal: {
             exceptions: {
                 emptyTitle: "Title should not be empty",
@@ -144,6 +161,7 @@ export const en: LocaleRecord = {
         },
         mainMenu: {
             profile: "Profile",
+            preferences: "Preferences",
             users: "Users",
             rates: "Rates",
             services: "Services",
@@ -152,6 +170,12 @@ export const en: LocaleRecord = {
             users: "Users",
             rates: "Employee Rates",
             services: "Services",
+            preferences: "Preferences",
+        },
+        usersDeactivateOwnAccountTitle: "Trying to deactivate your own account. Copy activation link before.",
+        createUserModal: {
+            selectRolesPlaceholder: "Select Roles",
+            selectRatePlaceholder: "Select Rate",
         },
         usersTableHeaders: {
             id: "Id",
@@ -171,6 +195,12 @@ export const en: LocaleRecord = {
             rate: "Shifts Amount",
             actions: "Actions",
         },
+        preferencesTableHeaders: {
+            day: "Day",
+            shift: "Shift Index",
+            preference: "Preference",
+            actions: "Actions",
+        },
         usersTableButtonsTitles: {
             confirmLink: "Confirm Link",
             deactivate: "Deactivate",
@@ -182,6 +212,10 @@ export const en: LocaleRecord = {
         removedRatesSwitch: {
             checked: "Removed",
             unchecked: "Current",
+        },
+        preferenceSwitch: {
+            checked: "Comfortable",
+            unchecked: "Uncomfortable",
         },
     },
     localeTitles: {

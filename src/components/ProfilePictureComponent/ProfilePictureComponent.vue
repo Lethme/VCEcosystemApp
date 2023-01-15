@@ -1,6 +1,6 @@
 <template>
   <vc-layout class="flex-grow-0" :shadow="shadow" :style="{width: `${width}px`, height: `${height}px`, padding: 0, borderRadius: '50%', overflow: 'hidden'}">
-    <div class="profile-picture-img" :style="{
+    <div :class="{ 'profile-picture-img': true, 'shadowed': shadow }" :style="{
       fontSize: `${Math.round(+width / 12.5)}px`,
       background: $store.getters.hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat', boxShadow: $store.getters.hasProfilePicture ? '' : 'none'
     }">

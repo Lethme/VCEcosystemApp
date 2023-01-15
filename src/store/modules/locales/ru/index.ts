@@ -1,3 +1,4 @@
+import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 
 export const ru: LocaleRecord = {
@@ -6,14 +7,27 @@ export const ru: LocaleRecord = {
     editText: "Изменить",
     saveText: "Сохранить",
     cancelText: "Отмена",
+    closeText: "Закрыть",
     removeText: "Удалить",
     restoreText: "Восстановить",
+    orderText: "Заказ",
+    fromText: "От",
+    executorText: "Исполнитель",
     roles: {
         ROOT: "Администратор",
         MODERATOR: "Модератор",
         ADMIN: "Админ",
         OPERATOR: "Дежурный",
         GUEST: "Гость",
+    },
+    daysOfWeek: {
+        [ApiDay.Monday]: "Понедельник",
+        [ApiDay.Tuesday]: "Вторник",
+        [ApiDay.Wednesday]: "Среда",
+        [ApiDay.Thursday]: "Четверг",
+        [ApiDay.Friday]: "Пятница",
+        [ApiDay.Saturday]: "Суббота",
+        [ApiDay.Sunday]: "Воскресенье",
     },
     mainMenuItemTitles: {
         newOrder: {
@@ -33,6 +47,7 @@ export const ru: LocaleRecord = {
             title: "Название услуги",
             price: "Цена, ₽/штука",
             description: "Описание",
+            customerDescription: "Описание для клиентов",
             actions: "Действия",
         },
         servicesTableRemoveButtonTitle: "Удалить",
@@ -78,6 +93,7 @@ export const ru: LocaleRecord = {
             archiveButtonTitle: "В архив",
             restoreButtonTitle: "Восстановить",
             removeButtonTitle: "Удалить",
+            receiptButtonTitle: "Показать чек",
         },
         ordersServicesTableHeaders: {
             id: "Id услуги",
@@ -131,6 +147,7 @@ export const ru: LocaleRecord = {
         addUserButtonTitle: "Добавить пользователя",
         addRateButtonTitle: "Создать ставку",
         addServiceButtonTitle: "Создать услугу",
+        addPreferenceButtonTitle: "Добавить предпочтение",
         createServiceModal: {
             exceptions: {
                 emptyTitle: "Название услуги не может быть пустым",
@@ -144,6 +161,7 @@ export const ru: LocaleRecord = {
         },
         mainMenu: {
             profile: "Профиль",
+            preferences: "Предпочтения",
             users: "Пользователи",
             rates: "Ставки",
             services: "Услуги",
@@ -152,6 +170,12 @@ export const ru: LocaleRecord = {
             users: "Список пользователей",
             rates: "Ставки сотрудников",
             services: "Услуги",
+            preferences: "Предпочтения",
+        },
+        usersDeactivateOwnAccountTitle: "Вы пытаетесь деактивировать собственный аккаунт. Не забудьте скопировать ссылку активации.",
+        createUserModal: {
+            selectRolesPlaceholder: "Выберите роли",
+            selectRatePlaceholder: "Выберите ставку",
         },
         usersTableHeaders: {
             id: "Id",
@@ -171,6 +195,12 @@ export const ru: LocaleRecord = {
             rate: "Количество смен",
             actions: "Действия"
         },
+        preferencesTableHeaders: {
+            day: "День недели",
+            shift: "Номер смены",
+            preference: "Предпочтение",
+            actions: "Действия",
+        },
         usersTableButtonsTitles: {
             confirmLink: "Ссылка активации",
             deactivate: "Деактивировать",
@@ -182,6 +212,10 @@ export const ru: LocaleRecord = {
         removedRatesSwitch: {
             checked: "Удалённые",
             unchecked: "Текущие",
+        },
+        preferenceSwitch: {
+            checked: "Удобно",
+            unchecked: "Неудобно",
         },
     },
     localeTitles: {

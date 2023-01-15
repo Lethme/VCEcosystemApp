@@ -1,5 +1,6 @@
 export interface CreateServiceDto {
     title: string;
     price: number;
-    description: string;
+    description?: string;
+    customerDescription?: string;
 }
