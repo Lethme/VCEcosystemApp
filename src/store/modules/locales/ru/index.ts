@@ -1,8 +1,9 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const ru: LocaleRecord = {
-    locale: "ru",
+    locale: Locale.Ru,
     copyright: "&copy; 2022 VC://VPI. Все права защищены.",
     editText: "Изменить",
     saveText: "Сохранить",
@@ -111,6 +112,7 @@ export const ru: LocaleRecord = {
         clearOrderButtonConfirm: "Вы действительно хотите очистить этот заказ?",
         addServiceButtonTitle: "Добавить услугу",
         selectServicePlaceholder: "Выберите услугу",
+        selectServiceNotSelected: "Вы не выбрали услугу для добавления",
         orderServicesTableHeaders: {
             services: "Услуга",
             price: "Цена, ₽/штука",
@@ -176,6 +178,11 @@ export const ru: LocaleRecord = {
         createUserModal: {
             selectRolesPlaceholder: "Выберите роли",
             selectRatePlaceholder: "Выберите ставку",
+            exceptions: {
+                emptyNameFields: "Поля ФИО не могут быть пустыми",
+                emptyUsername: "Логин не может быть пустым",
+                usernameWrongLength: "Логин должен содержать хотя бы 8 символов",
+            },
         },
         usersTableHeaders: {
             id: "Id",

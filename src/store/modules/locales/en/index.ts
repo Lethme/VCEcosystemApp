@@ -1,8 +1,9 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const en: LocaleRecord = {
-    locale: "en",
+    locale: Locale.En,
     copyright: "&copy; 2022 VC://VPI. All rights reserved.",
     editText: "Edit",
     saveText: "Save",
@@ -111,6 +112,7 @@ export const en: LocaleRecord = {
         clearOrderButtonConfirm: "Sure to clear this order?",
         addServiceButtonTitle: "Add Service",
         selectServicePlaceholder: "Select Service",
+        selectServiceNotSelected: "You have to select service first",
         orderServicesTableHeaders: {
             services: "Service",
             price: "Price, ₽/unit",
@@ -176,6 +178,11 @@ export const en: LocaleRecord = {
         createUserModal: {
             selectRolesPlaceholder: "Select Roles",
             selectRatePlaceholder: "Select Rate",
+            exceptions: {
+                emptyNameFields: "Name fields can't be empty",
+                emptyUsername: "Username can't be empty",
+                usernameWrongLength: "Username must be at least 8 characters length",
+            },
         },
         usersTableHeaders: {
             id: "Id",

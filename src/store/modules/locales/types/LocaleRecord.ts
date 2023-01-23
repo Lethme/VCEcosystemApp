@@ -1,7 +1,8 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export interface LocaleRecord {
-    locale: string;
+    locale: Locale;
     copyright: string;
     editText: string;
     saveText: string;
@@ -110,6 +111,7 @@ export interface LocaleRecord {
         clearOrderButtonConfirm: string;
         addServiceButtonTitle: string;
         selectServicePlaceholder: string;
+        selectServiceNotSelected: string;
         orderServicesTableHeaders: {
             services: string;
             price: string;
@@ -199,6 +201,11 @@ export interface LocaleRecord {
         createUserModal: {
             selectRolesPlaceholder: string;
             selectRatePlaceholder: string;
+            exceptions: {
+                emptyNameFields: string;
+                emptyUsername: string;
+                usernameWrongLength: string;
+            };
         };
         usersTableButtonsTitles: {
             confirmLink: string;

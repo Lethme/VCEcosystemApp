@@ -12,6 +12,8 @@ import {
 import {alphabetLowercase, alphabetUppercase, numbers, specialSymbols} from "@/api/utils/constans";
 import store from "@/store";
 import RequestPath from "./utils/types/RequestPath";
+import {Router, RouteLocationNormalizedLoaded} from "vue-router";
+import router from "@/router";
 
 class ApiService {
   public static get PasswordRegex(): RegExp {
@@ -45,6 +47,12 @@ class ApiService {
   }
   protected static get ApiPrefix(): RequestPrefix {
     return process.env.VUE_APP_API_PREFIX || "";
+  }
+  protected static get Router(): Router {
+    return router;
+  }
+  protected static get Route(): RouteLocationNormalizedLoaded {
+    return router.currentRoute.value;
   }
 
   public static GetProfilePicturePath(uuid: string) {
@@ -115,14 +123,40 @@ class ApiService {
     callback: () => (ApiResponse<T | Message>) | Promise<ApiResponse<T | Message>>
   ): Promise<ApiResponse<T | Message>> {
     try {
-      return await callback();
+      const response = await callback();
+      store.commit("setApiAvailableStatus", true);
+      return response;
     } catch (ex) {
       console.log(ex);
+
+      if ((ex as any).code && (ex as any).code === 'ERR_NETWORK') {
+        store.commit("setApiAvailableStatus", false);
+        await this.Router.push({
+          path: '/error',
+          query: {
+            redirect: this.Route.query.redirect ?? this.Route.fullPath,
+          }
+        });
+
+        return ex as any;
+      }
 
       const response: ApiResponse<Message> = (ex as any).response?.data;
 
       if (response && (response.statusCode === 401 || response.statusCode === 403)) {
           await store.dispatch("logout");
+      }
+
+      if (response && response.statusCode === 500) {
+        store.commit("setApiAvailableStatus", false);
+        await this.Router.push({
+          path: '/error',
+          query: {
+            redirect: this.Route.query.redirect ?? this.Route.fullPath,
+          }
+        })
+
+        return ex as any;
       }
 
       return (ex as any).response.data;

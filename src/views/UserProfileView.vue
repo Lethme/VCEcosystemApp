@@ -182,7 +182,7 @@ export default defineComponent({
       }
     });
 
-    watch(() => selectedKey.value, (key, oldKey) => {
+    watch(() => state.selectedKeys[0], (key, oldKey) => {
       state.selectedKeys = [key];
       router.push({
         query: { key: key !== menuKeys.value.profile.key ? key : undefined }

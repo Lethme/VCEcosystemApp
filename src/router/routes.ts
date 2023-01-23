@@ -59,6 +59,13 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
             access: RouteAccess.Public,
         }
+    },
+    {
+        path: '/error',
+        component: () => import('../views/ErrorView.vue'),
+        meta: {
+            access: RouteAccess.Public,
+        }
     }
 ];
 
