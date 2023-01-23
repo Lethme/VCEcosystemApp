@@ -15,7 +15,7 @@ export const ru: LocaleRecord = {
     fromText: "От",
     executorText: "Исполнитель",
     roles: {
-        ROOT: "Администратор",
+        ROOT: "Суперпользователь",
         MODERATOR: "Модератор",
         ADMIN: "Админ",
         OPERATOR: "Дежурный",
@@ -57,6 +57,13 @@ export const ru: LocaleRecord = {
     },
     ordersPage: {
         title: "Заказы",
+        filter: {
+            dates: {
+                from: "Начальная дата",
+                to: "Конечная дата",
+            },
+            userSelect: "Выберите пользователя",
+        },
         archivedSwitch: {
             checked: "Архивные",
             unchecked: "Текущие",
@@ -228,5 +235,5 @@ export const ru: LocaleRecord = {
     localeTitles: {
         ru: "Русский",
         en: "Английский",
-    }
+    },
 }

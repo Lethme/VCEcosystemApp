@@ -57,6 +57,13 @@ export const en: LocaleRecord = {
     },
     ordersPage: {
         title: "Orders",
+        filter: {
+            dates: {
+                from: "From",
+                to: "To",
+            },
+            userSelect: "Select User",
+        },
         archivedSwitch: {
             checked: "Archive",
             unchecked: "Current",
@@ -228,5 +235,5 @@ export const en: LocaleRecord = {
     localeTitles: {
         ru: "Russian",
         en: "English",
-    }
+    },
 }

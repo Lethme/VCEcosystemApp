@@ -495,6 +495,7 @@ export default defineComponent({
 
             if (response && response.status) {
                 await updateUsersList(false);
+                setDefaultCreateUserState();
             }
 
             createModalConfirmLoading.value = false;
@@ -507,12 +508,12 @@ export default defineComponent({
 
         const editUser = async () => {
             if (editUserState.value.username && !editUserState.value.username.length) {
-                createModalException.value = locale.value.userProfilePage.createUserModal.exceptions.emptyUsername;
+                editModalException.value = locale.value.userProfilePage.createUserModal.exceptions.emptyUsername;
                 return;
             }
 
             if (editUserState.value.username && editUserState.value.username.length < 8) {
-                createModalException.value = locale.value.userProfilePage.createUserModal.exceptions.usernameWrongLength;
+                editModalException.value = locale.value.userProfilePage.createUserModal.exceptions.usernameWrongLength;
                 return;
             }
 
@@ -523,7 +524,7 @@ export default defineComponent({
                     editUserState.value.patronymic && editUserState.value.patronymic.length
                 )
             ) {
-                createModalException.value = locale.value.userProfilePage.createUserModal.exceptions.emptyNameFields;
+                editModalException.value = locale.value.userProfilePage.createUserModal.exceptions.emptyNameFields;
                 return;
             }
 
@@ -545,6 +546,7 @@ export default defineComponent({
                 }
             }
 
+            setDefaultEditUserState();
             editModalConfirmLoading.value = false;
             editModalVisible.value = false;
         }

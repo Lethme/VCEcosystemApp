@@ -56,6 +56,13 @@ export interface LocaleRecord {
     };
     ordersPage: {
         title: string;
+        filter: {
+            dates: {
+                from: string;
+                to: string;
+            };
+            userSelect: string;
+        };
         archivedSwitch: {
             checked: string;
             unchecked: string;

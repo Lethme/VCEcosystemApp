@@ -3,11 +3,10 @@
         <div class="container-fluid py-sm-4">
             <a-layout class="flex-grow-1 py-4">
                 <a-layout-content>
-                    <div
-                        class="table-header-wrapper d-flex flex-column flex-sm-row gap-3 gap-sm-2 justify-content-between pb-4 pb-md-2">
+                    <div class="table-header-wrapper d-flex flex-column flex-xl-row gap-3 gap-xl-2 justify-content-between pb-4 pb-md-2">
                         <h4 class="text-start d-flex align-items-center m-0 gap-3">
                             <span>{{ $locale.ordersPage.title }}</span>
-                            <sync-outlined class="refresh-btn" @click="refreshOrders"/>
+                            <sync-outlined class="refresh-btn" @click="() => { refreshOrders(); updateUsers(); }"/>
                             <a-switch :checked-children="$locale.ordersPage.archivedSwitch.checked"
                                       :un-checked-children="$locale.ordersPage.archivedSwitch.unchecked"
                                       v-model:checked="showArchivedOrders" @change="refreshOrders"/>
@@ -15,15 +14,39 @@
                                       :un-checked-children="$locale.ordersPage.allOrdersSwitch.unchecked"
                                       v-model:checked="showAllOrders" @change="refreshOrders"/>
                         </h4>
-                        <div class="btn-wrapper d-flex gap-2">
-                            <a-range-picker
-                                :locale="$locale.locale === Locale.Ru ? datePickerRu : datePickerEn"
-                                :format="$locale.locale === Locale.Ru ? 'DD.MM.YYYY' : 'MM.DD.YYYY'"
-                                v-model:value="dates"
+                        <div class="btn-wrapper d-flex flex-column flex-xl-row gap-2">
+                            <a-select
+                                style="min-width: 300px;"
+                                class="text-start"
+                                v-if="$rootAccess && showAllOrders"
                                 size="large"
+                                allow-clear
+                                show-search
+                                :filter-option="filterUsers"
+                                v-model:value="selectUsersState"
+                                :placeholder="$locale.ordersPage.filter.userSelect"
+                                :options="selectUsersOptions"
+                            />
+                            <a-date-picker
+                                v-model:value="filterStateDateFrom"
+                                :locale="$locale.locale === Locale.Ru ? datePickerRu : datePickerEn"
+                                :format="$locale.locale === Locale.Ru ? 'DD.MM.YYYY, HH:mm:ss' : 'MM.DD.YYYY, hh:mm:ss A'"
+                                :placeholder="$locale.ordersPage.filter.dates.from"
+                                :disabled-date="disabledDateFrom"
+                                size="large"
+                                :show-time="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
+                            />
+                            <a-date-picker
+                                v-model:value="filterStateDateTo"
+                                :locale="$locale.locale === Locale.Ru ? datePickerRu : datePickerEn"
+                                :format="$locale.locale === Locale.Ru ? 'DD.MM.YYYY, HH:mm:ss' : 'MM.DD.YYYY, hh:mm:ss A'"
+                                :placeholder="$locale.ordersPage.filter.dates.to"
+                                :disabled-date="disabledDateTo"
+                                size="large"
+                                :show-time="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
                             />
                             <a-button type="primary" :size="$windowWidth >= 576 ? 'large' : 'default'"
-                                      class="d-flex align-items-center gap-2 col-12 col-sm-auto">
+                                      class="d-flex align-items-center gap-2">
                                 <template #icon>
                                     <plus-outlined/>
                                 </template>
@@ -125,11 +148,12 @@
 </template>
 
 <script lang="ts">
+import {ApiRole} from "@/api/services/enums/ApiRole";
 import {Pane} from "@/store/modules/orders/types";
-import {createVNode, defineComponent, reactive, ref, toRefs, unref} from "vue";
+import {computed, createVNode, defineComponent, reactive, ref, toRefs, unref, watch} from "vue";
 import {QuestionCircleOutlined, SyncOutlined, PlusOutlined} from '@ant-design/icons-vue';
 import {Order, OrderService, User} from "@/api/services/types";
-import {OrdersService} from "@/api/services";
+import {OrdersService, UsersService} from "@/api/services";
 import {Loader} from "@/utils";
 import {formatDate} from "@/api/utils/formatDate";
 import {Modal} from "ant-design-vue";
@@ -141,8 +165,8 @@ import {Locale} from "@/store/modules/locales/types/Locale";
 import moment, { Moment } from "moment";
 import datePickerRu from 'ant-design-vue/es/date-picker/locale/ru_RU';
 import datePickerEn from 'ant-design-vue/es/date-picker/locale/en_US';
-
-import 'moment/dist/locale/ru';
+import {useRoute, useRouter} from "vue-router";
+import {useStore} from "vuex";
 
 export interface OrderData extends Order {
     key: number;
@@ -179,13 +203,51 @@ export default defineComponent({
         this.$store.dispatch("updateServices");
     },
     setup() {
+        const store = useStore();
+        const user = computed(() => store.getters.userInfo as User);
+        const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
+
         const receiptOrder = ref<OrderData>();
         const receiptVisible = ref(false);
-        const filterState = reactive<{
-            dates: Array<Moment>
-        }>({
-            dates: [],
-        });
+
+        const users = ref<Array<User>>([]);
+
+        const selectUsersState = ref<number>();
+        const selectUsersOptions = computed(() => users.value.map(user => {
+            return {
+                value: user.id,
+                label: getFullUsername(user),
+                key: user.id,
+            }
+        }))
+
+        const updateUsers = async () => {
+            if (rootAccess.value) {
+                await Loader.Use(async () => {
+                    const response = await UsersService.GetUsersPrivate();
+
+                    if (response && response.status) {
+                        users.value = response.data as Array<User>;
+                    }
+                });
+            }
+        };
+
+        const filterUsers = (input: string, item: { key: string, value: string, label: string }) => {
+            return (item.label ?? '').toLocaleLowerCase().includes(input.toLocaleLowerCase());
+        }
+
+        const filterStateDateFrom = ref<Moment>();
+        const filterStateDateTo = ref<Moment>();
+        const filterStateDates = ref<Array<Moment>>([]);
+
+        const disabledDateFrom = (current: Moment) => {
+            return current >= filterStateDateTo.value!;
+        };
+
+        const disabledDateTo = (current: Moment) => {
+            return current <= filterStateDateFrom.value!;
+        };
 
         const showReceiptModal = (e: Event, order: OrderData) => {
             e.stopPropagation();
@@ -194,18 +256,24 @@ export default defineComponent({
             receiptVisible.value = true;
         }
 
-        console.log(datePickerRu);
-
         return {
             Locale,
+            selectUsersOptions,
+            selectUsersState,
             moment,
             datePickerRu,
             datePickerEn,
-            ...toRefs(filterState),
+            filterStateDateFrom,
+            filterStateDateTo,
+            filterStateDates,
+            disabledDateTo,
+            disabledDateFrom,
             receiptOrder,
             receiptVisible,
             showReceiptModal,
             formatPrice,
+            updateUsers,
+            filterUsers,
         }
     },
     computed: {
@@ -326,7 +394,20 @@ export default defineComponent({
             }).sort((f, s) => f.id - s.id));
         },
         orders(): Array<OrderData> {
-            return this.ordersRaw.map((order: Order) => {
+            return this.ordersRaw
+                .filter((order: Order) => {
+                    const createdAt = moment(new Date(order.createdAt as string));
+                    const filter = {
+                        from: this.filterStateDateFrom,
+                        to: this.filterStateDateTo,
+                        userId: this.selectUsersState,
+                    }
+
+                    return (!filter.from || createdAt >= filter.from) &&
+                        (!filter.to || createdAt <= filter.to) &&
+                        (!filter.userId || order.user.id === filter.userId);
+                })
+                .map((order: Order) => {
                 const price = order.services.map(service => service.amount * service.price).reduce((prev, cur) => prev + cur);
                 const change = order.moneyReceived - price;
                 const deletedAt = new Date(order.deletedAt as string);
@@ -356,7 +437,7 @@ export default defineComponent({
                     changeRaw: change,
                     username: getFullUsername(order.user, {short: this.$mobile}),
                 }
-            })
+            });
         },
     },
     methods: {
@@ -499,7 +580,13 @@ export default defineComponent({
     watch: {
         $rootAccess(current: boolean, old: boolean) {
             if (current) {
+                this.updateUsers();
                 this.loadOrders();
+            }
+        },
+        async showAllOrders(state: boolean) {
+            if (state && this.$rootAccess) {
+                await this.updateUsers();
             }
         },
     },
