@@ -97,6 +97,7 @@
             :title="editModalStateService.title"
             :confirm-loading="editModalConfirmLoading"
             :ok-text="$locale.saveText"
+            :cancel-text="$locale.cancelText"
             :onOk="saveService"
             :onCancel="() => editModalVisible = false"
             centered
