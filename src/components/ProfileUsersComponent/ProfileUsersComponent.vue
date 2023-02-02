@@ -546,7 +546,7 @@ export default defineComponent({
                 }
             }
 
-            setDefaultEditUserState();
+            //setDefaultEditUserState();
             editModalConfirmLoading.value = false;
             editModalVisible.value = false;
         }

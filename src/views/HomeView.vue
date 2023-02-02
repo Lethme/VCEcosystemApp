@@ -14,7 +14,7 @@
 <!--          <p class="date text-start" v-html="$formattedDate" />-->
 <!--        </a-layout-sider>-->
         <a-layout-content class="px-4">
-          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between align-items-center py-2">
+          <div class="table-header-wrapper d-flex flex-column flex-md-row justify-content-between align-items-md-center py-2">
             <h4 class="text-start d-flex align-items-center m-0 gap-3 pb-2">
               <span>{{ $locale.homePage.priceListTitle }}</span>
               <sync-outlined class="refresh-btn" @click="refreshServices" />
@@ -35,7 +35,7 @@
           <a-table
               v-if="$mobile"
               :scroll="{ y: 245 }"
-              :pagination="{ pageSize: 100 }"
+              :pagination="false"
               :dataSource="services"
               :columns="columns"
           />
