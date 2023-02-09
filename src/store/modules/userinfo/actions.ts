@@ -35,8 +35,6 @@ const actions = {
         if (user) {
           context.commit("setLocale", user.locale);
           context.commit("loadState");
-          const hasProfilePicture = await UsersService.HasProfilePicture(user.uuid);
-          context.commit("setUserHasProfilePicture", hasProfilePicture);
         }
       }
 
@@ -51,7 +49,6 @@ const actions = {
       context.commit("clearState");
       context.commit("setLocale", Locale.Ru);
       localStorage.removeItem("api_token");
-      context.commit("setUserHasProfilePicture", false);
       await router.push("/login");
     }
   }

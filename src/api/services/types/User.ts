@@ -7,6 +7,7 @@ import {Locale} from "@/store/modules/locales/types/Locale";
 interface User extends Timestamp {
     id: number;
     uuid: string;
+    hasProfilePicture: boolean;
     username: string;
     lastName: string;
     firstName: string;
