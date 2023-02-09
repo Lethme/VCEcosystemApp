@@ -193,6 +193,7 @@ export const ru: LocaleRecord = {
         },
         usersTableHeaders: {
             id: "Id",
+            avatar: "Аватарка",
             lastName: "Фамилия",
             firstName: "Имя",
             patronymic: "Отчество",

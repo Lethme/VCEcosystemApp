@@ -19,6 +19,9 @@
     <div class="table-wrapper">
         <a-table v-if="$mobile" :row-key="record => record.id" table-layout="auto" bordered :data-source="users"
                  :columns="columns" :pagination="{ pageSize: 1000 }" :scroll="{ y: 327 }">
+            <template #avatar="{ record }">
+                <vc-profile-picture height="50" width="50" :shadow="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" :self="false" />
+            </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">
                     <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.editText }}</a-button>
@@ -46,6 +49,9 @@
             </template>
         </a-table>
         <a-table v-else bordered :data-source="users" :columns="columns" :pagination="{ pageSize: 8 }">
+            <template #avatar="{ record }">
+                <vc-profile-picture height="50" width="50" :shadow="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" :self="false" />
+            </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">
                     <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.editText }}</a-button>
@@ -236,6 +242,7 @@ import {
     CheckCircleFilled,
     CloseCircleFilled,
 } from "@ant-design/icons-vue";
+import VcProfilePicture from "@/components/ProfilePictureComponent/ProfilePictureComponent.vue";
 
 export default defineComponent({
     name: "VcProfileUsers",
@@ -271,6 +278,11 @@ export default defineComponent({
                     dataIndex: 'id',
                     key: 'id',
                     fixed: !store.getters.mobile ? 'left' : false,
+                },
+                {
+                    title: locale.value.userProfilePage.usersTableHeaders.avatar,
+                    key: 'avatar',
+                    slots: {customRender: "avatar"},
                 },
                 {
                     title: locale.value.userProfilePage.usersTableHeaders.lastName,

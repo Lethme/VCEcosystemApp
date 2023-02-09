@@ -6,7 +6,10 @@
     >
         <div :class="{ 'profile-picture-img': true, 'shadowed': shadow }" :style="{
             fontSize: `${Math.round(+width / 12.5)}px`,
-            background: $user?.hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat', boxShadow: $user.hasProfilePicture ? '' : 'none'
+            background: self
+                ? ($user.hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat')
+                : (uuid ? 'url(' + getProfilePicUrl(uuid) + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat'),
+            boxShadow: $user.hasProfilePicture ? '' : 'none'
         }">
             <div
                 v-if="uploadable"
@@ -28,14 +31,22 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
+import {computed, defineComponent, PropType} from "vue";
 import {CameraOutlined} from "@ant-design/icons-vue";
 import {fileDialog} from "file-select-dialog";
-import {UsersService} from "@/api/services";
+import {ApiService, UsersService} from "@/api/services";
 import {Loader} from "@/utils";
 
 export default defineComponent({
     name: "VcProfilePicture",
+    components: {
+        CameraOutlined,
+    },
+    setup() {
+        return {
+            ApiService,
+        }
+    },
     props: {
         width: {
             type: String as PropType<string>,
@@ -65,6 +76,17 @@ export default defineComponent({
                 return true;
             },
         },
+        self: {
+            type: Boolean as PropType<boolean>,
+            required: false,
+            default() {
+                return true;
+            }
+        },
+        uuid: {
+            type: String as PropType<string>,
+            required: false,
+        }
     },
     data() {
         return {
@@ -72,7 +94,10 @@ export default defineComponent({
         }
     },
     methods: {
-        async selectFile() {
+        getProfilePicUrl(uuid: string) {
+            return ApiService.GetProfilePicturePath(uuid);
+        },
+        async selectFile(): Promise<void> {
             const fileList = await fileDialog({
                 accept: ['.jpg', '.png', 'jpeg'],
             });
@@ -92,7 +117,7 @@ export default defineComponent({
                 });
             }
         },
-        getBase64(file: File | null, callback: (base64: string) => Promise<void>) {
+        getBase64(file: File | null, callback: (base64: string) => Promise<void>): void {
             if (file) {
                 if (file.size / 1024 / 1024 > 1) {
                     this.exception = "Image size must be up to 1mb";
@@ -109,9 +134,6 @@ export default defineComponent({
                 };
             }
         },
-    },
-    components: {
-        CameraOutlined,
     },
 })
 </script>
