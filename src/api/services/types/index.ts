@@ -24,6 +24,9 @@ import { CreateUserDto } from "@/api/services/types/CreateUserDto";
 import { ShiftIndex } from "@/api/services/types/ShiftIndex";
 import { CreatePreferenceDto } from "@/api/services/types/CreatePreferenceDto";
 import { EditPreferenceDto } from "@/api/services/types/EditPreferenceDto";
+import { Schedule } from "@/api/services/types/Schedule";
+import { ScheduleUser } from "@/api/services/types/ScheduleUser";
+import { ScheduleResponse } from "@/api/services/types/ScheduleResponse";
 
 export type {
     Service,
@@ -53,6 +56,9 @@ export type {
     ShiftIndex,
     CreatePreferenceDto,
     EditPreferenceDto,
+    Schedule,
+    ScheduleUser,
+    ScheduleResponse,
 };
 
 export { App, PasswordStateFieldType };

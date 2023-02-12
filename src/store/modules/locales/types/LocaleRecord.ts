@@ -34,6 +34,7 @@ export interface LocaleRecord {
             new: string;
             edit: string;
         };
+        schedule: string;
         orders: string;
         locales: string;
         account: string;
@@ -54,6 +55,16 @@ export interface LocaleRecord {
         servicesTableEditButtonTitle: string;
         servicesTableRestoreButtonTitle: string;
     };
+    schedulePage: {
+        nextMonth: string;
+        prevMonth: string;
+        scheduleTableHeaders: {
+            date: string;
+            day: string;
+            firstShift: string;
+            secondShift: string;
+        }
+    },
     ordersPage: {
         title: string;
         filter: {

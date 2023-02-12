@@ -4,7 +4,17 @@
         :shadow="shadow"
         :style="{width: `${width}px`, height: `${height}px`, padding: 0, borderRadius: '50%', overflow: 'hidden'}"
     >
-        <div :class="{ 'profile-picture-img': true, 'shadowed': shadow }" :style="{
+        <a-image
+            v-if="preview"
+            :width="width"
+            :height="height"
+            :style="{ padding: 0, borderRadius: '50%', overflow: 'hidden' }"
+            :src="self
+                ? ($user.hasProfilePicture ? $user.getProfilePictureUrl() : $pictureFallback)
+                : (uuid ? getProfilePicUrl(uuid) : $pictureFallback)"
+            :preview="true"
+        />
+        <div v-else :class="{ 'profile-picture-img': true, 'shadowed': shadow, 'd-flex': true }" :style="{
             fontSize: `${Math.round(+width / 12.5)}px`,
             background: self
                 ? ($user.hasProfilePicture ? 'url(' + $user.getProfilePictureUrl() + ') center center/cover no-repeat' : 'url('+ $pictureFallback +') center center/cover no-repeat')
@@ -86,7 +96,14 @@ export default defineComponent({
         uuid: {
             type: String as PropType<string>,
             required: false,
-        }
+        },
+        preview: {
+            type: Boolean as PropType<boolean>,
+            required: false,
+            default() {
+                return false;
+            }
+        },
     },
     data() {
         return {

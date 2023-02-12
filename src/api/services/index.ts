@@ -5,6 +5,7 @@ import UsersService from "./UsersService";
 import ServicesService from "./ServicesService";
 import OrdersService from "./OrdersService";
 import RatesService from "./RatesService";
+import ScheduleService from "./ScheduleService";
 
 export {
     Url,
@@ -14,4 +15,5 @@ export {
     OrdersService,
     ServicesService,
     RatesService,
+    ScheduleService,
 };

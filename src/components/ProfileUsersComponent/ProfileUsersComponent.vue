@@ -20,7 +20,7 @@
         <a-table v-if="$mobile" :row-key="record => record.id" table-layout="auto" bordered :data-source="users"
                  :columns="columns" :pagination="{ pageSize: 1000 }" :scroll="{ y: 327 }">
             <template #avatar="{ record }">
-                <vc-profile-picture height="50" width="50" :shadow="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" :self="false" />
+                <vc-profile-picture height="50" width="50" :preview="record.hasProfilePicture" :shadow="false" :self="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" />
             </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">
@@ -50,7 +50,7 @@
         </a-table>
         <a-table v-else bordered :data-source="users" :columns="columns" :pagination="{ pageSize: 8 }">
             <template #avatar="{ record }">
-                <vc-profile-picture height="50" width="50" :shadow="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" :self="false" />
+                <vc-profile-picture height="70" width="70" :preview="record.hasProfilePicture" :shadow="false" :self="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" />
             </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">

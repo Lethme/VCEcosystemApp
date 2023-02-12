@@ -35,6 +35,7 @@ export const ru: LocaleRecord = {
             new: "Создать заказ",
             edit: "Новые заказы",
         },
+        schedule: "Расписание",
         orders: "Заказы",
         locales: 'Язык интерфейса',
         account: "Аккаунт",
@@ -54,6 +55,16 @@ export const ru: LocaleRecord = {
         servicesTableRemoveButtonTitle: "Удалить",
         servicesTableEditButtonTitle: "Изменить",
         servicesTableRestoreButtonTitle: "Восстановить",
+    },
+    schedulePage: {
+        nextMonth: "Следующий месяц",
+        prevMonth: "Предыдущий месяц",
+        scheduleTableHeaders: {
+            date: "Дата",
+            day: "День недели",
+            firstShift: "Первая смена",
+            secondShift: "Вторая смена",
+        },
     },
     ordersPage: {
         title: "Заказы",

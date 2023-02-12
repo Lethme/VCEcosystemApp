@@ -35,6 +35,7 @@ export const en: LocaleRecord = {
             new: "New Order",
             edit: "Edit New Orders",
         },
+        schedule: "Schedule",
         orders: "Orders",
         locales: "Locale",
         account: "Account",
@@ -54,6 +55,16 @@ export const en: LocaleRecord = {
         servicesTableRemoveButtonTitle: "Remove",
         servicesTableEditButtonTitle: "Edit",
         servicesTableRestoreButtonTitle: "Restore",
+    },
+    schedulePage: {
+        nextMonth: "Next Month",
+        prevMonth: "Previous Month",
+        scheduleTableHeaders: {
+            date: "Date",
+            day: "Day",
+            firstShift: "First Shift",
+            secondShift: "Second Shift",
+        },
     },
     ordersPage: {
         title: "Orders",
