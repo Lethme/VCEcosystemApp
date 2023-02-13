@@ -22,6 +22,9 @@
             <template #avatar="{ record }">
                 <vc-profile-picture height="50" width="50" :preview="record.hasProfilePicture" :shadow="false" :self="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" />
             </template>
+            <template #fio="{ record }">
+                <span>{{ getFullUsername(record, {short: $mobile}) }}</span>
+            </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">
                     <a-button type="primary" @click="() => showEditModal(record)">{{ $locale.editText }}</a-button>
@@ -51,6 +54,9 @@
         <a-table v-else bordered :data-source="users" :columns="columns" :pagination="{ pageSize: 8 }">
             <template #avatar="{ record }">
                 <vc-profile-picture height="70" width="70" :preview="record.hasProfilePicture" :shadow="false" :self="false" :uuid="record.hasProfilePicture ? record.uuid : undefined" />
+            </template>
+            <template #fio="{ record }">
+                <span>{{ getFullUsername(record, {short: $mobile}) }}</span>
             </template>
             <template #operation="{ record }">
                 <div class="btn-wrapper d-flex justify-content-end gap-2">
@@ -285,19 +291,9 @@ export default defineComponent({
                     slots: {customRender: "avatar"},
                 },
                 {
-                    title: locale.value.userProfilePage.usersTableHeaders.lastName,
-                    dataIndex: 'lastName',
-                    key: 'lastName',
-                },
-                {
-                    title: locale.value.userProfilePage.usersTableHeaders.firstName,
-                    dataIndex: 'firstName',
-                    key: 'firstName',
-                },
-                {
-                    title: locale.value.userProfilePage.usersTableHeaders.patronymic,
-                    dataIndex: 'patronymic',
-                    key: 'patronymic',
+                    title: locale.value.userProfilePage.usersTableHeaders.fio,
+                    key: 'fio',
+                    slots: {customRender: "fio"},
                 },
                 {
                     title: locale.value.userProfilePage.usersTableHeaders.username,

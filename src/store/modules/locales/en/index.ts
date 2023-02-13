@@ -205,6 +205,7 @@ export const en: LocaleRecord = {
         usersTableHeaders: {
             id: "Id",
             avatar: "Avatar",
+            fio: "Full Name",
             lastName: "Last Name",
             firstName: "First Name",
             patronymic: "Patronymic",

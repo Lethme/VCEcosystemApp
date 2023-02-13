@@ -194,6 +194,7 @@ export interface LocaleRecord {
         usersTableHeaders: {
             id: string;
             avatar: string;
+            fio: string;
             lastName: string;
             firstName: string;
             patronymic: string;
