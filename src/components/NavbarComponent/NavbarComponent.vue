@@ -14,10 +14,15 @@
                         <template #title>
                             <i class="hide-parent"></i>
                         </template>
-                        <a-menu-item key="notifications" class="p-0" style="align-self: center">
-                            <a-badge count="100">
-                                <bell-outlined style="font-size: 1.8em"/>
-                            </a-badge>
+                        <a-menu-item v-if="$authorized" key="notifications" class="p-0" style="align-self: center">
+                            <a-popover v-model:visible="notificationsVisible" title="Notifications" trigger="click" placement="bottomRight">
+                                <a-badge count="100">
+                                    <bell-outlined style="font-size: 1.8em"/>
+                                </a-badge>
+                                <template #content>
+                                    123
+                                </template>
+                            </a-popover>
                         </a-menu-item>
                         <a-menu-item v-if="!$authorized" class="d-flex align-items-center" key="login"
                                      style="margin-left: auto">
@@ -125,9 +130,18 @@ export default defineComponent({
     },
     setup() {
         const current = ref<string[]>([]);
+        const notificationsVisible = ref(false);
+
+        const showNotifications = () => { notificationsVisible.value = true };
+        const hideNotifications = () => { notificationsVisible.value = false };
+        const toggleNotifications = () => { notificationsVisible.value = !notificationsVisible.value }
 
         return {
             current,
+            notificationsVisible,
+            showNotifications,
+            hideNotifications,
+            toggleNotifications,
         };
     },
     computed: {
