@@ -15,12 +15,20 @@
                             <i class="hide-parent"></i>
                         </template>
                         <a-menu-item v-if="$authorized" key="notifications" class="p-0" style="align-self: center">
-                            <a-popover v-model:visible="notificationsVisible" title="Notifications" trigger="click" placement="bottomRight">
+                            <a-popover v-model:visible="notificationsVisible" :trigger="$mobile ? 'click' : 'hover'" placement="bottomRight">
                                 <a-badge count="100">
                                     <bell-outlined style="font-size: 1.8em"/>
                                 </a-badge>
+                                <template #title>
+                                    <div class="wrapper d-flex justify-content-between">
+                                        <h6 class="m-0 pt-2 pb-2" style="font-weight: 700">Notifications</h6>
+                                        <bell-outlined style="font-size: 1.5em; align-self: center"/>
+                                    </div>
+                                </template>
                                 <template #content>
-                                    123
+                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
                                 </template>
                             </a-popover>
                         </a-menu-item>
@@ -113,10 +121,12 @@ import {
     BellOutlined,
 } from '@ant-design/icons-vue';
 import {getFullUsername} from "@/api/utils/getFullUsername";
+import VcNotification from "@/components/NotificationComponent/NotificationComponent.vue";
 
 export default defineComponent({
     name: "VcNavbar",
     components: {
+        VcNotification,
         LoginOutlined,
         LogoutOutlined,
         SolutionOutlined,
