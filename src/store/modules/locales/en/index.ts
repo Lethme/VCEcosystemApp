@@ -14,6 +14,16 @@ export const en: LocaleRecord = {
     orderText: "Order",
     fromText: "From",
     executorText: "Executor",
+    telegramText: "Telegram",
+    telegramLinkText: "Scan this QR code or follow the link to link your Telegram account",
+    linkText: "Link",
+    accountText: "Account",
+    linkTelegramText: "Link",
+    unlinkTelegramText: "Unlink",
+    acceptText: "Accept",
+    rejectText: "Reject",
+    showText: "Show",
+    hideText: "Hide",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
@@ -59,11 +69,18 @@ export const en: LocaleRecord = {
     schedulePage: {
         nextMonth: "Next Month",
         prevMonth: "Previous Month",
+        shiftsExchangeTitle: "Shifts Exchange Requests",
         scheduleTableHeaders: {
             date: "Date",
             day: "Day",
             firstShift: "First Shift",
             secondShift: "Second Shift",
+        },
+        exchangeRequestsTableHeaders: {
+            suggestedShift: "Suggested Shift",
+            desiredShift: "Your Shift",
+            sender: "Sender",
+            actions: "Actions",
         },
     },
     ordersPage: {

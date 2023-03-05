@@ -1,5 +1,33 @@
 <template>
-    <div class="container-fluid pt-4 pb-4 d-flex flex-grow-1">
+    <div class="container-fluid pt-4 pb-4 d-flex flex-column flex-grow-1 gap-4">
+        <vc-layout v-if="exchangeRequests && exchangeRequests.length" class="w-100 p-4" class-inner="d-flex flex-column gap-3" :shadow="true">
+            <div class="header d-flex flex-column justify-content-center align-items-center">
+                <h4 class="mb-4 text-center d-flex align-items-center gap-2" v-html="$locale.schedulePage.shiftsExchangeTitle" />
+                <div class="table-wrapper w-100">
+                    <a-table class="cell-width-auto" bordered :data-source="exchangeRequests" :columns="exchangeRequestsTableColumns" :custom-row="customShiftsExchangeRow" :pagination="false">
+                        <template #desiredShift="{ record }">
+                            {{ `${(new Date(record.desiredDate)).toLocaleDateString($locale.locale, { day: '2-digit', month: '2-digit', year: 'numeric' })} - ${$locale.daysOfWeek[(new Date(record.desiredDate)).getDay() || 7]} - ${record.desiredShift}` }}
+                        </template>
+                        <template #suggestedShift="{ record }">
+                            {{ `${(new Date(record.suggestedDate)).toLocaleDateString($locale.locale, { day: '2-digit', month: '2-digit', year: 'numeric' })} - ${$locale.daysOfWeek[(new Date(record.suggestedDate)).getDay() || 7]} - ${record.suggestedShift}` }}
+                        </template>
+                        <template #sender="{ record }">
+                            <div v-if="record.sender" class="wrapper d-flex gap-2 align-items-center">
+                                <vc-profile-picture height="40" width="40" :preview="record.sender.hasProfilePicture" :shadow="false" :self="false" :uuid="record.sender.hasProfilePicture ? record.sender.uuid : undefined" />
+                                <span>{{ record.sender.lastName }}</span>
+                            </div>
+                        </template>
+                        <template #actions="{ record }">
+                            <div class="btn-wrapper d-flex flex-row gap-2 justify-content-end">
+                                <a-button type="secondary" @click="selectedExchangeRequest = selectedExchangeRequest?.id === record.id ? undefined : record">{{ selectedExchangeRequest?.id === record.id ? $locale.hideText : $locale.showText }}</a-button>
+                                <a-button type="primary" @click="resolveShiftsExchangeRequest(record.id, true)">{{ $locale.acceptText }}</a-button>
+                                <a-button type="primary" @click="resolveShiftsExchangeRequest(record.id, false)" danger>{{ $locale.rejectText }}</a-button>
+                            </div>
+                        </template>
+                    </a-table>
+                </div>
+            </div>
+        </vc-layout>
         <vc-layout class="w-100 p-4" class-inner="d-flex flex-column gap-3" :shadow="true">
             <div v-if="!$mobile" class="header d-flex flex-row justify-content-between">
                 <a-button size="large" type="primary" @click="showPrevMonth" :disabled="date.getMonth() * date.getFullYear() <= (new Date()).getMonth() * (new Date()).getFullYear()">{{ $locale.schedulePage.prevMonth }}</a-button>
@@ -17,7 +45,7 @@
                 </div>
             </div>
             <div class="table-wrapper">
-                <a-table class="cell-width-auto" bordered :data-source="schedule" :columns="columns" :pagination="false" :custom-row="customScheduleRow" :custom-cell="customScheduleCell">
+                <a-table class="cell-width-auto" bordered :data-source="schedule" :columns="scheduleTableColumns" :pagination="false" :custom-row="customScheduleRow">
                     <template #date="{ record }">
                         <span>{{ (new Date(record.date)).getDate() }}</span>
                     </template>
@@ -25,13 +53,13 @@
                         <span>{{ $locale.daysOfWeek[record.day] }}</span>
                     </template>
                     <template #firstShift="{ record }">
-                        <div v-if="record.firstShiftUser" class="wrapper d-flex gap-2 align-items-center">
+                        <div v-if="record.firstShiftUser && !record.weekend" class="wrapper d-flex gap-2 align-items-center" :style="selectedExchangeRequestStyle(record, 1)">
                             <vc-profile-picture height="40" width="40" :preview="record.firstShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.firstShiftUser?.hasProfilePicture ? record.firstShiftUser?.uuid : undefined" />
                             <span :style="{ color: record.firstShiftUser?.id === $user?.id ? '#6096B4' : '#000' }">{{ record.firstShiftUser?.lastName }}</span>
                         </div>
                     </template>
                     <template #secondShift="{ record }">
-                        <div v-if="record.secondShiftUser" class="wrapper d-flex gap-2 align-items-center">
+                        <div v-if="record.secondShiftUser && !record.weekend" class="wrapper d-flex gap-2 align-items-center" :style="selectedExchangeRequestStyle(record, 2)">
                             <vc-profile-picture height="40" width="40" :preview="record.secondShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.secondShiftUser?.hasProfilePicture ? record.secondShiftUser?.uuid : undefined" />
                             <span :style="{ color: record.secondShiftUser?.id === $user?.id ? '#6096B4' : '#000' }">{{ record.secondShiftUser?.lastName }}</span>
                         </div>
@@ -43,15 +71,16 @@
 </template>
 
 <script lang="ts">
-import {ScheduleService} from "@/api/services";
-import {Schedule, ScheduleResponse, ScheduleUser, User} from "@/api/services/types";
+import {ScheduleService, ShiftsExchangeService} from "@/api/services";
+import {Schedule, ScheduleResponse, ScheduleUser, ShiftsExchange, User} from "@/api/services/types";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 import {Loader} from "@/utils";
+import {datesEqual} from "@/utils/datesEqual";
 import moment, {Moment} from "moment";
 import 'moment/dist/locale/ru';
 moment.locale('ru');
 
-import {computed, defineComponent, onMounted, ref, watch} from "vue";
+import {computed, defineComponent, onMounted, onUnmounted, ref, watch} from "vue";
 import calendarRU from 'ant-design-vue/es/calendar/locale/ru_RU';
 import calendarEN from 'ant-design-vue/es/calendar/locale/en_US';
 import {Locale} from "@/store/modules/locales/types/Locale";
@@ -80,20 +109,49 @@ export default defineComponent({
         const schedule = ref<Array<ScheduleData>>([]);
         const users = ref<Array<ScheduleUser>>([]);
         const date = ref<Date>(new Date());
+        const exchangeRequests = ref<Array<ShiftsExchange>>([]);
+        const selectedExchangeRequest = ref<ShiftsExchange>();
+        const scheduleUpdateIntervalId = ref<number>();
 
-        const updateSchedule = async () => {
+        const updateSchedule = async (useLoader = true) => {
+            useLoader && Loader.SetState(true);
+            const response = await ScheduleService.Get(date.value.getMonth(), date.value.getFullYear());
+
+            if (response && response.status) {
+                users.value = (response.data as ScheduleResponse).users;
+                schedule.value = (response.data as ScheduleResponse).schedule.map(s => {
+                    return {
+                        ...s,
+                        firstShiftUser: users.value.find(u => u.id === s.firstShiftUserId),
+                        secondShiftUser: users.value.find(u => u.id === s.secondShiftUserId),
+                    } as ScheduleData;
+                });
+            }
+
+            await updateShiftsExchangeRequests(useLoader);
+            useLoader && Loader.SetState(false);
+        }
+
+        const updateShiftsExchangeRequests = async (useLoader = true) => {
+            useLoader && Loader.SetState(true);
+            const response = await ShiftsExchangeService.GetRequests(date.value.getMonth(), date.value.getFullYear());
+
+            if (response && response.status) {
+                exchangeRequests.value = response.data as Array<ShiftsExchange>;
+
+                if (selectedExchangeRequest.value && !exchangeRequests.value.some(request => request.id === selectedExchangeRequest.value?.id)) {
+                    selectedExchangeRequest.value = undefined;
+                }
+            }
+            useLoader && Loader.SetState(false);
+        }
+
+        const resolveShiftsExchangeRequest = async (id: number, accept: boolean) => {
             await Loader.Use(async () => {
-                const response = await ScheduleService.Get(date.value.getMonth(), date.value.getFullYear());
+                const response = await ShiftsExchangeService.ResolveRequest(id, accept);
 
                 if (response && response.status) {
-                    users.value = (response.data as ScheduleResponse).users;
-                    schedule.value = (response.data as ScheduleResponse).schedule.map(s => {
-                        return {
-                            ...s,
-                            firstShiftUser: users.value.find(u => u.id === s.firstShiftUserId),
-                            secondShiftUser: users.value.find(u => u.id === s.secondShiftUserId),
-                        } as ScheduleData;
-                    });
+                    await updateSchedule();
                 }
             });
         }
@@ -110,20 +168,47 @@ export default defineComponent({
             }
         }
 
-        const customScheduleCell = (record: ScheduleData, index: number) => {
+        const customShiftsExchangeRow = (record: ShiftsExchange, index: number) => {
             return {
                 style: {
-                    background: record.weekend ? '#FD8A8A20' : 'none',
+                    background: selectedExchangeRequest.value && selectedExchangeRequest.value?.id === record.id ? '#FD8A8A20' : 'none',
+                },
+            }
+        }
+
+        const selectedExchangeRequestStyle = (record: ScheduleData, shiftIndex: number) => {
+            if (selectedExchangeRequest.value && (
+                (
+                    datesEqual(new Date(record.date), new Date(selectedExchangeRequest.value!.desiredDate)) &&
+                    shiftIndex === selectedExchangeRequest.value?.desiredShift
+                ) ||
+                (
+                    datesEqual(new Date(record.date), new Date(selectedExchangeRequest.value!.suggestedDate)) &&
+                    shiftIndex === selectedExchangeRequest.value?.suggestedShift
+                )
+            )) {
+                return {
+                    background: '#FD8A8A20',
                 }
+            }
+
+            return {
+                background: 'none',
             }
         }
 
         onMounted(async () => {
             await updateSchedule();
+            //scheduleUpdateIntervalId.value = setInterval(updateSchedule.bind(null, false), 10000);
+        });
+
+        onUnmounted(async () => {
+            //clearInterval(scheduleUpdateIntervalId.value);
         });
 
         watch(() => date.value, async () => {
             await updateSchedule();
+            await updateShiftsExchangeRequests();
         });
 
         const showNextMonth = () => {
@@ -134,7 +219,7 @@ export default defineComponent({
             date.value = new Date(date.value.setMonth(date.value.getMonth() - 1));
         }
 
-        const columns = computed(() => {
+        const scheduleTableColumns = computed(() => {
             return [
                 {
                     title: locale.value.schedulePage.scheduleTableHeaders.date,
@@ -158,7 +243,33 @@ export default defineComponent({
                     slots: {customRender: "secondShift"},
                 },
             ]
-        })
+        });
+
+        const exchangeRequestsTableColumns = computed(() => {
+            return [
+                {
+                    title: locale.value.schedulePage.exchangeRequestsTableHeaders.desiredShift,
+                    key: 'desiredShift',
+                    slots: {customRender: "desiredShift"},
+                },
+                {
+                    title: locale.value.schedulePage.exchangeRequestsTableHeaders.suggestedShift,
+                    key: 'suggestedShift',
+                    slots: {customRender: "suggestedShift"},
+                },
+                {
+                    title: locale.value.schedulePage.exchangeRequestsTableHeaders.sender,
+                    key: 'sender',
+                    slots: {customRender: "sender"},
+                },
+                {
+                    title: locale.value.schedulePage.exchangeRequestsTableHeaders.actions,
+                    key: 'actions',
+                    align: 'right',
+                    slots: {customRender: "actions"},
+                },
+            ]
+        });
 
         return {
             Locale,
@@ -168,13 +279,18 @@ export default defineComponent({
             schedule,
             users,
             date,
-            columns,
+            exchangeRequests,
+            scheduleTableColumns,
+            exchangeRequestsTableColumns,
+            selectedExchangeRequest,
             getFullUsername,
             showNextMonth,
             showPrevMonth,
             updateSchedule,
             customScheduleRow,
-            customScheduleCell,
+            resolveShiftsExchangeRequest,
+            customShiftsExchangeRow,
+            selectedExchangeRequestStyle,
         }
     }
 });

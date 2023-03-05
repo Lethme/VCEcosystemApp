@@ -16,8 +16,10 @@ interface User extends Timestamp {
     roles: Array<Role>,
     rate?: Rate;
     preferences: Array<Preference>;
+    telegramLinked: boolean;
     logout: () => Promise<void>;
     getProfilePictureUrl: () => string;
+    getTelegramBotLink: () => string;
 }
 
 export default User;

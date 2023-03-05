@@ -14,6 +14,16 @@ export const ru: LocaleRecord = {
     orderText: "Заказ",
     fromText: "От",
     executorText: "Исполнитель",
+    telegramText: "Телеграм",
+    telegramLinkText: "Отсканируйте данный QR код или перейдите по данной ссылке, чтобы привязать Ваш Телеграм аккаунт",
+    linkText: "Ссылка",
+    accountText: "Аккаунт",
+    linkTelegramText: "Привязать",
+    unlinkTelegramText: "Отвязать",
+    acceptText: "Принять",
+    rejectText: "Отклонить",
+    showText: "Показать",
+    hideText: "Скрыть",
     roles: {
         ROOT: "Суперпользователь",
         MODERATOR: "Модератор",
@@ -59,11 +69,18 @@ export const ru: LocaleRecord = {
     schedulePage: {
         nextMonth: "Следующий месяц",
         prevMonth: "Предыдущий месяц",
+        shiftsExchangeTitle: "Запросы на обмен сменами",
         scheduleTableHeaders: {
             date: "Дата",
             day: "День недели",
             firstShift: "Первая смена",
             secondShift: "Вторая смена",
+        },
+        exchangeRequestsTableHeaders: {
+            suggestedShift: "Предложенная смена",
+            desiredShift: "Ваша смена",
+            sender: "Отправитель",
+            actions: "Действия",
         },
     },
     ordersPage: {

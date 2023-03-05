@@ -13,6 +13,16 @@ export interface LocaleRecord {
     orderText: string;
     fromText: string;
     executorText: string;
+    telegramText: string;
+    telegramLinkText: string;
+    linkText: string;
+    accountText: string;
+    linkTelegramText: string;
+    unlinkTelegramText: string;
+    acceptText: string;
+    rejectText: string;
+    showText: string;
+    hideText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
@@ -58,12 +68,19 @@ export interface LocaleRecord {
     schedulePage: {
         nextMonth: string;
         prevMonth: string;
+        shiftsExchangeTitle: string;
         scheduleTableHeaders: {
             date: string;
             day: string;
             firstShift: string;
             secondShift: string;
-        }
+        };
+        exchangeRequestsTableHeaders: {
+            suggestedShift: string;
+            desiredShift: string;
+            sender: string;
+            actions: string;
+        };
     },
     ordersPage: {
         title: string;

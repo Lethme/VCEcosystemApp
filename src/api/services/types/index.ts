@@ -27,6 +27,9 @@ import { EditPreferenceDto } from "@/api/services/types/EditPreferenceDto";
 import { Schedule } from "@/api/services/types/Schedule";
 import { ScheduleUser } from "@/api/services/types/ScheduleUser";
 import { ScheduleResponse } from "@/api/services/types/ScheduleResponse";
+import ShiftsExchange from "@/api/services/types/ShiftsExchange";
+import UserSchedule from "@/api/services/types/UserSchedule";
+import UserExchange from "@/api/services/types/UserExchange";
 
 export type {
     Service,
@@ -59,6 +62,9 @@ export type {
     Schedule,
     ScheduleUser,
     ScheduleResponse,
+    ShiftsExchange,
+    UserExchange,
+    UserSchedule,
 };
 
 export { App, PasswordStateFieldType };
