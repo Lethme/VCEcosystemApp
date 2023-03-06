@@ -8,7 +8,8 @@ const getters = {
     return state.date;
   },
   formattedDate(state: State): string {
-    return moment(state.date).format(store.getters.locale === Locale.Ru ? "DD.MM.YYYY, HH:mm:ss" : "MM.DD.YYYY, hh:mm:ss A");
+    //return moment(state.date).format(store.getters.locale === Locale.Ru ? "DD.MM.YYYY, HH:mm:ss" : "MM.DD.YYYY, hh:mm:ss A");
+    return state.date.toLocaleString(store.getters.locale);
   },
 };
 
