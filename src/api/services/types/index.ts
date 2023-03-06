@@ -30,6 +30,7 @@ import { ScheduleResponse } from "@/api/services/types/ScheduleResponse";
 import ShiftsExchange from "@/api/services/types/ShiftsExchange";
 import UserSchedule from "@/api/services/types/UserSchedule";
 import UserExchange from "@/api/services/types/UserExchange";
+import ShiftsExchangeRequestDto from "@/api/services/types/ShiftsExchangeRequestDto";
 
 export type {
     Service,
@@ -65,6 +66,7 @@ export type {
     ShiftsExchange,
     UserExchange,
     UserSchedule,
+    ShiftsExchangeRequestDto,
 };
 
 export { App, PasswordStateFieldType };

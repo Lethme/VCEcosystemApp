@@ -13,6 +13,7 @@
                 ? ($user.hasProfilePicture ? $user.getProfilePictureUrl() : $pictureFallback)
                 : (uuid ? getProfilePicUrl(uuid) : $pictureFallback)"
             :preview="true"
+            @click.stop
         />
         <div v-else :class="{ 'profile-picture-img': true, 'shadowed': shadow, 'd-flex': true }" :style="{
             fontSize: `${Math.round(+width / 12.5)}px`,
