@@ -1,7 +1,7 @@
-import HomeView from '../views/HomeView.vue'
-import LoginView from "@/views/LoginView.vue";
 import {RouteAccess} from "@/router/types";
+import LoginView from "@/views/LoginView.vue";
 import {RouteRecordRaw} from "vue-router";
+import HomeView from '../views/HomeView.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -58,6 +58,20 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/AboutView.vue'),
         meta: {
             access: RouteAccess.Public,
+        }
+    },
+    {
+        path: '/error',
+        component: () => import('../views/ErrorView.vue'),
+        meta: {
+            access: RouteAccess.Public,
+        }
+    },
+    {
+        path: '/schedule',
+        component: () => import('../views/ScheduleView.vue'),
+        meta: {
+            access: RouteAccess.Private,
         }
     }
 ];

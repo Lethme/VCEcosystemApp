@@ -1,3 +1,4 @@
+import moment from "moment";
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -17,6 +18,13 @@ import LocalesPlugin from "@/plugins/locales";
 import 'ant-design-vue/dist/antd.css';
 import './fonts.less';
 import './var.less';
+
+Object.defineProperty(String.prototype, 'capitalize', {
+    value: function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    },
+    enumerable: false
+});
 
 const app = createApp(App);
 

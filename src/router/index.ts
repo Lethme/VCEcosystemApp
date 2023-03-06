@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
     if (isAuthorized() || ApiService.ApiToken !== null) {
       next();
     } else {
-      next("/login");
+      next(`/login?redirect=${to.fullPath}`);
     }
   } else if (to.matched.some((record) => record.meta.access === RouteAccess.PrivateWhileAuthorized) && isAuthorized()) {
     next("/");

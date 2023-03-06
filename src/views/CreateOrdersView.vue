@@ -26,6 +26,7 @@
                   <a-popconfirm
                       :title="$locale.newOrdersPage.clearOrderButtonConfirm"
                       @confirm="clearOrder"
+                      v-if="pane.order.dataSource.length"
                   >
                     <a-button type="primary" size="large" danger class="col-12 col-md-auto">{{ $locale.newOrdersPage.clearOrderButtonTitle }}</a-button>
                   </a-popconfirm>
@@ -156,6 +157,7 @@ import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
 import { useStore } from 'vuex';
 import { Pane } from "@/store/modules/orders/types";
 import {formatPrice} from "@/api/utils/formatPrice";
+import {Modal} from "ant-design-vue";
 
 export default defineComponent({
   components: {
@@ -295,6 +297,15 @@ export default defineComponent({
     }
 
     const addService = () => {
+      if (!activePane.value.order.selectedService) {
+        Modal.info({
+          title: locale.value.newOrdersPage.selectServicePlaceholder,
+          content: locale.value.newOrdersPage.selectServiceNotSelected,
+        });
+
+        return;
+      }
+
       store.commit("addOrderService");
     }
 

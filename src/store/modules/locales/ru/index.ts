@@ -1,8 +1,9 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const ru: LocaleRecord = {
-    locale: "ru",
+    locale: Locale.Ru,
     copyright: "&copy; 2022 VC://VPI. Все права защищены.",
     editText: "Изменить",
     saveText: "Сохранить",
@@ -13,8 +14,18 @@ export const ru: LocaleRecord = {
     orderText: "Заказ",
     fromText: "От",
     executorText: "Исполнитель",
+    telegramText: "Телеграм",
+    telegramLinkText: "Отсканируйте данный QR код или перейдите по данной ссылке, чтобы привязать Ваш Телеграм аккаунт",
+    linkText: "Ссылка",
+    accountText: "Аккаунт",
+    linkTelegramText: "Привязать",
+    unlinkTelegramText: "Отвязать",
+    acceptText: "Принять",
+    rejectText: "Отклонить",
+    showText: "Показать",
+    hideText: "Скрыть",
     roles: {
-        ROOT: "Администратор",
+        ROOT: "Суперпользователь",
         MODERATOR: "Модератор",
         ADMIN: "Админ",
         OPERATOR: "Дежурный",
@@ -34,6 +45,7 @@ export const ru: LocaleRecord = {
             new: "Создать заказ",
             edit: "Новые заказы",
         },
+        schedule: "Расписание",
         orders: "Заказы",
         locales: 'Язык интерфейса',
         account: "Аккаунт",
@@ -54,8 +66,32 @@ export const ru: LocaleRecord = {
         servicesTableEditButtonTitle: "Изменить",
         servicesTableRestoreButtonTitle: "Восстановить",
     },
+    schedulePage: {
+        nextMonth: "Следующий месяц",
+        prevMonth: "Предыдущий месяц",
+        shiftsExchangeTitle: "Запросы на обмен сменами",
+        scheduleTableHeaders: {
+            date: "Дата",
+            day: "День недели",
+            firstShift: "Первая смена",
+            secondShift: "Вторая смена",
+        },
+        exchangeRequestsTableHeaders: {
+            suggestedShift: "Предложенная смена",
+            desiredShift: "Ваша смена",
+            sender: "Отправитель",
+            actions: "Действия",
+        },
+    },
     ordersPage: {
         title: "Заказы",
+        filter: {
+            dates: {
+                from: "Начальная дата",
+                to: "Конечная дата",
+            },
+            userSelect: "Выберите пользователя",
+        },
         archivedSwitch: {
             checked: "Архивные",
             unchecked: "Текущие",
@@ -111,6 +147,7 @@ export const ru: LocaleRecord = {
         clearOrderButtonConfirm: "Вы действительно хотите очистить этот заказ?",
         addServiceButtonTitle: "Добавить услугу",
         selectServicePlaceholder: "Выберите услугу",
+        selectServiceNotSelected: "Вы не выбрали услугу для добавления",
         orderServicesTableHeaders: {
             services: "Услуга",
             price: "Цена, ₽/штука",
@@ -176,9 +213,16 @@ export const ru: LocaleRecord = {
         createUserModal: {
             selectRolesPlaceholder: "Выберите роли",
             selectRatePlaceholder: "Выберите ставку",
+            exceptions: {
+                emptyNameFields: "Поля ФИО не могут быть пустыми",
+                emptyUsername: "Логин не может быть пустым",
+                usernameWrongLength: "Логин должен содержать хотя бы 8 символов",
+            },
         },
         usersTableHeaders: {
             id: "Id",
+            avatar: "Аватарка",
+            fio: "ФИО",
             lastName: "Фамилия",
             firstName: "Имя",
             patronymic: "Отчество",
@@ -221,5 +265,5 @@ export const ru: LocaleRecord = {
     localeTitles: {
         ru: "Русский",
         en: "Английский",
-    }
+    },
 }

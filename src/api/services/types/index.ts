@@ -24,6 +24,13 @@ import { CreateUserDto } from "@/api/services/types/CreateUserDto";
 import { ShiftIndex } from "@/api/services/types/ShiftIndex";
 import { CreatePreferenceDto } from "@/api/services/types/CreatePreferenceDto";
 import { EditPreferenceDto } from "@/api/services/types/EditPreferenceDto";
+import { Schedule } from "@/api/services/types/Schedule";
+import { ScheduleUser } from "@/api/services/types/ScheduleUser";
+import { ScheduleResponse } from "@/api/services/types/ScheduleResponse";
+import ShiftsExchange from "@/api/services/types/ShiftsExchange";
+import UserSchedule from "@/api/services/types/UserSchedule";
+import UserExchange from "@/api/services/types/UserExchange";
+import ShiftsExchangeRequestDto from "@/api/services/types/ShiftsExchangeRequestDto";
 
 export type {
     Service,
@@ -53,6 +60,13 @@ export type {
     ShiftIndex,
     CreatePreferenceDto,
     EditPreferenceDto,
+    Schedule,
+    ScheduleUser,
+    ScheduleResponse,
+    ShiftsExchange,
+    UserExchange,
+    UserSchedule,
+    ShiftsExchangeRequestDto,
 };
 
 export { App, PasswordStateFieldType };

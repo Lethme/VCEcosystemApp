@@ -1,7 +1,8 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export interface LocaleRecord {
-    locale: string;
+    locale: Locale;
     copyright: string;
     editText: string;
     saveText: string;
@@ -12,6 +13,16 @@ export interface LocaleRecord {
     orderText: string;
     fromText: string;
     executorText: string;
+    telegramText: string;
+    telegramLinkText: string;
+    linkText: string;
+    accountText: string;
+    linkTelegramText: string;
+    unlinkTelegramText: string;
+    acceptText: string;
+    rejectText: string;
+    showText: string;
+    hideText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
@@ -33,6 +44,7 @@ export interface LocaleRecord {
             new: string;
             edit: string;
         };
+        schedule: string;
         orders: string;
         locales: string;
         account: string;
@@ -53,8 +65,32 @@ export interface LocaleRecord {
         servicesTableEditButtonTitle: string;
         servicesTableRestoreButtonTitle: string;
     };
+    schedulePage: {
+        nextMonth: string;
+        prevMonth: string;
+        shiftsExchangeTitle: string;
+        scheduleTableHeaders: {
+            date: string;
+            day: string;
+            firstShift: string;
+            secondShift: string;
+        };
+        exchangeRequestsTableHeaders: {
+            suggestedShift: string;
+            desiredShift: string;
+            sender: string;
+            actions: string;
+        };
+    },
     ordersPage: {
         title: string;
+        filter: {
+            dates: {
+                from: string;
+                to: string;
+            };
+            userSelect: string;
+        };
         archivedSwitch: {
             checked: string;
             unchecked: string;
@@ -110,6 +146,7 @@ export interface LocaleRecord {
         clearOrderButtonConfirm: string;
         addServiceButtonTitle: string;
         selectServicePlaceholder: string;
+        selectServiceNotSelected: string;
         orderServicesTableHeaders: {
             services: string;
             price: string;
@@ -173,6 +210,8 @@ export interface LocaleRecord {
         };
         usersTableHeaders: {
             id: string;
+            avatar: string;
+            fio: string;
             lastName: string;
             firstName: string;
             patronymic: string;
@@ -199,6 +238,11 @@ export interface LocaleRecord {
         createUserModal: {
             selectRolesPlaceholder: string;
             selectRatePlaceholder: string;
+            exceptions: {
+                emptyNameFields: string;
+                emptyUsername: string;
+                usernameWrongLength: string;
+            };
         };
         usersTableButtonsTitles: {
             confirmLink: string;

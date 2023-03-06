@@ -8,7 +8,7 @@ import {DaysToRemoveOrders, Service} from "@/api/services/types";
 
 const actions = {
   async updateServices(context: ActionContext<State, any>) {
-    const response = await ServicesService.GetAll();
+    const response = await ServicesService.GetAll(false);
 
     if (response.status) {
       context.commit("setServices", (response.data as Array<Service>)

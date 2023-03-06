@@ -1,8 +1,9 @@
 import {ApiDay} from "@/api/services/enums/ApiDay";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
+import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const en: LocaleRecord = {
-    locale: "en",
+    locale: Locale.En,
     copyright: "&copy; 2022 VC://VPI. All rights reserved.",
     editText: "Edit",
     saveText: "Save",
@@ -13,6 +14,16 @@ export const en: LocaleRecord = {
     orderText: "Order",
     fromText: "From",
     executorText: "Executor",
+    telegramText: "Telegram",
+    telegramLinkText: "Scan this QR code or follow the link to link your Telegram account",
+    linkText: "Link",
+    accountText: "Account",
+    linkTelegramText: "Link",
+    unlinkTelegramText: "Unlink",
+    acceptText: "Accept",
+    rejectText: "Reject",
+    showText: "Show",
+    hideText: "Hide",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
@@ -34,6 +45,7 @@ export const en: LocaleRecord = {
             new: "New Order",
             edit: "Edit New Orders",
         },
+        schedule: "Schedule",
         orders: "Orders",
         locales: "Locale",
         account: "Account",
@@ -54,8 +66,32 @@ export const en: LocaleRecord = {
         servicesTableEditButtonTitle: "Edit",
         servicesTableRestoreButtonTitle: "Restore",
     },
+    schedulePage: {
+        nextMonth: "Next Month",
+        prevMonth: "Previous Month",
+        shiftsExchangeTitle: "Shifts Exchange Requests",
+        scheduleTableHeaders: {
+            date: "Date",
+            day: "Day",
+            firstShift: "First Shift",
+            secondShift: "Second Shift",
+        },
+        exchangeRequestsTableHeaders: {
+            suggestedShift: "Suggested Shift",
+            desiredShift: "Your Shift",
+            sender: "Sender",
+            actions: "Actions",
+        },
+    },
     ordersPage: {
         title: "Orders",
+        filter: {
+            dates: {
+                from: "From",
+                to: "To",
+            },
+            userSelect: "Select User",
+        },
         archivedSwitch: {
             checked: "Archive",
             unchecked: "Current",
@@ -111,6 +147,7 @@ export const en: LocaleRecord = {
         clearOrderButtonConfirm: "Sure to clear this order?",
         addServiceButtonTitle: "Add Service",
         selectServicePlaceholder: "Select Service",
+        selectServiceNotSelected: "You have to select service first",
         orderServicesTableHeaders: {
             services: "Service",
             price: "Price, ₽/unit",
@@ -176,9 +213,16 @@ export const en: LocaleRecord = {
         createUserModal: {
             selectRolesPlaceholder: "Select Roles",
             selectRatePlaceholder: "Select Rate",
+            exceptions: {
+                emptyNameFields: "Name fields can't be empty",
+                emptyUsername: "Username can't be empty",
+                usernameWrongLength: "Username must be at least 8 characters length",
+            },
         },
         usersTableHeaders: {
             id: "Id",
+            avatar: "Avatar",
+            fio: "Full Name",
             lastName: "Last Name",
             firstName: "First Name",
             patronymic: "Patronymic",
@@ -221,5 +265,5 @@ export const en: LocaleRecord = {
     localeTitles: {
         ru: "Russian",
         en: "English",
-    }
+    },
 }

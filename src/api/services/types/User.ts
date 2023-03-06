@@ -7,6 +7,7 @@ import {Locale} from "@/store/modules/locales/types/Locale";
 interface User extends Timestamp {
     id: number;
     uuid: string;
+    hasProfilePicture: boolean;
     username: string;
     lastName: string;
     firstName: string;
@@ -15,8 +16,10 @@ interface User extends Timestamp {
     roles: Array<Role>,
     rate?: Rate;
     preferences: Array<Preference>;
+    telegramLinked: boolean;
     logout: () => Promise<void>;
     getProfilePictureUrl: () => string;
+    getTelegramBotLink: () => string;
 }
 
 export default User;

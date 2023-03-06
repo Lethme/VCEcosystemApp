@@ -113,14 +113,14 @@ export default defineComponent({
         if (response.status) {
           // ToDo
           await this.$store.dispatch("updateUserInfo");
-          this.$router.push(this.$route.query.redirect as string || "/");
+          this.$router.push(this.$route.query.redirect as string || "/orders");
         } else {
-          this.formState.exception = (response.data as Message).message;
+          this.formState.exception = 'Неверно указан логин или пароль';
         }
       })
     },
     onFinishFailed(errorInfo: any) {
-      console.log('Failed:', errorInfo);
+      //console.log('Failed:', errorInfo);
     },
   }
 });

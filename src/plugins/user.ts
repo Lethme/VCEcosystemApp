@@ -19,6 +19,10 @@ class UserPlugin {
                         await (() => new Promise(resolve => setTimeout(resolve, 500)))();
                         await store.dispatch("logout");
                     }),
+                    getTelegramBotLink: () => {
+                        const user: User = store.getters.userInfo;
+                        return `https://t.me/VCNotifyBot?start=${user.uuid}`
+                    }
                 }
             }
         });
