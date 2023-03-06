@@ -176,7 +176,7 @@ export default defineComponent({
             const response = await ShiftsExchangeService.GetRequests(date.value.getMonth(), date.value.getFullYear());
 
             if (response && response.status) {
-                exchangeRequests.value = response.data as Array<ShiftsExchange>;
+                exchangeRequests.value = (response.data as Array<ShiftsExchange>).filter(request => request.receiverId === user.value.id);
 
                 if (selectedExchangeRequest.value && !exchangeRequests.value.some(request => request.id === selectedExchangeRequest.value?.id)) {
                     selectedExchangeRequest.value = undefined;
