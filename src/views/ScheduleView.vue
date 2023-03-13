@@ -312,7 +312,7 @@ export default defineComponent({
 
         const tableShiftWrapperClasses = (record: ScheduleData, shiftIndex: number) => {
             const scheduleShiftData = getScheduleShiftData(record, shiftIndex);
-            const myShift = shiftIndex === 1 ? record.firstShiftUserId === user.value.id : record.secondShiftUserId === user.value.id;
+            const myShift = shiftIndex === 1 ? record.firstShiftUserId === user.value?.id : record.secondShiftUserId === user.value?.id;
 
             return {
                 'ant-table-cell-wrapper': true,
@@ -330,7 +330,7 @@ export default defineComponent({
                 date: new Date(record.date),
                 shift: shiftIndex,
                 user: shiftUser,
-                myShift: shiftUser?.id === user.value.id,
+                myShift: shiftUser?.id === user.value?.id,
             } as ScheduleShiftData
         }
 

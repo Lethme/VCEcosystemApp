@@ -143,6 +143,7 @@ import {Loader} from "@/utils";
 import {CheckCircleFilled, CloseCircleFilled, SyncOutlined,} from "@ant-design/icons-vue";
 import {computed, defineComponent, onMounted, ref, watch} from "vue";
 import {useStore} from "vuex";
+import {Modal} from "ant-design-vue";
 
 interface Day {
     value: ApiDay;
@@ -244,6 +245,12 @@ export default defineComponent({
             if (response && response.status) {
                 await store.dispatch("updateUserInfo");
                 setDefaultCreateModalState();
+            } else {
+                Modal.error({
+                    title: locale.value.userProfilePage.addPreferenceButtonTitle,
+                    content: locale.value.exceptions.preferences["409"],
+                    centered: true,
+                });
             }
 
             createModalConfirmLoading.value = false;

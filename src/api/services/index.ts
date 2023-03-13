@@ -7,6 +7,7 @@ import OrdersService from "./OrdersService";
 import RatesService from "./RatesService";
 import ScheduleService from "./ScheduleService";
 import ShiftsExchangeService from "./ShiftsExchangeService";
+import BotService from "./BotService";
 
 export {
     Url,
@@ -18,4 +19,5 @@ export {
     RatesService,
     ScheduleService,
     ShiftsExchangeService,
+    BotService,
 };

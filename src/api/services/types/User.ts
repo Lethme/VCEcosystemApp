@@ -16,6 +16,7 @@ interface User extends Timestamp {
     roles: Array<Role>,
     rate?: Rate;
     preferences: Array<Preference>;
+    telegramId?: string;
     telegramLinked: boolean;
     logout: () => Promise<void>;
     getProfilePictureUrl: () => string;

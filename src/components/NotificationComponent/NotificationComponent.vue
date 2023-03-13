@@ -9,7 +9,7 @@
                     <slot />
                 </div>
             </div>
-            <div class="notification-actions d-flex">
+            <div class="notification-actions d-flex p-2 pt-0 pb-0">
                 <close-outlined class="close" @click="closeClick" style="align-self: start"/>
             </div>
         </div>

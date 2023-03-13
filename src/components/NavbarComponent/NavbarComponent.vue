@@ -26,9 +26,15 @@
                                     </div>
                                 </template>
                                 <template #content>
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                    <a-button block type="primary">{{ $locale.clearText }}</a-button>
+                                    <div class="notifications-wrapper d-flex flex-column gap-3 mt-3" style="max-height: 400px; overflow-y: auto;">
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                        <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                    </div>
                                 </template>
                             </a-popover>
                         </a-menu-item>
