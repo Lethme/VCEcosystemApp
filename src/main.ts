@@ -14,6 +14,7 @@ import WindowSizePlugin from "@/plugins/windowSize";
 import ServicesPlugin from "@/plugins/services";
 import UtilsPlugin from "@/plugins/utils";
 import LocalesPlugin from "@/plugins/locales";
+import NotificationsPlugin from "@/plugins/notifications";
 
 import 'ant-design-vue/dist/antd.css';
 import './fonts.less';
@@ -42,4 +43,5 @@ app
     .use(ServicesPlugin)
     .use(UtilsPlugin)
     .use(LocalesPlugin)
+    .use(NotificationsPlugin)
     .mount('#app');

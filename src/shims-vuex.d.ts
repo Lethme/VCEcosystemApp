@@ -1,5 +1,5 @@
 import { Store } from "@/store";
-import {Service, User} from "@/api/services/types";
+import {Notification, Service, User} from "@/api/services/types";
 import {WindowSize} from "@/plugins/windowSize";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 
@@ -24,6 +24,14 @@ declare module "@vue/runtime-core" {
     $removedServices: Array<Service>;
     $daysToRemoveOrders: number;
     $pictureFallback: string;
+    $notifications: Array<Notification>;
+    $readNotifications: Array<Notification>;
+    $unreadNotifications: Array<Notification>;
+
+    readNotification: (id) => Promise<void>;
+    readAllNotifications: () => Promise<void>;
+    removeNotification: (id) => Promise<void>;
+    removeAllNotifications: () => Promise<void>;
 
     refreshServices: () => Promise<void>;
     refreshUserInfo: (useLoader?: boolean) => Promise<void>;

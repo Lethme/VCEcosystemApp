@@ -13,6 +13,10 @@ export interface LocaleRecord {
     orderText: string;
     fromText: string;
     clearText: string;
+    markAllAsReadText: string;
+    removeAllNotificationsText: string;
+    noNotificationsText: string;
+    notificationsTitleText: string;
     executorText: string;
     telegramText: string;
     telegramLinkText: string;

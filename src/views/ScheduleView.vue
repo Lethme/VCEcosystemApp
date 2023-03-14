@@ -238,11 +238,11 @@ export default defineComponent({
 
         onMounted(async () => {
             await updateSchedule();
-            //scheduleUpdateIntervalId.value = setInterval(updateSchedule.bind(null, false), 10000);
+            scheduleUpdateIntervalId.value = setInterval(updateSchedule.bind(null, false), 5000);
         });
 
         onUnmounted(async () => {
-            //clearInterval(scheduleUpdateIntervalId.value);
+            clearInterval(scheduleUpdateIntervalId.value);
         });
 
         watch(() => date.value, async () => {
