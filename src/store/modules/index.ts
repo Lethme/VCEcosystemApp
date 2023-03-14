@@ -5,6 +5,7 @@ import date from "./date";
 import services from "./services";
 import orders from "./orders";
 import locales from "./locales";
+import notifications from "./notifications";
 
 export default {
     window,
@@ -14,4 +15,5 @@ export default {
     services,
     orders,
     locales,
+    notifications,
 };

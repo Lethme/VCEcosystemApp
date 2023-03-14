@@ -16,19 +16,34 @@
                         </template>
                         <a-menu-item v-if="$authorized" key="notifications" class="p-0" style="align-self: center">
                             <a-popover v-model:visible="notificationsVisible" :trigger="$mobile ? 'click' : 'hover'" placement="bottomRight">
-                                <a-badge count="100">
+                                <a-badge :count="$unreadNotifications.length">
                                     <bell-outlined style="font-size: 1.8em"/>
                                 </a-badge>
                                 <template #title>
                                     <div class="wrapper d-flex justify-content-between">
-                                        <h6 class="m-0 pt-2 pb-2" style="font-weight: 700">Notifications</h6>
+                                        <h6 class="m-0 pt-2 pb-2" style="font-weight: 700">{{ $locale.notificationsTitleText }}</h6>
                                         <bell-outlined style="font-size: 1.5em; align-self: center"/>
                                     </div>
                                 </template>
                                 <template #content>
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
-                                    <vc-notification title="Test notification" content="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, quod." />
+                                    <div v-if="$notifications.length" class="btns-wrapper d-flex flex-row flex-wrap gap-2">
+                                        <a-button block type="secondary" @click="() => $unreadNotifications.length && readAllNotifications()">{{ $locale.markAllAsReadText }}</a-button>
+                                        <a-button block type="secondary" danger @click="removeAllNotifications">{{ $locale.removeAllNotificationsText }}</a-button>
+                                        <a-divider class="mt-2 mb-0" />
+                                    </div>
+                                    <div v-if="$notifications.length" class="notifications-wrapper d-flex flex-column gap-2 mt-3" style="max-height: 400px; overflow-y: auto;">
+                                        <vc-notification
+                                            v-for="notification in $notifications"
+                                            :notification="notification"
+                                            @hover="() => !notification.read && readNotification(notification.id)"
+                                            @remove="removeNotification(notification.id)"
+                                            :key="notification.id"
+                                        />
+                                    </div>
+                                    <div v-else class="notifications-empty d-flex flex-column gap-3 justify-content-center align-items-center">
+                                        <inbox-outlined style="font-size: 4em; color: rgb(130, 130, 130)" />
+                                        <h6 style="color: rgb(130, 130, 130)">{{ $locale.noNotificationsText }}</h6>
+                                    </div>
                                 </template>
                             </a-popover>
                         </a-menu-item>
@@ -119,6 +134,7 @@ import {
     CheckOutlined,
     CalendarOutlined,
     BellOutlined,
+    InboxOutlined,
 } from '@ant-design/icons-vue';
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import VcNotification from "@/components/NotificationComponent/NotificationComponent.vue";
@@ -137,6 +153,7 @@ export default defineComponent({
         CheckOutlined,
         CalendarOutlined,
         BellOutlined,
+        InboxOutlined,
     },
     setup() {
         const current = ref<string[]>([]);

@@ -1,0 +1,14 @@
+.send-btn {
+    color: rgb(217, 217, 217);
+    transition: all .2s ease;
+}
+
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover input + * > .send-btn,
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled) input:focus + * > .send-btn,
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled) input:active + * > .send-btn {
+    color: rgb(64, 169, 255);
+}
+
+.ant-input-affix-wrapper-disabled input + * > .send-btn {
+    pointer-events: none;
+}

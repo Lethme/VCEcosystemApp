@@ -12,10 +12,16 @@ export interface LocaleRecord {
     restoreText: string;
     orderText: string;
     fromText: string;
+    clearText: string;
+    markAllAsReadText: string;
+    removeAllNotificationsText: string;
+    noNotificationsText: string;
+    notificationsTitleText: string;
     executorText: string;
     telegramText: string;
     telegramLinkText: string;
     linkText: string;
+    followLinkText: string;
     accountText: string;
     linkTelegramText: string;
     unlinkTelegramText: string;
@@ -23,6 +29,8 @@ export interface LocaleRecord {
     rejectText: string;
     showText: string;
     hideText: string;
+    allUsersText: string;
+    rolesText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;
@@ -259,10 +267,15 @@ export interface LocaleRecord {
         preferenceSwitch: {
             checked: string;
             unchecked: string;
-        }
+        },
     };
     localeTitles: {
         ru: string;
         en: string;
+    };
+    exceptions: {
+        preferences: {
+            409: string;
+        };
     };
 }

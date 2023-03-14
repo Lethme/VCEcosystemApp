@@ -4,7 +4,7 @@ import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const ru: LocaleRecord = {
     locale: Locale.Ru,
-    copyright: "&copy; 2022 VC://VPI. Все права защищены.",
+    copyright: `&copy; ${(new Date()).getFullYear()} VC://VPI. Все права защищены.`,
     editText: "Изменить",
     saveText: "Сохранить",
     cancelText: "Отмена",
@@ -13,10 +13,16 @@ export const ru: LocaleRecord = {
     restoreText: "Восстановить",
     orderText: "Заказ",
     fromText: "От",
+    clearText: "Очистить",
+    markAllAsReadText: "Отметить всё как прочитанное",
+    removeAllNotificationsText: "Удалить все уведомления",
+    noNotificationsText: "У Вас нет никаких уведомлений",
+    notificationsTitleText: "Уведомления",
     executorText: "Исполнитель",
     telegramText: "Телеграм",
     telegramLinkText: "Отсканируйте данный QR код или перейдите по данной ссылке, чтобы привязать Ваш Телеграм аккаунт",
     linkText: "Ссылка",
+    followLinkText: "Тык",
     accountText: "Аккаунт",
     linkTelegramText: "Привязать",
     unlinkTelegramText: "Отвязать",
@@ -24,6 +30,8 @@ export const ru: LocaleRecord = {
     rejectText: "Отклонить",
     showText: "Показать",
     hideText: "Скрыть",
+    allUsersText: "Все пользователи",
+    rolesText: "Все роли",
     roles: {
         ROOT: "Суперпользователь",
         MODERATOR: "Модератор",
@@ -265,5 +273,10 @@ export const ru: LocaleRecord = {
     localeTitles: {
         ru: "Русский",
         en: "Английский",
+    },
+    exceptions: {
+        preferences: {
+            409: "Для указанного дня уже задано предпочтение",
+        },
     },
 }

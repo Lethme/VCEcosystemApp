@@ -4,7 +4,7 @@ import {Locale} from "@/store/modules/locales/types/Locale";
 
 export const en: LocaleRecord = {
     locale: Locale.En,
-    copyright: "&copy; 2022 VC://VPI. All rights reserved.",
+    copyright: `&copy; ${(new Date()).getFullYear()} VC://VPI. All rights reserved.`,
     editText: "Edit",
     saveText: "Save",
     cancelText: "Cancel",
@@ -13,10 +13,16 @@ export const en: LocaleRecord = {
     restoreText: "Restore",
     orderText: "Order",
     fromText: "From",
+    clearText: "Clear",
+    markAllAsReadText: "Mark All As Read",
+    removeAllNotificationsText: "Remove All Notifications",
+    noNotificationsText: "You have no notifications right now",
+    notificationsTitleText: "Notifications",
     executorText: "Executor",
     telegramText: "Telegram",
     telegramLinkText: "Scan this QR code or follow the link to link your Telegram account",
     linkText: "Link",
+    followLinkText: "Follow Link",
     accountText: "Account",
     linkTelegramText: "Link",
     unlinkTelegramText: "Unlink",
@@ -24,6 +30,8 @@ export const en: LocaleRecord = {
     rejectText: "Reject",
     showText: "Show",
     hideText: "Hide",
+    allUsersText: "All Users",
+    rolesText: "All Roles",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
@@ -265,5 +273,10 @@ export const en: LocaleRecord = {
     localeTitles: {
         ru: "Russian",
         en: "English",
+    },
+    exceptions: {
+        preferences: {
+            409: "There's a preference for current day already",
+        },
     },
 }
