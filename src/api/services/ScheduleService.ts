@@ -25,6 +25,21 @@ class ScheduleService extends ApiService {
             return response.data;
         });
     }
+
+    static async SetWeekendPrivate(date: Date, weekend: boolean): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'weekend'],
+            query: { date, weekend }
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.post(url.Url, undefined, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
 }
 
 export default ScheduleService;

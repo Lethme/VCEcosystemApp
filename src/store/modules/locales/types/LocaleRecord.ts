@@ -13,10 +13,14 @@ export interface LocaleRecord {
     orderText: string;
     fromText: string;
     clearText: string;
+    messageText: string;
     markAllAsReadText: string;
     removeAllNotificationsText: string;
     noNotificationsText: string;
     notificationsTitleText: string;
+    sendBotMessageText: string;
+    yourTelegramIdText: string;
+    youCanLinkTelegramText: string;
     executorText: string;
     telegramText: string;
     telegramLinkText: string;
@@ -82,6 +86,7 @@ export interface LocaleRecord {
             day: string;
             firstShift: string;
             secondShift: string;
+            weekend: string;
         };
         exchangeRequestsTableHeaders: {
             suggestedShift: string;

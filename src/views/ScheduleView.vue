@@ -53,6 +53,9 @@
                         <template #day="{ record }">
                             <span>{{ $locale.daysOfWeek[record.day] }}</span>
                         </template>
+                        <template #weekend="{ record }">
+                            <a-switch v-if="record.day !== ApiDay.Sunday" :checked-value="!record.weekend" @change="setWeekend(record)" />
+                        </template>
                         <template #firstShift="{ record }">
                             <div
                                 :class="tableShiftWrapperClasses(record, 1)"
@@ -96,6 +99,7 @@
 <script lang="ts">
 import {ApiService, ScheduleService, ShiftsExchangeService} from "@/api/services";
 import {ApiDay} from "@/api/services/enums/ApiDay";
+import {ApiRole} from "@/api/services/enums/ApiRole";
 import {
     Schedule,
     ScheduleResponse,
@@ -150,6 +154,8 @@ export default defineComponent({
         const selectedExchangeRequest = ref<ShiftsExchange>();
         const scheduleUpdateIntervalId = ref<number>();
 
+        const access = computed(() => user.value?.roles.some(role => role.value === ApiRole.Root || role.value === ApiRole.Moderator));
+
         const selectedShiftForExchange = ref<ScheduleShiftData>();
 
         const updateSchedule = async (useLoader = true) => {
@@ -199,7 +205,7 @@ export default defineComponent({
             return {
                 style: record.weekend ? {
                     //background: '#FD8A8A20',
-                    pointerEvents: 'none',
+                    //pointerEvents: 'none',
                     color: '#0005'
                 } : {
 
@@ -258,6 +264,16 @@ export default defineComponent({
             date.value = new Date(date.value.setMonth(date.value.getMonth() - 1));
         }
 
+        const setWeekend = async (record: ScheduleData) => {
+            if (!access.value) return;
+
+            const response = await ScheduleService.SetWeekendPrivate(record.date, !record.weekend);
+
+            if (response && response.status) {
+                await updateSchedule(false);
+            }
+        }
+
         const scheduleTableColumns = computed(() => {
             return [
                 {
@@ -271,6 +287,13 @@ export default defineComponent({
                     key: 'day',
                     slots: {customRender: "day"},
                 },
+                access.value ?
+                    {
+                        title: locale.value.schedulePage.scheduleTableHeaders.weekend,
+                        key: "weekend",
+                        slots: {customRender: "weekend"},
+                    }
+                    : null,
                 {
                     title: locale.value.schedulePage.scheduleTableHeaders.firstShift,
                     key: 'firstShift',
@@ -281,7 +304,7 @@ export default defineComponent({
                     key: 'secondShift',
                     slots: {customRender: "secondShift"},
                 },
-            ]
+            ].filter(col => col)
         });
 
         const exchangeRequestsTableColumns = computed(() => {
@@ -432,12 +455,14 @@ export default defineComponent({
         }
 
         return {
+            setWeekend,
             profilePictureClick,
             scheduleShiftClick,
             getScheduleShiftData,
             scheduleShiftDataEqual,
             tableShiftWrapperClasses,
             Locale,
+            ApiDay,
             ApiService,
             calendarRU,
             calendarEN,
@@ -467,8 +492,7 @@ export default defineComponent({
         padding: 0;
 
         & .ant-table-cell-wrapper .wrapper,
-        &:nth-child(1),
-        &:nth-child(2) {
+        &:not(:last-child):not(:nth-last-child(2)) {
             padding: 16px;
             box-shadow: none;
             transition: all .1s linear;
@@ -491,6 +515,7 @@ export default defineComponent({
 
         & .ant-table-cell-wrapper.my-shift .wrapper {
             background: #1890ff0F;
+            font-weight: 500;
         }
 
         & .ant-table-cell-wrapper.selected .wrapper {
