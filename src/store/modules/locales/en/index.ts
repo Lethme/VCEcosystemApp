@@ -281,7 +281,7 @@ export const en: LocaleRecord = {
     },
     exceptions: {
         preferences: {
-            409: "There's a preference for current day already",
+            409: "There's a preference for current shift already",
         },
     },
 }

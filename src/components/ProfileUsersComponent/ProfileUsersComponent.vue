@@ -83,6 +83,10 @@
                 <check-circle-filled v-if="record.active" :style="{color: '#52C41A'}"/>
                 <close-circle-filled v-else :style="{color: '#FF4D4F'}"/>
             </template>
+            <template #telegramLinked="{ record }">
+                <check-circle-filled v-if="record.telegramLinked" :style="{color: '#52C41A'}"/>
+                <close-circle-filled v-else :style="{color: '#FF4D4F'}"/>
+            </template>
         </a-table>
         <a-modal
             :visible="createModalVisible"
@@ -319,6 +323,12 @@ export default defineComponent({
                     dataIndex: 'active',
                     key: 'active',
                     slots: {customRender: 'active'},
+                },
+                {
+                    title: locale.value.telegramText,
+                    dataIndex: 'telegramLinked',
+                    key: 'telegramLinked',
+                    slots: {customRender: 'telegramLinked'},
                 },
                 {
                     title: locale.value.userProfilePage.usersTableHeaders.actions,

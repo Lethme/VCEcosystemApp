@@ -1,3 +1,4 @@
+import {formatDate} from "@/api/utils/formatDate";
 import {Locale} from "@/store/modules/locales/types/Locale";
 import { State } from "./state";
 import moment from "moment";
@@ -9,7 +10,7 @@ const getters = {
   },
   formattedDate(state: State): string {
     //return moment(state.date).format(store.getters.locale === Locale.Ru ? "DD.MM.YYYY, HH:mm:ss" : "MM.DD.YYYY, hh:mm:ss A");
-    return state.date.toLocaleString(store.getters.locale);
+    return formatDate(state.date);
   },
 };
 
