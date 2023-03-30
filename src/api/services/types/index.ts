@@ -27,6 +27,7 @@ import { EditPreferenceDto } from "@/api/services/types/EditPreferenceDto";
 import { Schedule } from "@/api/services/types/Schedule";
 import { ScheduleUser } from "@/api/services/types/ScheduleUser";
 import { ScheduleResponse } from "@/api/services/types/ScheduleResponse";
+import { SetUserShiftDto } from "@/api/services/types/SetUserShiftDto";
 import ShiftsExchange from "@/api/services/types/ShiftsExchange";
 import UserSchedule from "@/api/services/types/UserSchedule";
 import UserExchange from "@/api/services/types/UserExchange";
@@ -68,7 +69,8 @@ export type {
     UserExchange,
     UserSchedule,
     ShiftsExchangeRequestDto,
-    Notification
+    Notification,
+    SetUserShiftDto,
 };
 
 export { App, PasswordStateFieldType };

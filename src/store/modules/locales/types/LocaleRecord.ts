@@ -78,6 +78,9 @@ export interface LocaleRecord {
         servicesTableRestoreButtonTitle: string;
     };
     schedulePage: {
+        shiftContextMenu: {
+            selectUser: string;
+        };
         nextMonth: string;
         prevMonth: string;
         shiftsExchangeTitle: string;

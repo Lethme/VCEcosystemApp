@@ -1,5 +1,5 @@
 import ApiService from "@/api/services/ApiService";
-import {ApiResponse, App, ScheduleResponse} from "@/api/services/types";
+import {ApiResponse, App, ScheduleResponse, SetUserShiftDto} from "@/api/services/types";
 import axios from "axios";
 import {Message} from "@/api/services/types/Message";
 
@@ -34,6 +34,20 @@ class ScheduleService extends ApiService {
 
         return await this.Try(async () => {
             const response = await axios.post(url.Url, undefined, {
+                headers: this.ApiRequestHeaders,
+            });
+
+            return response.data;
+        });
+    }
+
+    static async SetUserShiftPrivate(dto: SetUserShiftDto): Promise<ApiResponse<Message | undefined>> {
+        const url = this.CreateApiRequestUrl({
+            path: [this.Path, 'edit-shift'],
+        });
+
+        return await this.Try(async () => {
+            const response = await axios.post(url.Url, dto, {
                 headers: this.ApiRequestHeaders,
             });
 

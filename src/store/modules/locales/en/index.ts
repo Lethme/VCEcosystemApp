@@ -79,6 +79,9 @@ export const en: LocaleRecord = {
         servicesTableRestoreButtonTitle: "Restore",
     },
     schedulePage: {
+        shiftContextMenu: {
+            selectUser: "Set Other Operator",
+        },
         nextMonth: "Next Month",
         prevMonth: "Previous Month",
         shiftsExchangeTitle: "Shifts Exchange Requests",

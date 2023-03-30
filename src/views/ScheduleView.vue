@@ -57,34 +57,88 @@
                             <a-switch v-if="record.day !== ApiDay.Sunday" :checked-value="!record.weekend" @change="setWeekend(record)" />
                         </template>
                         <template #firstShift="{ record }">
-                            <div
-                                :class="tableShiftWrapperClasses(record, 1)"
-                                :style="selectedExchangeRequestStyle(record, 1)"
-                            >
+                            <a-dropdown :disabled="tableShiftWrapperSelectUnavailable(record, 2) || !$rootAccess" :trigger="['contextmenu']">
                                 <div
-                                    v-if="record.firstShiftUser && !record.weekend"
-                                    class="wrapper d-flex gap-2 align-items-center"
-                                    @click="scheduleShiftClick(getScheduleShiftData(record, 1))"
+                                    :class="tableShiftWrapperClasses(record, 1)"
+                                    :style="selectedExchangeRequestStyle(record, 1)"
                                 >
-                                    <vc-profile-picture height="40" width="40" :preview="record.firstShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.firstShiftUser?.hasProfilePicture ? record.firstShiftUser?.uuid : undefined" />
-                                    <span>{{ record.firstShiftUser?.lastName }}</span>
+                                    <div
+                                        v-if="record.firstShiftUser && !record.weekend"
+                                        class="wrapper d-flex gap-2 align-items-center"
+                                        @click="$operatorAccess ? scheduleShiftClick(getScheduleShiftData(record, 1)) : null"
+                                    >
+                                        <vc-profile-picture height="40" width="40" :preview="record.firstShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.firstShiftUser?.hasProfilePicture ? record.firstShiftUser?.uuid : undefined" />
+                                        <span>{{ record.firstShiftUser?.lastName }}</span>
+                                    </div>
                                 </div>
-                            </div>
+                                <template #overlay>
+                                    <div class="overlay-wrapper d-flex flex-column" style="border: 1px solid #ddd">
+                                        <a-menu>
+                                            <h6 class="ant-menu-item ant-menu-item-disabled" style="cursor: unset">
+                                                {{ (new Date(record.date)).toLocaleDateString($locale.locale, { day: '2-digit', month: '2-digit', year: '2-digit' }) }}
+                                                 |
+                                                {{ $locale.daysOfWeek[record.day] }}
+                                                 |
+                                                {{ record.firstShiftUser?.lastName }}
+                                            </h6>
+                                            <a-sub-menu key="selectUserFirstShift" class="d-flex flex-row align-items-center">
+                                                <template #title>{{ $locale.schedulePage.shiftContextMenu.selectUser }}</template>
+                                                <a-menu-item
+                                                    v-for="operator in operators.filter(op => op.id !== record.firstShiftUser?.id)"
+                                                    :key="operator.id"
+                                                    class="py-2 px-3 h-auto"
+                                                    @click="setUserShift(record, 1, operator)"
+                                                >
+                                                    <vc-profile-picture height="40" width="40" :preview="false" :shadow="false" :self="false" :uuid="operator.hasProfilePicture ? operator.uuid : undefined" />
+                                                    {{ operator.lastName }}
+                                                </a-menu-item>
+                                            </a-sub-menu>
+                                        </a-menu>
+                                    </div>
+                                </template>
+                            </a-dropdown>
                         </template>
                         <template #secondShift="{ record }">
-                            <div
-                                :class="tableShiftWrapperClasses(record, 2)"
-                                :style="selectedExchangeRequestStyle(record, 2)"
-                            >
+                            <a-dropdown :disabled="tableShiftWrapperSelectUnavailable(record, 2) || !$rootAccess" :trigger="['contextmenu']">
                                 <div
-                                    v-if="record.secondShiftUser && !record.weekend"
-                                    class="wrapper d-flex gap-2 align-items-center"
-                                    @click="scheduleShiftClick(getScheduleShiftData(record, 2))"
+                                    :class="tableShiftWrapperClasses(record, 2)"
+                                    :style="selectedExchangeRequestStyle(record, 2)"
                                 >
-                                    <vc-profile-picture height="40" width="40" :preview="record.secondShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.secondShiftUser?.hasProfilePicture ? record.secondShiftUser?.uuid : undefined" />
-                                    <span>{{ record.secondShiftUser?.lastName }}</span>
+                                    <div
+                                        v-if="record.secondShiftUser && !record.weekend"
+                                        class="wrapper d-flex gap-2 align-items-center"
+                                        @click="$operatorAccess ? scheduleShiftClick(getScheduleShiftData(record, 2)) : null"
+                                    >
+                                        <vc-profile-picture height="40" width="40" :preview="record.secondShiftUser?.hasProfilePicture" :shadow="false" :self="false" :uuid="record.secondShiftUser?.hasProfilePicture ? record.secondShiftUser?.uuid : undefined" />
+                                        <span>{{ record.secondShiftUser?.lastName }}</span>
+                                    </div>
                                 </div>
-                            </div>
+                                <template #overlay>
+                                    <div class="overlay-wrapper d-flex flex-column" style="border: 1px solid #ddd">
+                                        <a-menu>
+                                            <h6 class="ant-menu-item ant-menu-item-disabled" style="cursor: unset">
+                                                {{ (new Date(record.date)).toLocaleDateString($locale.locale, { day: '2-digit', month: '2-digit', year: '2-digit' }) }}
+                                                 |
+                                                {{ $locale.daysOfWeek[record.day] }}
+                                                 |
+                                                {{ record.secondShiftUser?.lastName }}
+                                            </h6>
+                                            <a-sub-menu key="selectUserSecondShift" class="d-flex flex-row align-items-center">
+                                                <template #title>{{ $locale.schedulePage.shiftContextMenu.selectUser }}</template>
+                                                <a-menu-item
+                                                    v-for="operator in operators.filter(op => op.id !== record.secondShiftUser?.id)"
+                                                    :key="operator.id"
+                                                    class="py-2 px-3 h-auto"
+                                                    @click="setUserShift(record, 2, operator)"
+                                                >
+                                                    <vc-profile-picture height="40" width="40" :preview="false" :shadow="false" :self="false" :uuid="operator.hasProfilePicture ? operator.uuid : undefined" />
+                                                    {{ operator.lastName }}
+                                                </a-menu-item>
+                                            </a-sub-menu>
+                                        </a-menu>
+                                    </div>
+                                </template>
+                            </a-dropdown>
                         </template>
                     </a-table>
                 </div>
@@ -97,7 +151,7 @@
 </template>
 
 <script lang="ts">
-import {ApiService, ScheduleService, ShiftsExchangeService} from "@/api/services";
+import {ApiService, ScheduleService, ShiftsExchangeService, UsersService} from "@/api/services";
 import {ApiDay} from "@/api/services/enums/ApiDay";
 import {ApiRole} from "@/api/services/enums/ApiRole";
 import {
@@ -155,6 +209,9 @@ export default defineComponent({
         const scheduleUpdateIntervalId = ref<number>();
 
         const access = computed(() => user.value?.roles.some(role => role.value === ApiRole.Root || role.value === ApiRole.Moderator));
+        const rootAccess = computed(() => user.value?.roles.some(role => role.value === ApiRole.Root));
+
+        const operators = ref<Array<User>>([]);
 
         const selectedShiftForExchange = ref<ScheduleShiftData>();
 
@@ -251,9 +308,20 @@ export default defineComponent({
             clearInterval(scheduleUpdateIntervalId.value);
         });
 
+        watch(() => rootAccess.value, async (value) => {
+            if (value) {
+                const response = await UsersService.GetUsersPrivate();
+
+                if (response && response.status) {
+                    operators.value = (response.data as Array<User>).filter(u => u.roles.some(role => role.value === ApiRole.Operator));
+                }
+            } else {
+                operators.value = [];
+            }
+        });
+
         watch(() => date.value, async () => {
             await updateSchedule();
-            await updateShiftsExchangeRequests();
         });
 
         const showNextMonth = () => {
@@ -342,6 +410,31 @@ export default defineComponent({
                 'my-shift': myShift,
                 'selected': selectedShiftForExchange.value && scheduleShiftDataEqual(scheduleShiftData, selectedShiftForExchange.value),
                 'select-unavailable': selectedShiftForExchange.value && !myShift && !scheduleShiftDataEqual(scheduleShiftData, selectedShiftForExchange.value)
+            }
+        }
+
+        const tableShiftWrapperSelectUnavailable = (record: ScheduleData, shiftIndex: number) => {
+            const scheduleShiftData = getScheduleShiftData(record, shiftIndex);
+            const myShift = shiftIndex === 1 ? record.firstShiftUserId === user.value?.id : record.secondShiftUserId === user.value?.id;
+
+            return selectedShiftForExchange.value && !myShift && !scheduleShiftDataEqual(scheduleShiftData, selectedShiftForExchange.value);
+        }
+
+        const setUserShift = async (record: ScheduleData, shiftIndex: number, operator: User) => {
+            if (rootAccess.value) {
+                const scheduleShiftData = getScheduleShiftData(record, shiftIndex);
+
+                const dto = {
+                    date: scheduleShiftData.date,
+                    shiftIndex,
+                    userId: operator.id,
+                };
+
+                const response = await ScheduleService.SetUserShiftPrivate(dto);
+
+                if (response && response.status) {
+                    await updateSchedule();
+                }
             }
         }
 
@@ -469,6 +562,7 @@ export default defineComponent({
             schedule,
             users,
             date,
+            operators,
             exchangeRequests,
             scheduleTableColumns,
             exchangeRequestsTableColumns,
@@ -482,6 +576,8 @@ export default defineComponent({
             resolveShiftsExchangeRequest,
             customShiftsExchangeRow,
             selectedExchangeRequestStyle,
+            tableShiftWrapperSelectUnavailable,
+            setUserShift,
         }
     }
 });
