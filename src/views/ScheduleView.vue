@@ -31,18 +31,18 @@
         <div class="container-fluid p-0 d-flex flex-column-reverse flex-xl-row gap-4">
             <vc-layout class="flex-grow-1 p-4" class-inner="d-flex flex-column gap-3" :shadow="true">
                 <div v-if="!$mobile" class="header d-flex flex-row justify-content-between">
-                    <a-button size="large" type="primary" @click="showPrevMonth" :disabled="date.getMonth() * date.getFullYear() <= (new Date()).getMonth() * (new Date()).getFullYear()">{{ $locale.schedulePage.prevMonth }}</a-button>
+                    <a-button size="large" type="primary" @click="showPrevMonth" :disabled="datesDiff(dayjs().startOf('month'), dayjs(date).startOf('month'), 'month') < 1">{{ $locale.schedulePage.prevMonth }}</a-button>
                     <h4 class="m-0 d-flex align-items-center gap-2">
                         {{ date.toLocaleString($locale.locale, { month: 'long' }).capitalize() + ', ' + date.getFullYear() }}
                         <sync-outlined class="refresh-btn" @click="updateSchedule"/>
                     </h4>
-                    <a-button size="large" type="primary" @click="showNextMonth" :disabled="date.getDate() < 26">{{ $locale.schedulePage.nextMonth }}</a-button>
+                    <a-button size="large" type="primary" @click="showNextMonth" :disabled="(new Date()).getDate() < 26 || datesDiff(dayjs().startOf('month'), dayjs(date).startOf('month'), 'month') > 0">{{ $locale.schedulePage.nextMonth }}</a-button>
                 </div>
                 <div v-else class="header d-flex flex-column gap-2">
                     <h4>{{ date.toLocaleString('default', { month: 'long' }).capitalize() + ', ' + date.getFullYear() }}</h4>
                     <div class="btn-wrapper d-flex flex-row gap-2">
-                        <a-button block size="large" type="primary" @click="showPrevMonth" :disabled="date.getMonth() * date.getFullYear() <= (new Date()).getMonth() * (new Date()).getFullYear()">Previous Month</a-button>
-                        <a-button block size="large" type="primary" @click="showNextMonth" :disabled="date.getDate() < 26">Next Month</a-button>
+                        <a-button block size="large" type="primary" @click="showPrevMonth" :disabled="datesDiff(dayjs().startOf('month'), dayjs(date).startOf('month'), 'month') < 1">Previous Month</a-button>
+                        <a-button block size="large" type="primary" @click="showNextMonth" :disabled="(new Date()).getDate() < 26 || datesDiff(dayjs().startOf('month'), dayjs(date).startOf('month'), 'month') > 0">Next Month</a-button>
                     </div>
                 </div>
                 <div class="table-wrapper">
@@ -166,7 +166,7 @@ import {getFullUsername} from "@/api/utils/getFullUsername";
 import VcLayout from "@/components/LayoutComponent/LayoutComponent.vue";
 import {Locale} from "@/store/modules/locales/types/Locale";
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
-import {Loader} from "@/utils";
+import {datesDiff, Loader} from "@/utils";
 import {datesEqual} from "@/utils/datesEqual";
 import {SyncOutlined,} from "@ant-design/icons-vue";
 import {Modal} from "ant-design-vue";
@@ -176,6 +176,7 @@ import moment from "moment";
 import 'moment/dist/locale/ru';
 import {computed, defineComponent, onMounted, onUnmounted, ref, watch} from "vue";
 import {useStore} from "vuex";
+import dayjs from "dayjs";
 
 moment.locale('ru');
 
@@ -325,11 +326,11 @@ export default defineComponent({
         });
 
         const showNextMonth = () => {
-            date.value = new Date(date.value.setMonth(date.value.getMonth() + 1));
+            date.value = dayjs(date.value).add(1, 'month').toDate();
         }
 
         const showPrevMonth = () => {
-            date.value = new Date(date.value.setMonth(date.value.getMonth() - 1));
+            date.value = dayjs(date.value).subtract(1, 'month').toDate();
         }
 
         const setWeekend = async (record: ScheduleData) => {
@@ -548,12 +549,14 @@ export default defineComponent({
         }
 
         return {
+            dayjs,
             setWeekend,
             profilePictureClick,
             scheduleShiftClick,
             getScheduleShiftData,
             scheduleShiftDataEqual,
             tableShiftWrapperClasses,
+            datesDiff,
             Locale,
             ApiDay,
             ApiService,
