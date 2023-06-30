@@ -2,7 +2,7 @@ import store from "@/store";
 import {Locale} from "@/store/modules/locales/types/Locale";
 import {ActionContext} from "vuex";
 import {State} from "./state";
-import {ApiService, UsersService} from "@/api/services";
+import {UsersService} from "@/api/services";
 import {ApiResponse, User} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 import {isAuthorized} from "@/utils";
@@ -37,7 +37,7 @@ const actions = {
                     await context.dispatch("updateNotifications");
 
                     if (!store.getters.refreshIntervalId) {
-                        context.commit("setRefreshIntervalId", setInterval(async () => await context.dispatch("updateNotifications"), 2000));
+                        context.commit("setRefreshIntervalId", setInterval(async () => await context.dispatch("updateNotifications"), 10000));
                     }
                 }
             }
