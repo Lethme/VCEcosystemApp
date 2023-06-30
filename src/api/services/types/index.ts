@@ -33,6 +33,7 @@ import UserSchedule from "@/api/services/types/UserSchedule";
 import UserExchange from "@/api/services/types/UserExchange";
 import ShiftsExchangeRequestDto from "@/api/services/types/ShiftsExchangeRequestDto";
 import Notification from "@/api/services/types/Notification";
+import { Environment } from "@/api/services/types/Environment";
 
 export type {
     Service,
@@ -73,4 +74,4 @@ export type {
     SetUserShiftDto,
 };
 
-export { App, PasswordStateFieldType };
+export { App, PasswordStateFieldType, Environment };

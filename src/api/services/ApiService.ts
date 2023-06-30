@@ -1,5 +1,5 @@
 import {Url} from "@/api/services";
-import {ApiResponse, PasswordState, PasswordStateFieldType} from "@/api/services/types";
+import {ApiResponse, Environment, PasswordState, PasswordStateFieldType} from "@/api/services/types";
 import {Message} from "@/api/services/types/Message";
 import {
     ApiRequestOptions,
@@ -11,8 +11,7 @@ import {
 } from "@/api/services/utils/types";
 import {alphabetLowercase, alphabetUppercase, numbers, specialSymbols} from "@/api/utils/constans";
 import store from "@/store";
-import RequestPath from "./utils/types/RequestPath";
-import {Router, RouteLocationNormalizedLoaded} from "vue-router";
+import {RouteLocationNormalizedLoaded, Router} from "vue-router";
 import router from "@/router";
 
 class ApiService {
@@ -60,8 +59,12 @@ class ApiService {
         return router.currentRoute.value;
     }
 
-    public static get Env(): string {
+    public static get Env(): Environment {
         return process.env.NODE_ENV;
+    }
+
+    public static get BotName(): string {
+        return ApiService.Env === Environment.Production ? 'VCNotifyBot' : 'VCNotifyDevBot';
     }
 
     public static GetProfilePicturePath(uuid: string) {

@@ -21,7 +21,7 @@ class UserPlugin {
                     }),
                     getTelegramBotLink: () => {
                         const user: User = store.getters.userInfo;
-                        return `https://t.me/VCNotifyBot?start=${user.uuid}`
+                        return `https://t.me/${ApiService.BotName}?start=${user.uuid}`
                     }
                 }
             }
