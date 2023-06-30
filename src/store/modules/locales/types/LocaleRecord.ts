@@ -35,6 +35,8 @@ export interface LocaleRecord {
     hideText: string;
     allUsersText: string;
     rolesText: string;
+    activeText: string;
+    inactiveText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;

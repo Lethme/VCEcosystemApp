@@ -15,6 +15,7 @@ interface User extends Timestamp {
     locale: Locale;
     roles: Array<Role>,
     rate?: Rate;
+    active: boolean;
     preferences: Array<Preference>;
     telegramId?: string;
     telegramLinked: boolean;

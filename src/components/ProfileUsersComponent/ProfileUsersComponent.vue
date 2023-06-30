@@ -4,10 +4,22 @@
             <h6 v-if="$mobile" class="text-start m-0 d-flex align-items-center gap-2">
                 {{ $locale.userProfilePage.contentTitles.users }}
                 <sync-outlined class="refresh-btn" @click="updateUsersList"/>
+                <a-switch
+                    :checked-children="$locale.activeText"
+                    :un-checked-children="$locale.inactiveText"
+                    v-model:checked="showActiveUsers"
+                    @change="updateUsersList"
+                />
             </h6>
-            <h4 v-else class="text-start m-0 d-flex align-items-center gap-2">
+            <h4 v-else class="text-start m-0 d-flex align-items-center gap-3">
                 {{ $locale.userProfilePage.contentTitles.users }}
                 <sync-outlined class="refresh-btn" @click="updateUsersList"/>
+                <a-switch
+                    :checked-children="$locale.activeText"
+                    :un-checked-children="$locale.inactiveText"
+                    v-model:checked="showActiveUsers"
+                    @change="updateUsersList"
+                />
             </h4>
         </div>
         <div class="btn-wrapper">
@@ -236,7 +248,7 @@
 </template>
 
 <script lang="ts">
-import {RatesService, UsersService, AuthService, ServicesService} from "@/api/services";
+import {AuthService, RatesService, UsersService} from "@/api/services";
 import {ApiRole} from "@/api/services/enums/ApiRole";
 import {CreateUserDto, EditUserDto, Rate, User} from "@/api/services/types";
 import {getFullUsername} from "@/api/utils/getFullUsername";
@@ -247,12 +259,7 @@ import {computed, defineComponent, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 
-import {
-    SyncOutlined,
-    CheckCircleFilled,
-    CloseCircleFilled,
-} from "@ant-design/icons-vue";
-import VcProfilePicture from "@/components/ProfilePictureComponent/ProfilePictureComponent.vue";
+import {CheckCircleFilled, CloseCircleFilled, SyncOutlined,} from "@ant-design/icons-vue";
 
 export default defineComponent({
     name: "VcProfileUsers",
@@ -268,12 +275,16 @@ export default defineComponent({
         const user = computed(() => store.getters.userInfo as User);
         const rootAccess = computed(() => user.value ? user.value.roles.some(role => role.value === ApiRole.Root) : false);
         const users = ref<Array<User>>([]);
+        const showActiveUsers = ref(true);
+
         const updateUsersList = async (useLoader = true) => {
             useLoader && Loader.SetState(true);
 
             const response = await UsersService.GetUsersPrivate();
             if (response.status) {
-                users.value = (response.data as Array<User>).sort((f, s) => f.id - s.id);
+                users.value = (response.data as Array<User>)
+                    .filter(u => u.active === showActiveUsers.value)
+                    .sort((f, s) => f.id - s.id);
             } else {
                 users.value = [];
             }
@@ -574,6 +585,7 @@ export default defineComponent({
             columns,
             roles,
             rates,
+            showActiveUsers,
             filterRoles,
             filterRates,
             updateUsersList,

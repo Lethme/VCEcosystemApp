@@ -36,6 +36,8 @@ export const en: LocaleRecord = {
     hideText: "Hide",
     allUsersText: "All Users",
     rolesText: "All Roles",
+    activeText: "Active",
+    inactiveText: "Inactive",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",
