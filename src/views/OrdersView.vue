@@ -151,8 +151,8 @@
 <script lang="ts">
 import {ApiRole} from "@/api/services/enums/ApiRole";
 import {Pane} from "@/store/modules/orders/types";
-import {computed, createVNode, defineComponent, reactive, ref, toRefs, unref, watch} from "vue";
-import {QuestionCircleOutlined, SyncOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import {computed, createVNode, defineComponent, ref} from "vue";
+import {PlusOutlined, QuestionCircleOutlined, SyncOutlined} from '@ant-design/icons-vue';
 import {Order, OrderService, User} from "@/api/services/types";
 import {OrdersService, UsersService} from "@/api/services";
 import {Loader} from "@/utils";
@@ -163,11 +163,11 @@ import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import {formatPrice} from "@/api/utils/formatPrice";
 import {Locale} from "@/store/modules/locales/types/Locale";
-import moment, {Moment} from "moment";
+import moment from "moment";
 import datePickerRu from 'ant-design-vue/es/date-picker/locale/ru_RU';
 import datePickerEn from 'ant-design-vue/es/date-picker/locale/en_US';
-import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
+import dayjs, {Dayjs} from "dayjs";
 
 export interface OrderData extends Order {
     key: number;
@@ -238,16 +238,15 @@ export default defineComponent({
             return (item.label ?? '').toLocaleLowerCase().includes(input.toLocaleLowerCase());
         }
 
-        const filterStateDateFrom = ref<Moment>();
-        const filterStateDateTo = ref<Moment>();
-        const filterStateDates = ref<Array<Moment>>([]);
+        const filterStateDateFrom = ref<Dayjs>(dayjs().startOf('day'));
+        const filterStateDateTo = ref<Dayjs>();
 
-        const disabledDateFrom = (current: Moment) => {
+        const disabledDateFrom = (current: Dayjs) => {
             return current >= filterStateDateTo.value!;
         };
 
-        const disabledDateTo = (current: Moment) => {
-            return current <= filterStateDateFrom.value!;
+        const disabledDateTo = (current: Dayjs) => {
+            return current <= filterStateDateFrom.value;
         };
 
         const showReceiptModal = (e: Event, order: OrderData) => {
@@ -266,7 +265,6 @@ export default defineComponent({
             datePickerEn,
             filterStateDateFrom,
             filterStateDateTo,
-            filterStateDates,
             disabledDateTo,
             disabledDateFrom,
             receiptOrder,
