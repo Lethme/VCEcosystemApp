@@ -108,7 +108,7 @@ export const ru: LocaleRecord = {
                 from: "Начальная дата",
                 to: "Конечная дата",
             },
-            userSelect: "Выберите пользователя",
+            userSelect: "Выберите пользователей",
         },
         archivedSwitch: {
             checked: "Архивные",

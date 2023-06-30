@@ -19,6 +19,7 @@
                             <a-select
                                 style="min-width: 300px;"
                                 class="text-start"
+                                mode="multiple"
                                 v-if="$rootAccess && showAllOrders"
                                 size="large"
                                 allow-clear
@@ -213,11 +214,11 @@ export default defineComponent({
 
         const users = ref<Array<User>>([]);
 
-        const selectUsersState = ref<number>();
+        const selectUsersState = ref<Array<number>>([]);
         const selectUsersOptions = computed(() => users.value.map(user => {
             return {
                 value: user.id,
-                label: getFullUsername(user),
+                label: getFullUsername(user, {short: true}),
                 key: user.id,
             }
         }))
@@ -399,12 +400,12 @@ export default defineComponent({
                     const filter = {
                         from: this.filterStateDateFrom,
                         to: this.filterStateDateTo,
-                        userId: this.selectUsersState,
+                        userIds: this.selectUsersState,
                     }
 
                     return (!filter.from || createdAt >= filter.from) &&
                         (!filter.to || createdAt <= filter.to) &&
-                        (!filter.userId || order.user.id === filter.userId);
+                        (!filter.userIds.length || filter.userIds.indexOf(order.user.id) !== -1);
                 })
                 .map((order: Order) => {
                     const price = order.services.length ? order.services.map(service => service.amount * service.price).reduce((prev, cur) => prev + cur) : 0;

@@ -108,7 +108,7 @@ export const en: LocaleRecord = {
                 from: "From",
                 to: "To",
             },
-            userSelect: "Select User",
+            userSelect: "Select Users",
         },
         archivedSwitch: {
             checked: "Archive",
