@@ -42,10 +42,10 @@ export class OrderState {
             const groupedItemIndex = resultDataSource.findIndex(resultItem => resultItem.id === item.id);
 
             if (groupedItemIndex !== -1) {
-                resultDataSource[groupedItemIndex].amount += item.amount;
+                resultDataSource[groupedItemIndex].amount += item.amount * (item.multiplier ?? 1);
                 resultDataSource[groupedItemIndex].totalPrice += item.totalPrice;
             } else {
-                resultDataSource.push({ ...item });
+                resultDataSource.push({ ...item, amount: item.amount * (item.multiplier ?? 1) });
             }
         }
 

@@ -1,7 +1,7 @@
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 import {isAuthorized} from "@/utils";
 import {State, StateJSON} from "./state";
-import {OrderState, Pane} from "@/store/modules/orders/types";
+import {OrderState} from "@/store/modules/orders/types";
 import {cloneDeep} from "lodash-es";
 import {Service, User} from "@/api/services/types";
 import store from "@/store";
@@ -127,7 +127,7 @@ const mutations = {
 
       const itemIndex = activePane.order.getItemIndexByKey(payload);
       if (itemIndex !== -1) {
-        activePane.order.dataSource[itemIndex].totalPrice = activePane.order.dataSource[itemIndex].amount * activePane.order.dataSource[itemIndex].price;
+        activePane.order.dataSource[itemIndex].totalPrice = activePane.order.dataSource[itemIndex].amount * (activePane.order.dataSource[itemIndex].multiplier ?? 1) * activePane.order.dataSource[itemIndex].price;
       }
 
       store.commit("saveState");
@@ -153,6 +153,7 @@ const mutations = {
         price: service.price,
         totalPrice: service.price,
         amount: 1,
+        multiplier: 1,
       });
 
       store.commit("saveState");

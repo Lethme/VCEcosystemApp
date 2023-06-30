@@ -170,7 +170,9 @@ export const en: LocaleRecord = {
             services: "Service",
             price: "Price, ₽/unit",
             totalPrice: "Total Price, ₽",
+            totalAmount: "Total Amount",
             amount: "Amount",
+            multiplier: "Multiplier",
             actions: "Actions",
         },
         orderServicesTableButtonsTitles: {

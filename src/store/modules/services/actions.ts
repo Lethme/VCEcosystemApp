@@ -1,8 +1,7 @@
 import store from "@/store";
 import {Pane} from "@/store/modules/orders/types";
-import {Action, ActionContext} from "vuex";
-import { State } from "./state";
-import {Loader} from "@/utils";
+import {ActionContext} from "vuex";
+import {State} from "./state";
 import {OrdersService, ServicesService} from "@/api/services";
 import {DaysToRemoveOrders, Service} from "@/api/services/types";
 
@@ -27,9 +26,9 @@ const actions = {
           const item = pane.order.dataSource[j];
           const service = services.find(s => s.id === item.id);
 
-          if (service && item.price !== service.price) {
+          if (service) {
             item.price = service.price;
-            item.totalPrice = item.price * item.amount;
+            item.totalPrice = item.price * item.amount * (item.multiplier ?? 1);
           }
         }
       }

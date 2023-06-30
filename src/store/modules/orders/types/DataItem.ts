@@ -5,4 +5,5 @@ export interface DataItem {
     price: number;
     totalPrice: number;
     amount: number;
+    multiplier: number;
 }

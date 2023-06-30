@@ -170,6 +170,8 @@ export interface LocaleRecord {
             price: string;
             totalPrice: string;
             amount: string;
+            totalAmount: string;
+            multiplier: string;
             actions: string;
         };
         orderServicesTableButtonsTitles: {
