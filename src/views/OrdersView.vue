@@ -3,7 +3,8 @@
         <div class="container-fluid py-sm-4">
             <a-layout class="flex-grow-1 py-4">
                 <a-layout-content>
-                    <div class="table-header-wrapper d-flex flex-column flex-xl-row gap-3 gap-xl-2 justify-content-between pb-4 pb-md-2">
+                    <div
+                        class="table-header-wrapper d-flex flex-column flex-xl-row gap-3 gap-xl-2 justify-content-between pb-4 pb-md-2">
                         <h4 class="text-start d-flex align-items-center m-0 gap-3">
                             <span>{{ $locale.ordersPage.title }}</span>
                             <sync-outlined class="refresh-btn" @click="() => { refreshOrders(); updateUsers(); }"/>
@@ -162,7 +163,7 @@ import {getDaysBetweenDates} from "@/api/utils/getDaysBetweenDates";
 import {getFullUsername} from "@/api/utils/getFullUsername";
 import {formatPrice} from "@/api/utils/formatPrice";
 import {Locale} from "@/store/modules/locales/types/Locale";
-import moment, { Moment } from "moment";
+import moment, {Moment} from "moment";
 import datePickerRu from 'ant-design-vue/es/date-picker/locale/ru_RU';
 import datePickerEn from 'ant-design-vue/es/date-picker/locale/en_US';
 import {useRoute, useRouter} from "vue-router";
@@ -408,36 +409,36 @@ export default defineComponent({
                         (!filter.userId || order.user.id === filter.userId);
                 })
                 .map((order: Order) => {
-                const price = order.services.map(service => service.amount * service.price).reduce((prev, cur) => prev + cur);
-                const change = order.moneyReceived - price;
-                const deletedAt = new Date(order.deletedAt as string);
-                const currentDate = new Date();
+                    const price = order.services.length ? order.services.map(service => service.amount * service.price).reduce((prev, cur) => prev + cur) : 0;
+                    const change = order.moneyReceived - price;
+                    const deletedAt = new Date(order.deletedAt as string);
+                    const currentDate = new Date();
 
-                return {
-                    ...order,
-                    key: order.id,
-                    createdAt: formatDate(new Date(order.createdAt as string)),
-                    updatedAt: formatDate(new Date(order.updatedAt as string)),
-                    deletedAt: formatDate(deletedAt),
-                    removedIn: this.showArchivedOrders
-                        ? formatDate(
-                            increaseDateByDays(
-                                currentDate,
-                                this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)
-                            )
-                        ) : undefined,
-                    remaining: this.showArchivedOrders
-                        ? parseFloat((this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)).toFixed(2))
-                        : undefined,
-                    cash: formatPrice(order.moneyReceived),
-                    price: formatPrice(price),
-                    change: formatPrice(change),
-                    cashRaw: order.moneyReceived,
-                    priceRaw: price,
-                    changeRaw: change,
-                    username: getFullUsername(order.user, {short: this.$mobile}),
-                }
-            });
+                    return {
+                        ...order,
+                        key: order.id,
+                        createdAt: formatDate(new Date(order.createdAt as string)),
+                        updatedAt: formatDate(new Date(order.updatedAt as string)),
+                        deletedAt: formatDate(deletedAt),
+                        removedIn: this.showArchivedOrders
+                            ? formatDate(
+                                increaseDateByDays(
+                                    currentDate,
+                                    this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)
+                                )
+                            ) : undefined,
+                        remaining: this.showArchivedOrders
+                            ? parseFloat((this.$daysToRemoveOrders - getDaysBetweenDates(deletedAt, currentDate)).toFixed(2))
+                            : undefined,
+                        cash: formatPrice(order.moneyReceived),
+                        price: formatPrice(price),
+                        change: formatPrice(change),
+                        cashRaw: order.moneyReceived,
+                        priceRaw: price,
+                        changeRaw: change,
+                        username: getFullUsername(order.user, {short: this.$mobile}),
+                    }
+                });
         },
     },
     methods: {
