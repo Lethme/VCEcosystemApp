@@ -37,6 +37,7 @@ export interface LocaleRecord {
     rolesText: string;
     activeText: string;
     inactiveText: string;
+    summaryText: string;
     roles: {
       ROOT: string;
       MODERATOR: string;

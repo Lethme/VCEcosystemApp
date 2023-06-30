@@ -38,6 +38,7 @@ export const en: LocaleRecord = {
     rolesText: "All Roles",
     activeText: "Active",
     inactiveText: "Inactive",
+    summaryText: "Summary",
     roles: {
         ROOT: "Root",
         MODERATOR: "Moderator",

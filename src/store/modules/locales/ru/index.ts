@@ -38,6 +38,7 @@ export const ru: LocaleRecord = {
     rolesText: "Все роли",
     activeText: "Активные",
     inactiveText: "Неактивные",
+    summaryText: "Итог",
     roles: {
         ROOT: "Суперпользователь",
         MODERATOR: "Модератор",

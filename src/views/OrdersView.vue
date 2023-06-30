@@ -58,33 +58,67 @@
                             </a-button>
                         </div>
                     </div>
-                    <a-table class="unselectable" v-model:expanded-row-keys="expandedRowKeys" :data-source="orders"
-                             :columns="columns" :expand-row-by-click="true" :custom-row="customOrderRow">
-                        <template v-slot:expandedRowRender="record">
-                            <a-table class="unselectable" :data-source="ordersInner.at(record.index)" :key="record.id"
-                                     :columns="innerColumns" :pagination="false"
-                                     :custom-row="(r, i) => customOrderServiceRow(record.record, r, i)"/>
-                        </template>
-                        <template #recordsActions="{ record }">
-                            <div class="btn-wrapper d-flex gap-2 justify-content-end">
-                                <a-button type="primary" @click="(e) => showReceiptModal(e, record)">
-                                    {{ $locale.ordersPage.ordersTableActions.receiptButtonTitle }}
-                                </a-button>
-                                <a-button v-if="!showArchivedOrders" type="primary" danger
-                                          @click="(e) => archiveOrderClick(e, record)">
-                                    {{ $locale.ordersPage.ordersTableActions.archiveButtonTitle }}
-                                </a-button>
-                                <div class="archive-actions d-flex flex-row gap-2" v-else>
-                                    <a-button type="primary" @click="(e) => restoreOrderClick(e, record)">
-                                        {{ $locale.ordersPage.ordersTableActions.restoreButtonTitle }}
+                    <div class="table-view-wrapper d-flex flex-column flex-xxl-row gap-3">
+                        <a-table class="unselectable w-100" v-model:expanded-row-keys="expandedRowKeys" :data-source="orders"
+                                 :columns="columns" :expand-row-by-click="true" :custom-row="customOrderRow">
+                            <template v-slot:expandedRowRender="record">
+                                <a-table class="unselectable" :data-source="ordersInner.at(record.index)" :key="record.id"
+                                         :columns="innerColumns" :pagination="false"
+                                         :custom-row="(r, i) => customOrderServiceRow(record.record, r, i)"/>
+                            </template>
+                            <template #recordsActions="{ record }">
+                                <div class="btn-wrapper d-flex gap-2 justify-content-end">
+                                    <a-button type="primary" @click="(e) => showReceiptModal(e, record)">
+                                        {{ $locale.ordersPage.ordersTableActions.receiptButtonTitle }}
                                     </a-button>
-                                    <a-button type="primary" danger @click="(e) => removeOrderClick(e, record)">
-                                        {{ $locale.ordersPage.ordersTableActions.removeButtonTitle }}
+                                    <a-button v-if="!showArchivedOrders" type="primary" danger
+                                              @click="(e) => archiveOrderClick(e, record)">
+                                        {{ $locale.ordersPage.ordersTableActions.archiveButtonTitle }}
                                     </a-button>
+                                    <div class="archive-actions d-flex flex-row gap-2" v-else>
+                                        <a-button type="primary" @click="(e) => restoreOrderClick(e, record)">
+                                            {{ $locale.ordersPage.ordersTableActions.restoreButtonTitle }}
+                                        </a-button>
+                                        <a-button type="primary" danger @click="(e) => removeOrderClick(e, record)">
+                                            {{ $locale.ordersPage.ordersTableActions.removeButtonTitle }}
+                                        </a-button>
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                    </a-table>
+                            </template>
+                        </a-table>
+                        <div v-if="orders.length" class="summary-wrapper d-flex flex-column">
+                            <a-card class="text-start" :title="$locale.summaryText">
+                                <template #extra>
+                                    <h4 class="m-0 text-end">{{ formatPrice(ordersSummary.totalPrice) }}</h4>
+                                </template>
+                                <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.servicesTitle }}</h6>
+                                <a-collapse class="order-services-collapse mb-0" :bordered="false" expand-icon-position="left">
+                                    <a-collapse-panel
+                                        v-for="service in ordersSummary.services"
+                                        :key="service.id"
+                                        class="text-start service-panel-header"
+                                        :header="service.title"
+                                    >
+                                        <div
+                                            class="summary-service-wrapper d-flex flex-row justify-content-between">
+                                            <div class="summary-service">
+                                                <h6 class="summary-service-amount">
+                                                    {{ $locale.newOrdersPage.orderSummary.services.amount }}: <span
+                                                    class="value">{{ service.amount }}</span></h6>
+                                                <h6 class="summary-service-price m-0">
+                                                    {{ $locale.newOrdersPage.orderSummary.services.price }}: <span
+                                                    class="value">{{ formatPrice(service.price) }}</span></h6>
+                                            </div>
+                                            <div
+                                                class="summary-service-total-price d-flex flex-column justify-content-center align-items-stretch">
+                                                <h5 class="m-0 value">{{ formatPrice(service.amount * service.price) }}</h5>
+                                            </div>
+                                        </div>
+                                    </a-collapse-panel>
+                                </a-collapse>
+                            </a-card>
+                        </div>
+                    </div>
                     <a-modal
                         v-if="receiptOrder"
                         v-model:visible="receiptVisible"
@@ -169,6 +203,11 @@ import datePickerRu from 'ant-design-vue/es/date-picker/locale/ru_RU';
 import datePickerEn from 'ant-design-vue/es/date-picker/locale/en_US';
 import {useStore} from "vuex";
 import dayjs, {Dayjs} from "dayjs";
+
+export interface OrdersSummary {
+    totalPrice: number;
+    services: Array<OrderService>;
+}
 
 export interface OrderData extends Order {
     key: number;
@@ -274,6 +313,7 @@ export default defineComponent({
             formatPrice,
             updateUsers,
             filterUsers,
+            log: console.log,
         }
     },
     computed: {
@@ -439,6 +479,31 @@ export default defineComponent({
                     }
                 });
         },
+        ordersSummary(): OrdersSummary {
+            const summary: OrdersSummary = {
+                totalPrice: 0,
+                services: [],
+            };
+
+            this.orders.forEach(order => {
+                summary.totalPrice += order.priceRaw;
+
+                order.services.forEach(service => {
+                    const summaryService = summary.services.find(s => s.id === service.id);
+                    if (summaryService) {
+                        summaryService.amount += service.amount;
+                    } else {
+                        summary.services.push({ ...service });
+                    }
+                });
+            });
+
+            if (summary.services.length) {
+                summary.services.sort((f, s) => f.id - s.id);
+            }
+
+            return summary;
+        }
     },
     methods: {
         async refreshOrders() {
@@ -606,5 +671,9 @@ export default defineComponent({
 
 .test-font {
     font-size: 1.7em !important;
+}
+
+.summary-wrapper {
+    min-width: 400px;
 }
 </style>

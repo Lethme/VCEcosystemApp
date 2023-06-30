@@ -57,7 +57,7 @@
                                         >
                                             <div v-if="activePane.order.dataEditable[record.key] && $windowWidth >= 768"
                                                  class="editable-cell-input-wrapper w-100">
-                                                <a-input-number type="number" pattern="[0-9]*" inputmode="numeric"
+                                                <a-input-number type="number" pattern="[0-9]+" inputmode="numeric"
                                                                 class="w-100"
                                                                 v-model:value="activePane.order.dataEditable[record.key].amount"
                                                                 :min="1" @pressEnter="save(record.key)"
@@ -153,10 +153,15 @@
                                     </a-collapse>
                                     <div class="money-received-wrapper pb-3">
                                         <h6 class="pb-1">{{ $locale.newOrdersPage.orderSummary.cash }}</h6>
-                                        <a-input-number class="w-100" v-model:value="activePane.order.cash" :min="0"
-                                                        @change="() => saveState(false)"/>
+                                        <a-input-number
+                                            class="w-100"
+                                            v-model:value="activePane.order.cash"
+                                            :min="0"
+                                            @change="() => saveState(false)"
+                                            @keydown.enter="showModal"
+                                        />
                                     </div>
-                                    <a-button type="primary" size="large" block @click="showModal">
+                                    <a-button type="primary" size="large" block @click="showModal" :disabled="activePane.order.cash < activePane.order.totalPrice">
                                         {{ $locale.newOrdersPage.orderSummary.createOrderButtonTitle }}
                                     </a-button>
                                 </a-card>
@@ -221,7 +226,7 @@
 <script lang="ts">
 import {LocaleRecord} from "@/store/modules/locales/types/LocaleRecord";
 import {Loader} from "@/utils";
-import {computed, ComputedRef, defineComponent, ref, WritableComputedRef} from 'vue';
+import {computed, ComputedRef, defineComponent, ref, watch, WritableComputedRef} from 'vue';
 import {Service} from "@/api/services/types";
 import {OrdersService} from "@/api/services";
 import {CheckOutlined, EditOutlined} from '@ant-design/icons-vue';
@@ -336,7 +341,9 @@ export default defineComponent({
         const confirmLoading = ref<boolean>(false);
 
         const showModal = () => {
-            visible.value = true;
+            if (activePane.value.order.cash >= activePane.value.order.totalPrice) {
+                visible.value = true;
+            }
         };
 
         const handleOk = async () => {
@@ -355,6 +362,22 @@ export default defineComponent({
             visible.value = false;
             confirmLoading.value = false;
         };
+
+        const handleOkGlobal = async (event: KeyboardEvent) => {
+            if (event.key === "Enter") {
+                await handleOk();
+            }
+        }
+
+        watch(() => visible.value, (v) => {
+            if (v) {
+                setTimeout(() => {
+                    document.addEventListener('keydown', handleOkGlobal);
+                });
+            } else {
+                document.removeEventListener('keydown', handleOkGlobal);
+            }
+        })
 
         const paneAction = (targetKey: string | MouseEvent, action: string) => {
             store.dispatch("paneAction", {
@@ -443,6 +466,7 @@ export default defineComponent({
             confirmLoading,
             showModal,
             handleOk,
+            log: console.log,
         };
     },
 });
